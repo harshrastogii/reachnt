@@ -20,3 +20,8 @@ node_modules/
 
 # Retired Claude artifact build (portal now deploys from web/ to Vercel)
 outputs/artifact/
+
+# Third-party documents: read locally, linked in research/sources/README.md, not redistributed
+research/sources/*.pdf
+research/sources/*.txt
+!research/sources/dhlgcd_repairs_fs17.txt

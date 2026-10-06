@@ -2,7 +2,7 @@
 
 Repair triage for remote NT public housing. ReachNT ranks repairs by need, uses Uber's H3 hexagon grid to let one tradesperson serve neighbouring communities on one trip, prices the equity trade-off, asks a named person to sign it, and tells each tenant why their repair waited.
 
-Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code Fair 2026, AI Challenge: housing maintenance triage.
+Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code Fair 2026, Artificial Intelligence Challenge: housing maintenance triage.
 
 **Live portal:** https://reachnt.vercel.app (all repair requests are synthetic demo data).
 
@@ -47,7 +47,7 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 | Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns |
 | Python solution | `src/reachnt/`, `run_all.py`, `notebooks/01_walkthrough.ipynb`, `tests/` |
 | Database design | `docs/DATABASE.md`, `docs/schema.sql` |
-| Background research | `research/RESEARCH.md`, source PDFs in `research/sources/` |
+| Background research | `research/RESEARCH.md`; links to the documents we read in full in `research/sources/README.md` |
 
 ## Run it
 

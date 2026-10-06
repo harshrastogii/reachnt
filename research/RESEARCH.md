@@ -2,7 +2,7 @@
 
 Research for the HMW: *How might we help a housing maintenance coordinator prioritise urgent repairs across remote NT communities without "efficiency" quietly pushing remote tenants to the back of the queue?*
 
-Compiled 6 October 2026. Every figure below has a source in the list at the end, and PDFs we read in full are in `research/sources/`. Where we could not verify something, we say so.
+Compiled 6 October 2026. Every figure below has a source in the list at the end, and documents we read in full are linked in `research/sources/README.md`. Where we could not verify something, we say so.
 
 ---
 

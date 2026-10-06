@@ -1,5 +1,7 @@
 # Deploying ReachNT to Vercel
 
+Live now at https://reachnt.vercel.app. The Vercel project `reachnt` is connected to `github.com/harshrastogii/reachnt` with Root Directory `web`, so every push to `main` redeploys it. The steps below are for setting it up again from scratch.
+
 The portal is a static site plus two tiny serverless functions. Everything it needs is in this `web/` folder.
 
 ## Option A: from GitHub (recommended)
@@ -20,7 +22,7 @@ vercel --prod    # publish
 
 ## Map keys (all optional)
 
-Set these in Vercel under **Project → Settings → Environment Variables**, then redeploy. The browser reads them from `/api/config`. With none set, the portal uses Esri World Imagery without a key and falls back to the bundled Digital Earth Australia tiles.
+Set these in Vercel under **Project → Settings → Environment Variables**, then redeploy. The browser reads them from `/api/config`. With none set, the portal uses Esri World Imagery without a key and falls back to the bundled Digital Earth Australia tiles. Esri's photos of NT communities go down to zoom level 17, enough to see single houses. The portal stops there and enlarges one level further, so it never shows Esri's grey "Map data not yet available" tile.
 
 | Variable | What it does | Where to get it |
 |---|---|---|

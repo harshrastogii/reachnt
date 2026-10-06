@@ -4,6 +4,8 @@ Repair triage for remote NT public housing. ReachNT ranks repairs by need, uses 
 
 Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code Fair 2026, AI Challenge: housing maintenance triage.
 
+**Live portal:** https://reachnt.vercel.app (all repair requests are synthetic demo data).
+
 > **HMW:** How might we help a housing maintenance coordinator prioritise urgent repairs across remote NT communities without "efficiency" quietly pushing remote tenants to the back of the queue?
 
 **Synthetic data.** The repair requests are synthetic; no public NT work-order data exists. The 70 communities, house counts, crew hubs, road closures, airstrips, job mix, response clocks and cost structure are real or sourced (see `research/RESEARCH.md`).
@@ -50,7 +52,7 @@ Imagery is chosen in this order:
 
 The bundled tiles stop at zoom 11.5 so they never turn to blur. Add `?offline` to the URL to force them. MapLibre, h3-js and jsPDF load from a CDN, with copies in `web/vendor/`.
 
-**Deploy:** import the project in Vercel with Root Directory `web`, framework "Other" and no build command. Keys go in environment variables, listed in `web/DEPLOY.md`.
+**Deploy:** the Vercel project `reachnt` builds from this repository's `web/` folder on every push to `main`. No keys are needed. Optional keys are listed in `web/DEPLOY.md`.
 
 **Offline:** the portal installs as an app (PWA). "Done" and "Couldn't do it" are kept on the phone and sent to `/api/sync` when signal returns. "Save run sheet (PDF)" for trades and "Save as PDF" on any repair give a printable copy with the map.
 

@@ -1,0 +1,71 @@
+cid,lat,lon,osm_name,osm_place,shift_km,source
+C00,-23.76683,133.93705,Amoonguna,town,0.46,osm
+C01,-24.12925,134.37302,Santa Teresa,village,0.32,osm
+C02,-24.12469,133.08693,Wallace Rockhole,hamlet,0.61,osm
+C03,-23.94277,132.77946,Hermannsburg,village,0.31,osm
+C04,-22.80257,134.45547,Engawala,hamlet,0.55,osm
+C05,-22.98385,134.93432,Atitjere,village,0.62,osm
+C06,-24.0739,132.26983,Areyonga,hamlet,0.43,osm
+C07,-22.20812,133.4314,Pmara Jutunta,village,0.25,osm
+C08,-22.53426,132.75579,Laramba,village,0.64,osm
+C09,-22.12402,133.26606,Nturiya,village,0.6,osm
+C10,-23.4473,131.88216,Haasts Bluff,village,0.37,osm
+C11,-25.13067,132.57052,Imanpa,hamlet,0.09,osm
+C12,-23.20496,131.91225,Papunya,village,0.6,osm
+C13,-21.74139,133.73159,Wilora,village,0.23,osm
+C14,-25.5822,134.57778,Aputula,town,0.33,osm
+C15,-22.25822,132.20612,Yuelamu,village,0.45,osm
+C16,-22.25275,131.79783,Yuendumu,village,0.38,osm
+C17,-23.26574,131.27311,Mount Liebig,village,0.57,osm
+C18,-25.3491,131.06427,Mutitjulu,village,0.58,osm
+C19,-22.64982,130.55344,Nyirripi,town,0.35,osm
+C20,-23.27591,129.38819,Kintore,village,0.49,osm
+C21,-24.87489,129.08441,Kaltukatjara,village,0.72,osm
+C22,-11.76259,130.63211,Wurrumiyanga,village,0.91,osm
+C23,-12.53941,130.70074,Belyuen,village,0.1,osm
+C24,-11.42206,130.67417,Milikapiti,village,0.51,osm
+C25,-11.40493,130.41739,Pirlangimpi,town,0.63,osm
+C26,-11.1507,132.5786,Minjilang,locality,0.17,osm
+C27,-11.64955,133.39032,Warruwi,village,0.06,osm
+C28,-13.75054,130.68893,Nauiyu,locality,0.13,osm
+C29,-14.15058,130.07637,Peppimenarti,village,0.4,osm
+C30,-14.35076,129.88005,Palumpa,village,0.08,osm
+C31,-12.32469,133.05362,Gunbalanya,village,0.87,osm
+C32,-14.24133,129.52087,Wadeye,town,0.18,osm
+C33,-14.55056,132.18311,Binjari,locality,0.34,osm
+C34,-14.26931,132.8317,Manyallaluk,hamlet,0.2,osm
+C35,-14.525,132.8648,Barunga,village,0.79,osm
+C36,-13.8636,131.82233,Kybrook,hamlet,0.47,osm
+C37,-14.5545,133.11399,Wugularr,village,0.66,osm
+C38,-14.95449,133.30168,Jilkminggan,locality,0.53,osm buildings
+C39,-15.22162,134.08189,Minyerri,village,0.27,osm
+C40,-13.66581,134.33602,Bulman,town,0.8,osm
+C41,-14.70985,134.56572,Rittarangu,town,0.46,osm
+C42,-16.44782,130.88207,Yarralin,village,0.33,osm
+C43,-14.73414,134.73234,Ngukurr,town,0.53,osm
+C44,-15.76579,130.03977,Bulla,town,0.64,osm
+C45,-16.81471,131.22071,Nitjpurru,village,0.53,osm
+C46,-16.42894,129.61849,Amanbidji,village,0.2,osm
+C47,-17.40043,130.80575,Daguragu,town,0.61,osm
+C48,-17.44704,130.83346,Kalkarindji,village,0.49,osm
+C49,-12.2178,136.70523,Gunyangara,hamlet,0.57,osm
+C50,-12.25392,136.88997,Yirrkala,town,0.44,osm
+C51,-12.02431,135.56784,Galiwinku,town,0.53,osm
+C52,-13.86043,136.81087,Umbakumba,town,0.11,osm
+C53,-13.78389,136.19583,Milyakburra,village,0.62,osm
+C54,-12.10409,134.92029,Milingimbi,town,0.46,osm
+C55,-13.97953,136.46137,Angurugu,town,0.16,osm
+C56,-12.5001,135.80378,Gapuwiyak,village,0.68,osm
+C57,-12.328,134.92993,Ramingining,village,0.22,osm
+C58,-14.27803,135.74216,Numbulwar,town,0.32,osm
+C59,-12.05242,134.22673,Maningrida,village,0.78,osm
+C60,-20.46351,135.25151,Wutunugurra,village,0.42,osm
+C61,-21.00505,134.40598,Ali Curung,village,0.7,osm
+C62,-21.04968,134.68054,Imangara,village,0.07,osm
+C63,-20.64501,135.58659,Canteen Creek,town,0.66,osm
+C64,-21.5067,133.99652,Tara,hamlet,0.51,osm
+C65,-21.24614,132.61391,Willowra,town,0.79,osm
+C66,-21.65724,135.22532,Ampilatwatja,village,0.57,osm
+C67,-18.33578,130.63592,Lajamanu,village,0.64,osm
+C68,-20.98415,137.84796,Alpurrurulam,town,0.51,osm
+C69,-16.75943,136.98237,Robinson River,village,0.26,osm

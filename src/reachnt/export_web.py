@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from . import explain
-from .config import OUTPUTS, RAW, WEB_DATA, params, taxonomy
+from .config import OUTPUTS, PROCESSED, RAW, WEB_DATA, params, taxonomy
 from .geo import load_communities, run_pairs
 from .planner import run_option, single_job_cost, trip_option
 
@@ -23,6 +23,16 @@ LABELS = {
     "guarantee_0.2": "Most urgent first, one community per trip",
     "floor_1": "Cheapest first, but urgent jobs on time",
     "cheapest_1": "Cheapest first (nobody decided this)",
+}
+PLAIN = {   # every setting in the comparison chart, in words a coordinator would use
+    "cheapest_1": "Cheapest first", "floor_1": "Cheapest first, but urgent jobs on time",
+    "official_0.2": "Most urgent first, remote repairs on the longer official deadline",
+    "guarantee_0.2": "Most urgent first, one community per trip", "guarantee_0.5": "Most urgent first, tighter budget",
+    "guarantee_0.2_h3": "ReachNT: most urgent first, with shared trips", "guarantee_0.5_h3": "ReachNT with a tighter budget",
+    "cheapest_1_h3": "Cheapest first, with shared trips",
+    "need_0.8": "Most urgent first, no deadline, cost counts a lot", "need_0.4": "Most urgent first, no deadline, cost counts some",
+    "need_0.2": "Most urgent first, no deadline, cost counts a little", "need_0.1": "Most urgent first, no deadline, cost counts very little",
+    "need_0.05": "Most urgent first, no deadline, cost barely counts", "need_0": "Most urgent first, cost ignored",
 }
 SHORT = {"guarantee_0.2_h3": "ReachNT", "guarantee_0.2": "Urgent first", "floor_1": "Cheapest + deadline", "cheapest_1": "Cheapest first"}
 LEDGER = {
@@ -70,14 +80,21 @@ def build(N: dict) -> None:
         together = round(trip_total(o))
         pair_rows.append(dict(hub=pr.hub, a=pr.a, b=pr.b, grid_distance=int(pr.grid_distance), km=round(pr.km, 1),
                               together=together, separate=single[pr.a] + single[pr.b], saving=single[pr.a] + single[pr.b] - together))
-    cdict = [dict(cid=r.cid, name=r.community.title(), hub=r.hub, band=r.band, houses=int(r.houses_est), lat=round(r.lat, 4),
-                  lon=round(r.lon, 4), r7=r.h3_r7, r5=r.h3_r5, r4=r.h3_r4, island=bool(r.island),
+    # Map positions: the OSM settlement point where scripts/osm_settlements.py found one (NTG coordinates are only
+    # given to ~1 km). Planning and costs above still use the NTG coordinates.
+    osm = PROCESSED / "settlements_osm.csv"
+    mpos = pd.read_csv(osm).set_index("cid")[["lat", "lon"]].to_dict("index") if osm.exists() else {}
+    bpath = PROCESSED / "building_cells_osm.json"
+    bcells = json.loads(bpath.read_text()) if bpath.exists() else {}
+    at = lambda r: mpos.get(r.cid, {"lat": r.lat, "lon": r.lon})
+    cdict = [dict(cid=r.cid, name=r.community.title(), hub=r.hub, band=r.band, houses=int(r.houses_est), lat=round(at(r)["lat"], 5),
+                  lon=round(at(r)["lon"], 5), r7=r.h3_r7, r5=r.h3_r5, r4=r.h3_r4, island=bool(r.island),
                   closure=(r.closure_road if isinstance(r.closure_road, str) else ""),
                   closure_months=(r.closure_months if isinstance(r.closure_months, str) else ""), airstrip=bool(r.has_airstrip),
                   hours=round(r.oneway_hours, 1), overcrowded_pct=int(r.pct_2022), trip_cost=single[r.cid]) for r in com.itertuples()]
 
     from .geo import house_cell
-    centre = {r.cid: (r.lat, r.lon) for r in com.itertuples()}
+    centre = {r.cid: (at(r)["lat"], at(r)["lon"]) for r in com.itertuples()}
     centre.update({f"TOWN-{h}": (v["lat"], v["lon"]) for h, v in P["hubs"].items()})
     demo, year = {}, {}
     for k in DEMO_POLICIES:
@@ -105,8 +122,8 @@ def build(N: dict) -> None:
                                                 as_of_week=int(wk), booked=bool(sr.done))
                 log = [x for x in jr.reason_log if x[0] < int(wk)]
                 rows.append(dict(id=sr.job_id, site=sr.site, place=place, band=jr.band, trade=jr.trade, hazard=jr.hazard,
-                                 category=jr.category, text=jr.text,
-                                 cell=house_cell(jr.site, int(jr.house.rsplit("-H", 1)[1]), centre[jr.site], jr.site.startswith("TOWN")),
+                                 category=jr.category, text=jr.text, house=int(jr.house.rsplit("-H", 1)[1]),
+                                 cell=house_cell(jr.site, int(jr.house.rsplit("-H", 1)[1]), centre[jr.site], jr.site.startswith("TOWN"), bcells.get(jr.site)),
                                  day=int(jr.day),
                                  value=round(float(sr.value)), done=bool(sr.done), trip=bool(sr.trip), run=sr.get("run", ""),
                                  mode=sr["mode"], reachable=bool(sr.reachable), trip_cost=round(float(sr.trip_cost)),
@@ -143,7 +160,8 @@ def build(N: dict) -> None:
         hubs=hubs, communities=cdict,
         pairs=pair_rows,
         policies={k: v for k, v in N["policies"].items()},
-        labels=LABELS, short=SHORT,
+        labels=LABELS, short=SHORT, plain=PLAIN,
+        costs={k: P["costs"][k] for k in ("labour_per_hour", "vehicle_per_km", "overnight_per_night", "charter_per_hour", "town_travel_per_job", "hours_per_day")},
         demo=demo, year=year,
         reader=N["reader"], calibration=N["calibration"],
         totals=dict(communities=N["communities"], remote_houses=N["remote_houses"], town_houses=N["town_houses"],

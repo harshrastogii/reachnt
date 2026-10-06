@@ -366,3 +366,13 @@ button.trip-card:hover { background: var(--fill-2); }
 #splash { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 6px; padding: 26px 34px; color: var(--ink); transition: opacity .5s, transform .6s var(--spring); }
 #splash span { color: var(--ink-3); font-size: 13.5px; }
 #splash.gone { opacity: 0; transform: translate(-50%, -46%) scale(.98); pointer-events: none; }
+
+/* "How are costs worked out?" */
+details.costs { margin: 8px 6px 10px; padding: 10px 12px; border-radius: 14px; background: var(--glass); border: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+details.costs summary { cursor: pointer; font-weight: 600; color: var(--ink); list-style: none; }
+details.costs summary::-webkit-details-marker { display: none; }
+details.costs summary::before { content: "▸"; display: inline-block; margin-right: 6px; transition: transform .2s; }
+details.costs[open] summary::before { transform: rotate(90deg); }
+details.costs p, details.costs ul { margin: 8px 0 0; line-height: 1.45; }
+details.costs ul { padding-left: 18px; }
+@media (prefers-reduced-motion: reduce) { details.costs summary::before { transition: none; } }

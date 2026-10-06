@@ -78,7 +78,8 @@ h3:
   public_res: 6            # ~36 km2: anything shown outside the department is aggregated to res 6 ...
   public_min_count: 5      # ... and suppressed below 5 (k-anonymity)
   nearby_k: 3              # "while you're there": res-5 rings searched around a tradesperson's current cell
-  house_ring_k: 4          # synthetic houses are scattered within 4 res-10 rings of the community centre (~500 m)
+  house_ring_k: 2          # without mapped buildings, synthetic houses sit within 2 res-10 rings (~150 m) of the OSM settlement point
+  min_building_cells: 8    # with at least this many res-10 cells holding OSM buildings, houses go on those cells
   town_ring_k: 30
 
 # ------------------------------------------------------------------ demand

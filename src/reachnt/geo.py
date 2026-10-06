@@ -141,14 +141,19 @@ def run_pairs(com: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def house_cell(site: str, house_no: int, centre: tuple[float, float], town: bool) -> str:
-    """A synthetic house's H3 cell: a fixed cell within a few rings of the settlement centre.
+def house_cell(site: str, house_no: int, centre: tuple[float, float], town: bool, building_cells: list[str] | None = None) -> str:
+    """A synthetic house's H3 cell, fixed for that house.
 
-    Real houses would be indexed from the asset register; the address stays in the PII vault."""
+    When enough OpenStreetMap buildings are mapped (scripts/osm_settlements.py), the house goes on a cell that
+    contains a building; otherwise on a cell within a few rings of the settlement point. Real houses would be
+    indexed from the asset register; the address stays in the PII vault."""
     H = params()["h3"]
+    rng = np.random.default_rng(zlib.crc32(site.encode()) + house_no)
+    if building_cells and len(building_cells) >= H["min_building_cells"]:
+        cells = sorted(building_cells)
+        return cells[int(rng.integers(len(cells)))]
     c = h3.latlng_to_cell(centre[0], centre[1], H["house_res"])
     disk = sorted(h3.grid_disk(c, H["town_ring_k"] if town else H["house_ring_k"]))
-    rng = np.random.default_rng(zlib.crc32(site.encode()) + house_no)
     return disk[int(rng.integers(len(disk)))]
 
 

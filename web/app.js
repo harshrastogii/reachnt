@@ -245,7 +245,7 @@
     });
     imagery = DEA;
     map = new maplibregl.Map({
-      container: "map", attributionControl: { compact: true }, preserveDrawingBuffer: true,
+      container: "map", attributionControl: { compact: true, customAttribution: "Community and house positions © OpenStreetMap contributors" }, preserveDrawingBuffer: true,
       style: { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": SEA } }] },
       center: [133.4, -19.4], zoom: phone() ? 3.9 : 4.7, maxZoom: 11.5, maxBounds: [[118, -32], [148, -6]],
     });
@@ -302,6 +302,7 @@
     el.innerHTML = `<span class="hx"><b>${n ?? ""}</b></span>${name ? `<span class="nm">${esc(name)}${sub ? `<small>${esc(sub)}</small>` : ""}</span>` : ""}`;
     if (onClick) el.addEventListener("click", (e) => { e.stopPropagation(); onClick(); });
     markers.push(new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat(lngLat).addTo(map));
+    el.setAttribute("aria-label", `${name || ""}${n != null && n !== "" ? `, ${n}` : ""} ${sub || ""}`.trim());   // MapLibre replaces it with "Map marker"
   }
   function hubBadge() {
     const el = document.createElement("div"); el.className = "hubb"; el.title = "Trades start their trips here";
@@ -325,11 +326,11 @@
       if (r.run) {
         const [a, b] = r.run.split("+").map((k) => comById[k]);
         const path = [...arc(HUBLL(), ll(a)), ...arc(ll(a), ll(b), 0.1).slice(1), ...arc(ll(b), HUBLL()).slice(1)];
-        feats.push(F({ type: "LineString", coordinates: path }, { kind: air ? "air" : "shared", color: COL.shared }));
+        feats.push(F({ type: "LineString", coordinates: path }, { kind: air ? "air" : "shared", color: COL.shared, sites: [a.cid, b.cid] }));
         shared.push([a, b, pairOf(r.run)]);
       } else {
         const c = comById[r.site];
-        feats.push(F({ type: "LineString", coordinates: arc(HUBLL(), ll(c)) }, { kind: air ? "air" : "road", color: air ? COL.air : COL.booked }));
+        feats.push(F({ type: "LineString", coordinates: arc(HUBLL(), ll(c)) }, { kind: air ? "air" : "road", color: air ? COL.air : COL.booked, sites: [c.cid] }));
       }
     });
     return { feats, shared };
@@ -352,15 +353,20 @@
         badge(ll(c), { n: Math.round(p), cls: cls + " small", name: map.getZoom() > 6.2 ? c.name : "", sub: "days", onClick: () => toast(`${c.name}: 9 in 10 urgent repairs fixed within ${Math.round(p)} days over the year`) });
       });
     } else {
-      const { feats, shared } = tripRoutes(all);
+      let { feats, shared } = tripRoutes(all);
+      const focus = comById[state.filter] ? state.filter : null;
+      if (focus) {   // one community picked: show only the trip that reaches it, so other routes don't seem to pass through it
+        feats = feats.filter((f) => f.properties.sites.includes(focus));
+        shared = shared.filter(([a, b]) => a.cid === focus || b.cid === focus);
+      }
       map.getSource("routes").setData(fc(state.layer === "week" ? feats : []));
       hubComs.forEach((c) => {
         const r = all.filter((x) => x.site === c.cid); if (!r.length) return;
         const st = r.some((x) => x.trip) ? "booked" : r.some((x) => !x.reachable) ? "cut" : "waiting";
         badge(ll(c), { n: r.length, cls: "s-" + st + (state.filter === c.cid ? " sel" : ""), name: c.name, onClick: () => focusCommunity(c.cid) });
       });
-      if (state.layer === "week") shared.forEach(([a, b, p]) => p && savingTag(a, b, p));
-      map.getSource("foot").setData(fc(hubComs.map((c) => F(hexGeom(c.r7)))));
+      if (state.layer === "week") shared.forEach(([a, b, p]) => p && savingTag(a, b, p, !!focus));
+      map.getSource("foot").setData(fc([]));
     }
     if (state.layer === "reach" && !refreshMap.reach) {
       const lons = hubComs.map((c) => c.lon), lats = hubComs.map((c) => c.lat);
@@ -381,7 +387,8 @@
          <span><i class="lg" style="background:#64d2ff"></i>under 3 hours</span><span><i class="lg" style="background:#b28cff"></i>6 to 9 hours</span><span><i class="lg" style="background:#ff7aa8"></i>9 hours or more</span>`
       : `<b>This week</b><span>Each hexagon is a community. The number is repairs waiting.</span>
          <span><i class="lg s-booked"></i>a tradesperson goes this week</span><span><i class="lg s-waiting"></i>no trip this week</span>
-         <span><i class="lg s-cut"></i>road cut, no airstrip</span><span><i class="ln"></i>shared trip: one person, two places</span>`;
+         <span><i class="lg s-cut"></i>road cut, no airstrip</span><span><i class="ln"></i>shared trip: one person, two places</span>
+         <span class="src">Lines show who goes where, not the road they drive.</span>`;
     L.innerHTML += `<span class="src">${esc(imagery.name)}${imagery.crisp ? "" : " · zoom limited offline"}</span>`;
   }
   function focusCommunity(cid) {
@@ -441,7 +448,7 @@
       + decisionHTML()
       + `<div class="stats">${stats.map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("")}</div>`
       + `<div class="filters" style="padding:0 6px 6px">${tb("all", "All trades")}${Object.keys(TRADE).map((k) => tb(k, TRADE_SHORT[k])).join("")}</div>`
-      + `<div class="filters" style="padding:0 6px 8px">${fb("remote", "Remote")}${fb("urgent", "Urgent")}${fb("town", "Town")}${fb("all", "All")}${comById[f] ? fb(f, esc(comById[f].name) + " ✕") : ""}</div>`
+      + `<div class="filters" style="padding:0 6px 8px">${fb("remote", "Remote")}${fb("urgent", "Urgent")}${fb("town", "Town")}${fb("all", "All")}${comById[f] ? `<button data-f="all" aria-pressed="true" aria-label="Stop showing only ${esc(comById[f].name)}">${esc(comById[f].name)} ✕</button>` : ""}</div>`
       + `<p class="note" style="padding:0 8px 6px">Most urgent first. Where someone lives never changes their place in line; it only changes how the trip is planned.</p>`
       + list.slice(0, 120).map((r) => `<button class="row" data-id="${r.id}" aria-current="${state.job === r.id}"><span class="dot ${r.category}"></span>
           <span class="t">${esc(H[r.hazard].label)}</span><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>
@@ -450,7 +457,7 @@
   }
   function tripsHTML() {
     const all = rows(); const F2 = fieldData();
-    let h = guide("trips", `<b>Shared trips.</b> When two communities are close, one tradesperson can visit both on the same trip instead of two separate trips. ReachNT finds the pairs with a hexagon map grid (Uber's H3): if their hexagons are no more than two apart, about 90 km, they can share. Tap a trip to see it on the map.`);
+    let h = guide("trips", `<b>Shared trips.</b> When two communities are close, one tradesperson can visit both on the same trip instead of two separate trips. ReachNT finds the pairs with a hexagon map grid (Uber's H3): if their hexagons are no more than two apart, about 90 km, they can share. Tap a trip to see it on the map.`) + costsHTML();
     Object.keys(TRADE).forEach((t) => {
       if (!F2[t]) return;
       const tj = all.filter((r) => r.trade === t); const groups = {};
@@ -560,8 +567,9 @@
     urgent_p90_remote: { name: "Days until 9 in 10 urgent remote repairs are fixed", fmt: (v) => Math.round(v) + " d", help: "Out of every 10 urgent repairs in remote communities, 9 are fixed within this many days." },
     overdue_equal_remote: { name: "Urgent remote repairs fixed late", fmt: (v) => Math.round(v * 100) + "%", help: "Share of urgent remote repairs not fixed within 2 working days, the same deadline as town." },
   };
-  const SERIES = (p) => p.key.endsWith("_h3") ? (p.policy === "cheapest" ? "cheapH3" : "reach") : p.policy;
-  const SCOL = { reach: "var(--hex)", guarantee: "var(--accent)", need: "var(--ink-3)", cheapest: "var(--warn)", cheapH3: "var(--warn)", floor: "var(--good)", official: "var(--ink-3)" };
+  // The four plans in the Plan menu are named on the chart; every other setting we tested is a grey dot (hover for its name).
+  const NAMED = { "guarantee_0.2_h3": ["ReachNT", "var(--hex)"], "guarantee_0.2": ["Urgent first, no sharing", "var(--accent)"],
+                  floor_1: ["Cheapest, urgent on time", "var(--good)"], cheapest_1: ["Cheapest first", "var(--warn)"] };
   function chartSVG() {
     const P = Object.values(RN.policies); const m = state.metric; const MM = METRIC[m];
     const W = 640, Hh = 330, M = { l: 56, r: 24, t: 18, b: 46 };
@@ -572,24 +580,46 @@
     for (let i = 0; i <= 4; i++) { const v = (y1 / 4) * i; g += `<line x1="${M.l}" x2="${W - M.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${M.l - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11">${MM.fmt(v)}</text>`; }
     for (let v = Math.ceil(x0 / 100) * 100; v <= x1; v += 100) g += `<text x="${X(v)}" y="${Hh - M.b + 18}" text-anchor="middle" font-size="11">$${v}</text>`;
     g += `<text x="${(W + M.l) / 2}" y="${Hh - 6}" text-anchor="middle" font-size="12">Average cost per repair, including travel →</text>`;
-    const path = (list) => list.map((p, i) => (i ? "L" : "M") + X(p.cost_per_job).toFixed(1) + "," + Y(p[m]).toFixed(1)).join("");
-    const need = P.filter((p) => p.policy === "need").sort((a, b) => a.lam - b.lam);
-    const gu = P.filter((p) => p.policy === "guarantee" && !p.key.endsWith("_h3")).sort((a, b) => a.lam - b.lam);
-    const r3 = P.filter((p) => p.policy === "guarantee" && p.key.endsWith("_h3")).sort((a, b) => a.lam - b.lam);
-    g += `<path class="draw" d="${path(need)}" fill="none" stroke="var(--ink-3)" stroke-width="1.4" stroke-dasharray="3 3"/>`;
-    g += `<path class="draw" d="${path(gu)}" fill="none" stroke="var(--accent)" stroke-width="2.2"/>`;
-    g += `<path class="draw" d="${path(r3)}" fill="none" stroke="var(--hex)" stroke-width="3"/>`;
-    const LBL = { "guarantee_0.2_h3": ["ReachNT", 18], cheapest_1: ["Cheapest first", -10], floor_1: ["Cheapest + deadline", 20], "guarantee_0.2": ["Urgent first, no sharing", -12] };
-    P.forEach((p) => {
-      const s = SERIES(p); const col = SCOL[s]; const sel = p.key === state.policy; const demo = !!RN.demo[p.key]; const cx = X(p.cost_per_job), cy = Y(p[m]);
-      const tip = `${label(p.key) || p.label}: ${money(p.cost_per_job)} per repair`;
-      const hexy = s === "reach" || s === "cheapH3"; const rr = sel ? 10 : hexy ? 7 : s === "need" ? 3.5 : 6;
-      g += hexy ? `<polygon points="${[0, 1, 2, 3, 4, 5].map((i) => { const a = Math.PI / 3 * i; return (cx + rr * Math.cos(a)).toFixed(1) + "," + (cy + rr * Math.sin(a)).toFixed(1); }).join(" ")}"`
-                : `<circle cx="${cx}" cy="${cy}" r="${rr}"`;
-      g += ` fill="${col}" stroke="var(--glass-strong)" stroke-width="2" ${demo ? `data-k="${p.key}" style="cursor:pointer"` : ""}><title>${esc(tip)}</title>${hexy ? "</polygon>" : "</circle>"}`;
-      if (LBL[p.key]) g += `<text x="${cx + 12}" y="${cy + LBL[p.key][1]}" font-size="12" font-weight="600" style="fill:var(--ink-2)">${LBL[p.key][0]}</text>`;
+    const name = (p) => (RN.plain && RN.plain[p.key]) || label(p.key) || p.label;
+    P.filter((p) => !NAMED[p.key]).forEach((p) => {
+      g += `<circle cx="${X(p.cost_per_job)}" cy="${Y(p[m])}" r="4" fill="var(--ink-3)" opacity=".55"><title>${esc(name(p))}: ${money(p.cost_per_job)} per repair</title></circle>`;
+    });
+    const named = P.filter((p) => NAMED[p.key]);
+    const taken = named.map((p) => ({ x: X(p.cost_per_job) - 9, y: Y(p[m]) - 9, w: 18, h: 18 }));   // markers are off limits for labels
+    const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    named.forEach((p) => {
+      const [nm, col] = NAMED[p.key]; const cx = X(p.cost_per_job), cy = Y(p[m]); const sel = p.key === state.policy; const rr = sel ? 9 : 6.5;
+      g += p.key.endsWith("_h3")
+        ? `<polygon points="${[0, 1, 2, 3, 4, 5].map((i) => { const a = Math.PI / 3 * i; return (cx + rr * 1.15 * Math.cos(a)).toFixed(1) + "," + (cy + rr * 1.15 * Math.sin(a)).toFixed(1); }).join(" ")}"`
+        : `<circle cx="${cx}" cy="${cy}" r="${rr}"`;
+      g += ` fill="${col}" stroke="var(--glass-strong)" stroke-width="2" data-k="${p.key}" style="cursor:pointer"><title>${esc(name(p))}: ${money(p.cost_per_job)} per repair</title>${p.key.endsWith("_h3") ? "</polygon>" : "</circle>"}`;
+      // first label spot that overlaps nothing: right, left, above, below, then further out
+      const w = nm.length * 6.7 + 6, h = 16;
+      const spots = [[12, -8], [-12 - w, -8], [-w / 2, -26], [-w / 2, 10], [12, -26], [12, 10], [-12 - w, -26], [-12 - w, 10]];
+      let box = null;
+      for (const [dx, dy] of spots) {
+        const c = { x: cx + dx, y: cy + dy, w, h };
+        if (c.x >= M.l && c.x + w <= W - M.r && c.y >= 0 && c.y + h <= Hh - M.b && !taken.some((t) => hit(c, t))) { box = c; break; }
+      }
+      box = box || { x: cx + 12, y: cy - 8, w, h };
+      taken.push(box);
+      g += `<text x="${box.x + 3}" y="${box.y + 12}" font-size="12" font-weight="${sel ? 700 : 600}" style="fill:var(--ink${sel ? "" : "-2"})">${nm}</text>`;
     });
     return `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Average cost per repair against ${esc(MM.name)} for each way of planning" style="width:100%;height:auto">${g}</svg>`;
+  }
+  function costsHTML() {
+    const C = RN.costs; if (!C) return "";
+    return `<details class="costs"><summary>How are costs worked out?</summary>
+      <p>Nobody types in a price. ReachNT costs each trip from where the community is:</p>
+      <ul><li><b>Distance:</b> the straight line from the trades hub (${esc(RN.hub)} in this demo), plus 20% for bends in the road, driven at about 70 km/h.</li>
+      <li><b>The tradesperson's time</b>, driving included: ${money(C.labour_per_hour)} an hour.</li>
+      <li><b>The vehicle:</b> $${C.vehicle_per_km.toFixed(2)} a km, there and back.</li>
+      <li><b>Nights away:</b> ${money(C.overnight_per_night)} a night for communities more than 2 hours' drive out.</li>
+      <li><b>A charter plane</b> when the road is cut and there is an airstrip: ${money(C.charter_per_hour)} an hour, for the flights in and out to drop off and collect the tradesperson.</li>
+      <li><b>A job in town:</b> ${money(C.town_travel_per_job)} of local driving.</li></ul>
+      <p>A shared trip is priced as one loop, hub → first community → second → back, instead of two return trips. The difference is the saving shown on the map.
+      "Cost per repair" is the whole year's cost divided by the number of repairs done.</p>
+      <p>These rates are estimates checked against a 2017 study of remote housing costs (Nous Group). A housing department would put its own contract rates in config/params.yaml.</p></details>`;
   }
   function renderTradeoff() {
     const P = RN.policies; const cur = P[state.policy]; const MM = METRIC[state.metric];
@@ -608,8 +638,8 @@
             <button data-m="harm_days_total">Days living with a fault</button><button data-m="urgent_p90_remote">Remote wait</button><button data-m="overdue_equal_remote">Fixed late</button></div>
           <p class="note" style="margin-bottom:6px"><b style="color:var(--ink)">How to read this.</b> Each dot is one way of planning a whole year of repairs. Further right costs more per repair. Higher means ${esc(MM.name.toLowerCase())} goes up. ${esc(MM.help)} The best plans sit low and to the left.</p>
           ${chartSVG()}
-          <div class="legend" style="margin-top:6px"><span><i style="background:var(--hex)"></i>ReachNT: urgent first, shared trips</span><span><i style="background:var(--accent)"></i>Urgent first, no sharing</span>
-            <span><i style="background:var(--warn)"></i>Cheapest first</span><span><i style="background:var(--good)"></i>Cheapest, with a deadline for urgent jobs</span><span><i style="background:var(--ink-3)"></i>Other settings we tested</span></div>
+          <p class="note" style="margin-top:4px">Named dots are the four plans in the Plan menu. Grey dots are ${Object.keys(RN.policies).length - 4} other settings we tested; hover over one to see its name.</p>
+          ${costsHTML()}
         </div>
         <div class="card"><b>${esc(label(state.policy))}: urgent repairs by how hard the place is to reach</b>
           <div style="overflow-x:auto;margin-top:8px"><table class="tbl">
@@ -687,7 +717,7 @@
       feats.push(F({ type: "LineString", coordinates: path }, { kind: air ? "air" : cs[1] ? "shared" : "road", color: cs[1] ? COL.shared : air ? COL.air : COL.booked }));
     });
     map.getSource("routes").setData(fc(feats));
-    map.getSource("foot").setData(fc(stops.map((s) => F(hexGeom(comById[s.cid].r7)))));
+    map.getSource("foot").setData(fc([]));
     stops.forEach((s, i) => badge(ll(comById[s.cid]), { n: i + 1, cls: "s-stop", name: comById[s.cid].name, sub: `${s.jobs.length} job${s.jobs.length > 1 ? "s" : ""}`, onClick: () => focusCommunity(s.cid) }));
     order.filter((k) => k.includes("+")).forEach((k) => { const [a, b] = k.split("+").map((c) => comById[c]); const p = pairOf(k); if (p) savingTag(a, b, p, true); });
     const near = {}; (F2.nearby || []).forEach((n) => { const r = all.find((x) => x.id === n.id); if (r) (near[r.site] = near[r.site] || []).push(r); });
@@ -797,11 +827,13 @@
     ];
     const secs = r.sections.filter(([t]) => t !== "What we heard" && t !== "Where it is up to");
     el.innerHTML = `<div class="grabber"></div><div class="app-head">
-        <div class="who"><div class="avatar" style="background:var(--good-bg);color:var(--good)">${icon(r.trade, 24)}</div><div><h2>Your repair</h2><p>${esc(state.place)} · example tenant</p></div></div>
+        <div class="who"><div class="avatar" style="background:var(--good-bg);color:var(--good)">${icon(r.trade, 24)}</div><div><h2>Your repair</h2><p>${esc(state.place)} · example household, house ${r.house}</p></div></div>
         <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:8px">
-          <select id="tplace" class="pill" style="min-width:0;width:100%" aria-label="Community">${places.map((p) => `<option${p === state.place ? " selected" : ""}>${esc(p)}</option>`).join("")}</select>
-          <select id="tjob" class="pill" style="min-width:0;width:100%" aria-label="Repair">${jobs.map((x) => `<option value="${x.id}"${x === r ? " selected" : ""}>${esc(H[x.hazard].label)}</option>`).join("")}</select>
+          <label class="field-label" for="tplace" style="margin:0">Community</label><label class="field-label" for="tjob" style="margin:0">Household and repair</label>
+          <select id="tplace" class="pill" style="min-width:0;width:100%">${places.map((p) => `<option${p === state.place ? " selected" : ""}>${esc(p)}</option>`).join("")}</select>
+          <select id="tjob" class="pill" style="min-width:0;width:100%">${jobs.map((x) => `<option value="${x.id}"${x === r ? " selected" : ""}>House ${x.house}: ${esc(H[x.hazard].label)}</option>`).join("")}</select>
         </div>
+        <p class="note" style="margin-top:6px">Each repair in the list belongs to a different made-up household, so the map moves to that house.</p>
       </div>
       <div class="panel-body">
         ${guide("tenant", `<b>What a tenant sees.</b> The green bubble is the text message. Below is every week the repair waited and the real reason. The map shows the house as a small hexagon, not an address.`)}

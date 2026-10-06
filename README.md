@@ -97,6 +97,7 @@ The planner is single-threaded with a fixed seed, so every run gives the same nu
 | Esri World Imagery (live tiles only, not stored) | Esri terms, attribution shown |
 | Road Report NT live feed | NTG, read only |
 | OurAirports | Public domain |
+| OpenStreetMap settlement points and buildings (map positions only, `scripts/osm_settlements.py`) | ODbL 1.0, © OpenStreetMap contributors |
 | NIAA/PwC-IC Review of the NPRH NT (2023), Appendix B | Commonwealth report, figures quoted |
 
 ## Ethics

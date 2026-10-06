@@ -1,10 +1,10 @@
 // ReachNT service worker: keeps the app, its data and the satellite tiles on the phone so a tradesperson
 // can open their run sheet with no signal. Field updates are queued by the app and sent when back online.
-const VERSION = "reachnt-v2";
+const VERSION = "reachnt-v3";
 const SHELL = ["./", "index.html", "styles.css", "app.js", "data/app.js", "manifest.webmanifest",
   "vendor/maplibre-gl.js", "vendor/maplibre-gl.css", "vendor/h3-js.umd.js", "vendor/jspdf.umd.min.js",
   "tiles/dea_z5_8.js", "tiles/dea_z9.js", "tiles/dea_z10.js", "icons/icon-192.png"];
-const TILE_HOSTS = ["server.arcgisonline.com", "api.maptiler.com", "storage.googleapis.com"];
+const TILE_HOSTS = ["server.arcgisonline.com", "ibasemaps-api.arcgis.com", "api.maptiler.com", "storage.googleapis.com"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

@@ -204,7 +204,9 @@
     // Esri's photos of NT communities stop at level 17 (checked for all 70). Asking for 18+ returns a grey "Map data not
     // yet available" tile, so we stop at 17 and let the map enlarge it. blankTile=false turns any other gap into a 404,
     // and MapLibre then keeps showing the coarser tile instead of the grey one.
-    const esri = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false" + (cfg.esriKey ? `&token=${cfg.esriKey}` : "");
+    // with a key, use Esri's keyed basemap service (usage counted on the account, as Esri's terms ask); without one, the public service
+    const esri = (cfg.esriKey ? "https://ibasemaps-api.arcgis.com/arcgis" : "https://server.arcgisonline.com/ArcGIS")
+      + "/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false" + (cfg.esriKey ? `&token=${cfg.esriKey}` : "");
     if (await probe(esri.replace("{z}", 6).replace("{y}", 34).replace("{x}", 55))) return { name: "Esri World Imagery", crisp: true, src: { tiles: [esri], maxzoom: 17, attribution: "Imagery © Esri, Maxar, Earthstar Geographics" } };
     return null;
   }

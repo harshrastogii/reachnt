@@ -3,6 +3,7 @@ numbers.json, report figures and the web prototype's data.
 
     python run_all.py            # full run (about 10 minutes)
     python run_all.py --quick    # skip the sensitivity sweep
+    python run_all.py --quality  # only the quality measures (evaluate.py, about 4 minutes), merged into numbers.json
 """
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 import pandas as pd  # noqa: E402
 
-from reachnt import experiments, export_web, figures, geo, simulate  # noqa: E402
+from reachnt import evaluate, experiments, export_web, figures, geo, simulate  # noqa: E402
 from reachnt.config import OUTPUTS, PROCESSED, params  # noqa: E402
 
 
@@ -54,6 +55,8 @@ def main(quick: bool = False) -> None:
         crews_total=int(sum(simulate.crew_sizes(req).values())),
         reader=reader, calibration=calib, policies=S, sensitivity=sens,
     )
+    print("6b. Quality measures: ROC/PR-AUC, calibration, ranking, solver gap, five random years")
+    numbers["quality"] = evaluate.build()
     (OUTPUTS / "numbers.json").write_text(json.dumps(numbers, indent=1, default=float))
     print("7. Figures")
     figures.build_all(numbers)
@@ -64,5 +67,12 @@ def main(quick: bool = False) -> None:
           f"Need + guarantee: ${f['cost_per_job']:.0f}/job, harm-days {f['harm_days_total']:.0f}. ReachNT (+ H3 run zones): ${n['cost_per_job']:.0f}/job, harm-days {n['harm_days_total']:.0f}.")
 
 
+def quality_only() -> None:
+    numbers = json.loads((OUTPUTS / "numbers.json").read_text())
+    numbers["quality"] = evaluate.build()
+    (OUTPUTS / "numbers.json").write_text(json.dumps(numbers, indent=1, default=float))
+    figures.build_all(numbers)
+
+
 if __name__ == "__main__":
-    main(quick="--quick" in sys.argv)
+    quality_only() if "--quality" in sys.argv else main(quick="--quick" in sys.argv)

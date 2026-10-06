@@ -149,7 +149,8 @@ def read(text: str, clf: Classifier | None) -> Reading:
             needs_human = True
             reasons.append(f"You wrote '{danger_word}'. A person will call to check it is safe.")
     if source == "model":
-        reasons.append(f"No listed phrase matched; the model is {mc:.0%} sure this is '{H[mh]['label']}'.")
+        # no percentage: on unfamiliar wording the model's confidence runs ahead of its accuracy (evaluate.py, calibration)
+        reasons.append(f"No listed phrase matched. The model's best guess is '{H[mh]['label']}'.")
     if primary and H[primary]["category"] == "immediate":
         reasons.append("Immediate jobs are confirmed by phone and made safe by the local Housing Maintenance Officer.")
     hazards = sorted(set(hits) | ({primary} if primary else set()), key=lambda k: (CAT_RANK[H[k]["category"]], -H[k]["harm"]))

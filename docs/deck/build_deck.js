@@ -211,7 +211,8 @@ s.addNotes("Every piece is open source, hosted in Australia, and sized for a ter
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Trust" });
 s.addText("What it cannot do yet", { placeholder: "title" });
 const Rd = N.reader;
-[[pct(Rd.seen.combined.category_acc) + " → " + pct(Rd.heldout.combined.category_acc), `category read correctly on familiar vs new wording. The safety net sends ${pct(Rd.heldout.combined.to_person)} of new-wording reports to a person and still misses ${(Rd.heldout.combined.danger_missed * 100).toFixed(1)}% of dangerous ones.`, HEX.cost],
+const Qh = N.quality.reader.heldout;
+[["AUC " + Qh.danger.roc_auc.toFixed(2), `for spotting a dangerous fault in wording the model never saw (${N.quality.reader.seen.danger.roc_auc.toFixed(2)} on familiar wording). A person checks ${pct(Rd.heldout.combined.to_person)} of those reports, so ${pct(Qh.danger.net_recall)} of dangerous ones are still caught.`, HEX.cost],
  ["Synthetic", "repair requests: no public NT work-order data exists. Geography, roads, clocks and costs are real; comparisons are the finding, not the absolute numbers.", HEX.violet],
  ["No co-design", "yet. Real reports come in Kriol, Aboriginal English and other languages. Tenants, Aboriginal Housing NT, land councils and the AIS shape the words first.", HEX.blue]].forEach(([n, l, col], i) => {
   const x = 0.6 + i * 4.1;

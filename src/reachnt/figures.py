@@ -169,6 +169,36 @@ def context_map(N: dict):
     plt.close(fig)
 
 
+def reader_quality(Q: dict) -> None:
+    """Appendix figure: can the reader spot a dangerous fault, and can its confidence be trusted?"""
+    R = Q["reader"]
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.6))
+    for name, colr, lab in [("seen", GREY, "Familiar"), ("heldout", BLUE, "New wording")]:
+        d, c = R[name]["danger"], R[name]["curves"]
+        axes[0].plot(*c["roc"], color=colr, lw=1.8, label=f"{lab} (AUC {d['roc_auc']:.2f})")
+        axes[1].plot(*c["pr"], color=colr, lw=1.8, label=f"{lab} (AUC {d['pr_auc']:.2f})")
+        rel = np.array(c["reliability"])
+        axes[2].plot(rel[:, 0], rel[:, 1], color=colr, lw=1.8, marker="o", ms=3.5, label=lab)
+    axes[0].plot([0, 1], [0, 1], color=MUTED, lw=0.8, ls="--")
+    d = R["heldout"]["danger"]   # the whole safety net, not just the model's score
+    axes[0].scatter([1 - d["net_specificity"]], [d["net_recall"]], s=55, marker="*", color=VIOLET, zorder=5,
+                    label="New + person checks")
+    axes[0].set(xlabel="Safe reports wrongly flagged", ylabel="Dangerous reports caught", title="Spotting danger (ROC)")
+    base = R["heldout"]["danger"]["pr_auc_baseline"]
+    axes[1].axhline(base, color=MUTED, lw=0.8, ls="--")
+    axes[1].annotate(f"guessing: {base:.2f}", (0.02, base), xytext=(0, 3), textcoords="offset points", fontsize=7, color=INK2)
+    axes[1].set(xlabel="Dangerous reports caught", ylabel="Flagged reports truly dangerous", title="Spotting danger (PR)")
+    axes[2].plot([0, 1], [0, 1], color=MUTED, lw=0.8, ls="--")
+    axes[2].set(xlabel="How sure the model says it is", ylabel="How often it is right", title="Is its confidence honest?")
+    for ax in axes:
+        ax.set(xlim=(0, 1), ylim=(0, 1.02))
+        ax.title.set_fontsize(8.5)
+        ax.legend(fontsize=6.8, loc="lower right" if ax is not axes[1] else "lower left")
+    fig.tight_layout()
+    fig.savefig(FIG / "fig5_reader_quality.png", bbox_inches="tight")
+    plt.close(fig)
+
+
 def build_all(N: dict) -> None:
     FIG.mkdir(parents=True, exist_ok=True)
     _style()
@@ -176,3 +206,5 @@ def build_all(N: dict) -> None:
     frontier(N)
     band_waits(N)
     reasons(N)
+    if "quality" in N:
+        reader_quality(N["quality"])

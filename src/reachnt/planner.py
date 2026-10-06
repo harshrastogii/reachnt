@@ -71,6 +71,9 @@ class PlanResult:
     hours_used: float
     capacity: float
     cost: dict[str, float]          # travel, labour, overnight
+    optimal: bool = True            # solver proved no better plan exists
+    gap: float = 0.0                # (best bound - plan value) / |best bound|; 0 when optimal
+    solve_s: float = 0.0
 
 
 def plan_week(jobs: list[dict], options: dict[str, TripOption], capacity_hours: float, lam: float,
@@ -148,7 +151,10 @@ def plan_week(jobs: list[dict], options: dict[str, TripOption], capacity_hours: 
     travel = sum(o.fixed_cost + o.travel_hours * C["labour_per_hour"] for o in trips.values())
     travel += sum(C["town_travel_per_job"] for j in jobs if j["job_id"] in dset and j["site"] == "TOWN")
     hours = sum(j["hours"] for j in jobs if j["job_id"] in dset) + sum(o.travel_hours for o in trips.values())
-    return PlanResult(done, trips, hours, capacity_hours, {"travel": travel, "labour": labour, "overnight": overnight})
+    val, bound = solver.ObjectiveValue(), solver.BestObjectiveBound()
+    gap = 0.0 if st == cp_model.OPTIMAL else max(0.0, (bound - val) / max(abs(bound), 1.0))
+    return PlanResult(done, trips, hours, capacity_hours, {"travel": travel, "labour": labour, "overnight": overnight},
+                      st == cp_model.OPTIMAL, gap, solver.WallTime())
 
 
 def single_job_cost(option: TripOption, hours: float) -> dict:

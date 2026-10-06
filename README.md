@@ -23,6 +23,21 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 - **Days households lived with a fault** adds one for every day a household waited. Dangerous faults count more.
 - **A shared trip** is one crew visiting two neighbouring communities on the same run, so the drive or flight is paid once. H3 hexagons decide which communities are close enough to pair.
 
+## How good is the AI? (report Appendix G, `src/reachnt/evaluate.py`)
+
+| Check | Familiar wording | New wording |
+|---|---|---|
+| Spotting a dangerous fault, ROC-AUC (0.5 = guessing) | 1.00 | 0.78 (0.73–0.82) |
+| Spotting a dangerous fault, PR-AUC (guessing = 0.23) | 0.99 | 0.60 (0.53–0.68) |
+| Dangerous reports caught by the whole system (model, rules, person) | 100% | 99% |
+| Urgency category correct (macro-F1) | 0.90 | 0.79 |
+| Queue order vs true order (Kendall's τ, after a person checks) | 0.91 | 0.86 |
+
+- **Model on its own:** weak on wording it never saw. Its confidence is also too high at the top end: when it says 84% it is right 65% of the time, so tenants never see a confidence percentage.
+- **Whole system:** still catches 99% of dangerous reports, because it sends 40% of those reports to a person.
+- **Trip planner:** CP-SAT proved 99.5% of 26,028 weekly plans optimal. The median plan takes 4 ms.
+- **Five random years:** ReachNT cut fault-days by 69–74% against cheapest-first, for 38–40% more per repair. Shared trips saved $68–78 per repair in every year.
+
 ## Deliverables
 
 | Deliverable | Where |
@@ -39,7 +54,8 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 ```bash
 pip install -r requirements.txt
 python run_all.py                     # every number, figure and the portal data (~15 min on 8 cores)
-pytest -q tests                       # 21 checks, all passing
+pytest -q tests                       # 24 checks, all passing
+python run_all.py --quality           # only the quality measures (ROC/PR-AUC, calibration, solver gap, 5 random years)
 python -m http.server 8731 --directory web   # then open http://localhost:8731
 python docs/report/build_pdf.py
 ```
@@ -68,6 +84,7 @@ The planner is single-threaded with a fixed seed, so every run gives the same nu
 4. **Plan trips** (`planner.py`): weekly, per hub and trade, OR-Tools CP-SAT chooses single trips and run zones under crew hours, road closures and airstrips.
 5. **Show the trade-off** (`simulate.py`, `experiments.py`): one year under 14 settings plus a sensitivity sweep.
 6. **Sign and explain** (`explain.py`, portal ledger): every week a job waits, the reason is logged; the tenant's answer is built from that log and the signed decision.
+7. **Check quality** (`evaluate.py`): ROC-AUC and PR-AUC for spotting danger, calibration, cross-validation, ranking agreement (Kendall's τ), CP-SAT optimality gaps, and the headline plans in five random years. Report Appendix G.
 
 ## Data and licences
 

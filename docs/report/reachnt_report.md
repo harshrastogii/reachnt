@@ -6,8 +6,8 @@ event: "CDU IT Code Fair 2026, AI Challenge: Housing maintenance triage"
 team: Team AIC015
 team_name: Top Enders
 members:
-  - "Harsh Rastogi (386401): research, data pipeline, H3 and trip-planning engine, ReachNT portal, report"
-  - "Aashish (385593): research review, testing, presentation"
+  - "Harsh Rastogi (386401): research (including the deep dive into H3), data pipeline, trip-planning engine, ReachNT portal, report"
+  - "Aashish (385593): research; proposed Uber's H3 hexagon grid, which became ReachNT's shared-trip method"
 date: 7 October 2026
 acknowledgement: We acknowledge the Larrakia people, Traditional Owners of the land on which Charles Darwin University's Darwin campuses stand, and the Traditional Owners of all the Country this report discusses. This report contains no images, names or voices of people. All repair requests in it are synthetic.
 ---
@@ -148,6 +148,8 @@ FIGURE: outputs/figures/fig4_reasons.png | 16.0 | Figure 4. Job-weeks remote job
 TABLE: Table 3. Reader accuracy on synthetic reports. "New wording" uses phrasings kept out of training.
 | Measure | Familiar wording (330) | New wording (660) |
 |---|---|---|
+| Spotting a dangerous fault, model ROC-AUC (0.5 = guessing) | {{Qr['seen']['danger']['roc_auc']:.2f}} | {{Qr['heldout']['danger']['roc_auc']:.2f}} |
+| Spotting a dangerous fault, model PR-AUC (guessing = {{Qr['heldout']['danger']['pr_auc_baseline']:.2f}}) | {{Qr['seen']['danger']['pr_auc']:.2f}} | {{Qr['heldout']['danger']['pr_auc']:.2f}} |
 | Category correct, rules only | 84% | 62% |
 | Category correct, model only | 96% | 59% |
 | Category correct, combined | 90% | 79% |
@@ -155,7 +157,7 @@ TABLE: Table 3. Reader accuracy on synthetic reports. "New wording" uses phrasin
 | Dangerous fault missed and not sent to a person | 0% | 1.3% |
 | Sent to a person | 17% | 40% |
 
-On new wording, the safety net works only because it sends four in ten reports to a person. Real reports will come in Aboriginal English, Kriol and other languages [20], which synthetic English cannot test.
+On new wording the model alone is only moderately good at spotting danger, and its confidence is not honest. The safety net works only because it sends four in ten reports to a person. Appendix G has the full measures: calibration, cross-validation, ranking agreement, solver gaps, and the results in four more random years. Real reports will come in Aboriginal English, Kriol and other languages [20], which synthetic English cannot test.
 
 ## 3.7 Sensitivity
 
@@ -231,11 +233,12 @@ We used Claude (Anthropic) as a coding and writing assistant: to search for and 
 CODE:
 pip install -r requirements.txt
 python run_all.py                      rebuilds every number, figure and the portal data (about 15 minutes on 8 cores)
-pytest -q tests                        checks: location-free urgency, reader safety net, planner limits, H3 shared trips, readable answers
-open web/index.html                    the ReachNT portal; works offline with bundled satellite tiles
+python run_all.py --quality           quality measures only (Appendix G)
+pytest -q tests                        checks: location-free urgency, reader safety net, planner limits and optimality, H3 shared trips, readable answers
+https://reachnt.vercel.app             the ReachNT portal (or open web/index.html); works offline with bundled satellite tiles
 notebooks/01_walkthrough.ipynb         the method step by step
 
-Code: src/reachnt/ geo.py (communities, access, H3 cells and shared trips), synth.py, intake.py (reader), urgency.py (need score), planner.py (CP-SAT trips and shared trips), simulate.py, explain.py (tenant answers), experiments.py, figures.py, export_web.py. Parameters, each tagged as sourced or assumed: config/params.yaml. Fault taxonomy: config/taxonomy.yaml. Database: docs/schema.sql and docs/DATABASE.md.
+Code: src/reachnt/ geo.py (communities, access, H3 cells and shared trips), synth.py, intake.py (reader), urgency.py (need score), planner.py (CP-SAT trips and shared trips), simulate.py, explain.py (tenant answers), experiments.py, evaluate.py (quality measures), figures.py, export_web.py. Parameters, each tagged as sourced or assumed: config/params.yaml. Fault taxonomy: config/taxonomy.yaml. Database: docs/schema.sql and docs/DATABASE.md.
 
 # Appendix C: Dataset links
 
@@ -263,3 +266,7 @@ TABLE: Table F1. Data zones and access in the ReachNT database (docs/schema.sql)
 | pii (vault) | Name, phone, address, language, interpreter need; all personal fields encrypted | Intake staff through a logged function; the tenant through a one-time code |
 | ops (work) | Houses as ID + H3 res-10 cell, jobs, scores, trips, weekly reasons, decision ledger | Coordinator (own hub); tradesperson (own trips + open jobs within 3 res-5 rings); housing officer (own communities); analyst (no vault) |
 | public (views) | Waits and fault-days by H3 res-6 cell and access band, cells under 5 jobs hidden | Anyone |
+
+# Appendix G: How good are the algorithms?
+
+QUALITY_APPENDIX

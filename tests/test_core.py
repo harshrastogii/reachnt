@@ -6,11 +6,12 @@ import inspect
 import sys
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from reachnt import explain, intake, planner, synth, urgency  # noqa: E402
+from reachnt import evaluate, explain, intake, planner, synth, urgency  # noqa: E402
 from reachnt.config import params, taxonomy  # noqa: E402
 
 
@@ -177,3 +178,23 @@ def test_planner_uses_a_run_zone_when_it_is_cheaper_than_two_trips():
     res = planner.plan_week(jobs, opts, capacity_hours=24, lam=0.2, runs={"CA+CB": (run, ("CA", "CB"))})
     assert len(res.done) == 6
     assert res.trips["CA"].site == "CA+CB" and res.trips["CB"].site == "CA+CB"
+
+
+def test_small_plan_is_proved_optimal():
+    jobs = [dict(job_id=f"t{i}", site="TOWN", hours=2, value=500) for i in range(6)]
+    jobs += [dict(job_id=f"r{i}", site="C01", hours=2, value=1500) for i in range(3)]
+    res = planner.plan_week(jobs, {"C01": _opt("C01", 8, 1000)}, capacity_hours=20, lam=0.2)
+    assert res.optimal and res.gap == 0.0
+
+
+def test_calibration_error_is_zero_when_confidence_matches_accuracy():
+    conf = np.array([0.8] * 10)
+    right = np.array([1] * 8 + [0] * 2, dtype=float)
+    ece, curve = evaluate._ece(conf, right)
+    assert ece == pytest.approx(0.0) and curve[0][2] == 10
+    assert evaluate._ece(np.array([0.9] * 10), np.zeros(10))[0] == pytest.approx(0.9)
+
+
+def test_reader_names_no_confidence_percentage(clf):
+    r = intake.read("the thingy in the yard is making a funny noise", clf)
+    assert not any("%" in s for s in r.reasons)

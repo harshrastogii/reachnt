@@ -1,0 +1,14 @@
+{
+  "name": "ReachNT",
+  "short_name": "ReachNT",
+  "description": "Remote NT repair triage: urgent first, shared trips, and a reason for every wait.",
+  "start_url": "./#field",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d1418",
+  "theme_color": "#0d1418",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

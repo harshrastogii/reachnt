@@ -1,0 +1,783 @@
+place_key,name,ntg_type,larger,mobile_2021,claimed_4g_2026,nbn_fixed_line,nbn_fixed_wireless,population_2020,population_match,land_council,cda,unsealed_share_25km,dist_sealed_km,lat,lon,flood_study_km
+P0000,Adelaide Bore,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Central Land Council,,1.0,50.75,-22.21,133.94,161.1
+P0001,Alyuen,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.8265212549643206,1.01,-22.67,133.35,121.8
+P0002,Akngwertnarre,Town Camp,False,Not recorded,True,True,False,44.0,name+distance,Central Land Council,,0.5401012949264788,0.0,-23.69,133.86,1.0
+P0003,Alkipi,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9724998224237454,8.58,-23.27,131.83,209.3
+P0004,Red Sandhill,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.8396233333318497,7.64,-24.01,132.85,102.8
+P0005,Alpara,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,1.0,62.46,-25.92,131.21,356.1
+P0006,Injulkama,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,27.84,-23.080000000000002,133.11,100.4
+P0007,Amoonguna,Major,True,Y,True,False,False,281.0,name+distance,Central Land Council,,0.5449591327904237,0.0,-23.77,133.94,0.2
+P0008,Ampilatwatja,Major,True,Y,True,False,False,491.0,name+distance,Central Land Council,,0.9944569348621349,0.06,-21.66,135.23,262.7
+P0009,Amputjuta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9674232466099281,6.88,-24.93,129.12,490.7
+P0010,Angula,Family Outstation,False,Not recorded,False,False,False,14.0,name+distance,Central Land Council,,1.0,36.4,-22.56,134.22,127.7
+P0011,Angas Downs,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7990116130057666,0.99,-25.03,132.27,211.7
+P0012,Anningie,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,34.49,-21.830000000000002,133.14000000000001,216.2
+P0013,Indaringinya,Family Outstation,False,Not recorded,False,False,False,23.0,name+distance,Central Land Council,,0.6291528943925557,31.35,-21.68,134.72,237.5
+P0014,Anthelk Ewlpaye,Town Camp,False,Not recorded,True,True,False,68.0,name+distance,Central Land Council,,0.5556205681781214,0.01,-23.69,133.88,0.1
+P0015,Anthepe,Town Camp,False,Not recorded,True,False,False,60.0,name+distance,Central Land Council,,0.5540504456470087,0.0,-23.76,133.87,0.0
+P0016,Sugar Creek,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7652333519593709,7.07,-23.95,132.57,128.8
+P0017,Aper Alwerrknge,Town Camp,False,Not recorded,True,True,False,19.0,name+distance,Central Land Council,,0.5471658076933947,0.02,-23.67,133.87,0.0
+P0018,Areyonga,Major,True,N,False,False,False,229.0,name+distance,Central Land Council,,0.991476319011827,0.03,-24.07,132.27,161.4
+P0019,Arrkapa,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.8347109703940598,4.68,-23.98,132.83,104.3
+P0020,Artekerr,Family Outstation,False,Not recorded,False,False,False,23.0,name+distance,Central Land Council,,1.0,31.29,-22.29,134.54,167.3
+P0021,Atnwengerrpe,Family Outstation,False,Not recorded,False,False,False,60.0,name+distance,Central Land Council,,0.9672464486715735,18.25,-21.87,134.99,230.2
+P0022,Utily,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Central Land Council,,0.9929228823715016,4.52,-23.490000000000002,131.87,199.9
+P0023,Blackwater,Family Outstation,False,Not recorded,True,False,False,21.0,name+distance,Central Land Council,,0.9751018953226624,2.9,-23.26,131.9,203.0
+P0024,Orrtipa-Thurra,Minor,True,Not recorded,True,False,False,60.0,name+distance,Central Land Council,,0.9974655840968245,0.32,-22.78,136.17000000000002,248.2
+P0025,Atneltyey,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9352080590729405,17.17,-22.04,134.61,196.1
+P0026,Mala,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,39.56,-21.69,130.85,376.8
+P0027,Town Bore,Family Outstation,False,Not recorded,False,False,False,7.0,name+distance,Central Land Council,,0.9805670228018873,20.89,-23.35,132.06,183.9
+P0028,Engawala,Minor,True,Y,True,False,False,181.0,name+distance,Central Land Council,,0.93601866260699,0.01,-22.8,134.46,112.5
+P0029,Eight Mile,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.6801200540491875,2.07,-23.89,132.68,116.9
+P0030,Ewyenper Atwatye,Town Camp,False,Not recorded,True,False,False,113.0,name+distance,Central Land Council,,0.5545691286319904,0.01,-23.71,133.9,0.6
+P0031,Finke,Major,True,Y,True,False,False,226.0,name+distance,Central Land Council,,0.993287435731675,0.01,-25.580000000000002,134.58,209.7
+P0032,Gilbert Springs,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7787124657772151,8.4,-23.97,132.48,138.4
+P0033,Parrulyu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,62.82,-20.45,130.91,331.2
+P0034,Haasts Bluff,Major,True,N,False,False,False,162.0,name+distance,Central Land Council,,0.977814990856453,0.01,-23.45,131.88,199.9
+P0035,Atitjere,Major,True,Y,True,False,False,263.0,name+distance,Central Land Council,,0.9768403810468769,0.1,-22.98,134.93,130.2
+P0036,Hermannsburg,Major,True,Y,True,False,False,711.0,name+distance,Central Land Council,,0.7629331221708179,0.04,-23.94,132.78,108.3
+P0037,Green Valley,Family Outstation,False,Not recorded,False,False,False,7.0,name+distance,Central Land Council,,0.9585953418041453,18.21,-23.150000000000002,131.74,222.0
+P0038,Ilkarralalama,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7903434383953459,8.1,-23.96,132.47,139.8
+P0039,Dons Bore,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.7818693643476075,7.43,-22.26,131.92000000000002,251.5
+P0040,New Ilparpa,Town Camp,False,Not recorded,True,False,False,52.0,name+distance,Central Land Council,,0.5542644180842387,0.0,-23.77,133.87,0.3
+P0041,Ilperle-Tyathe,Town Camp,False,Not recorded,True,False,False,40.0,name+distance,Central Land Council,,0.5470844916690577,0.02,-23.67,133.86,0.5
+P0042,Ilpili,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,77.63,-23.32,130.36,354.0
+P0043,Ilyiperenye,Town Camp,False,Not recorded,True,False,False,40.0,name+distance,Central Land Council,,0.5607309213883177,0.0,-23.740000000000002,133.87,0.0
+P0044,Imanpa,Major,True,Y,True,False,False,177.0,name+distance,Central Land Council,,0.8993768923409425,0.02,-25.13,132.57,198.4
+P0045,Importna,Family Outstation,False,Not recorded,True,False,False,3.0,name+distance,Central Land Council,,0.7995802429148406,0.2,-23.94,132.74,111.8
+P0046,Ininti,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9448239108900679,24.51,-23.17,129.15,477.7
+P0047,Injirramurri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,46.75,-22.47,131.13,307.8
+P0048,Intjartnama,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.8650820481850521,12.73,-24.060000000000002,132.92000000000002,98.3
+P0049,Five Mile,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Central Land Council,,0.7568334845743978,2.53,-23.92,132.85,100.9
+P0050,Inyilingi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9727549281148552,14.91,-23.25,131.42000000000002,249.6
+P0051,Ipolera,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8420185171071716,12.61,-23.990000000000002,132.37,149.3
+P0052,Tinki,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9647216362313614,16.63,-23.27,129.56,435.3
+P0053,Irrultja,Minor,True,Not recorded,False,False,False,45.0,name+distance,Central Land Council,,1.0,28.94,-21.98,135.11,226.0
+P0054,Itwiyethwenge,Town Camp,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.548435398431837,0.29,-23.66,133.87,0.0
+P0055,Iwupataka,Minor,True,Not recorded,True,False,False,,name+distance,Central Land Council,,0.8295856584497822,0.6,-23.79,133.5,33.4
+P0056,Kaltukatjara,Major,True,Y,True,False,False,463.0,name+distance,Central Land Council,,0.9568339667764699,0.02,-24.88,129.08,493.5
+P0057,Kaporilya,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Central Land Council,,0.7788848998076977,0.88,-23.94,132.72,114.0
+P0058,Karnte,Town Camp,False,Not recorded,True,False,False,36.0,name+distance,Central Land Council,,0.5596560136566596,0.05,-23.76,133.86,0.0
+P0059,Kintore,Major,True,Y,True,False,False,482.0,name+distance,Central Land Council,,0.9647216362313614,0.07,-23.28,129.39000000000001,452.4
+P0060,Kulpitharra,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Central Land Council,,1.0,34.35,-23.740000000000002,132.0,184.5
+P0061,Kunapula,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,34.61,-25.16,129.23,487.2
+P0062,Kungkayunti,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,40.2,-23.63,131.24,261.6
+P0063,Armstrongs,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.6761506851843352,2.76,-23.88,132.68,117.0
+P0064,Kurkutjara,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,121.26,-25.94,129.41,505.2
+P0065,Inkwelaye,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9435022383504056,5.08,-22.080000000000002,134.83,201.6
+P0066,Kwala,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.773369261197536,1.84,-23.93,132.89000000000001,97.0
+P0067,Labrapuntja,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Central Land Council,,0.7458882723984263,3.99,-23.91,132.94,91.8
+P0068,Laramba,Major,True,N,True,False,False,281.0,name+distance,Central Land Council,,0.9961996997680557,0.01,-22.53,132.76,168.5
+P0069,Larapinta Valley,Town Camp,False,Not recorded,True,False,False,90.0,name+distance,Central Land Council,,0.5536116372612947,0.02,-23.71,133.85,0.4
+P0070,Lilla,Family Outstation,False,Not recorded,False,False,False,16.0,name+distance,Central Land Council,,0.24452521752003845,1.44,-24.3,131.6,232.5
+P0071,Inarlenge,Town Camp,False,Not recorded,True,True,False,64.0,name+distance,Central Land Council,,0.554416704568062,0.04,-23.73,133.86,0.5
+P0072,Little Well,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Central Land Council,,1.0,95.95,-24.14,135.33,144.7
+P0073,Ltira,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Central Land Council,,0.8464209259615153,11.97,-24.060000000000002,132.9,99.8
+P0074,Liltjera,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.8032392162585604,3.07,-23.94,132.64000000000001,122.2
+P0075,Lyilyalanama,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Central Land Council,,0.7995802429148406,0.43,-23.95,132.74,111.8
+P0076,Mantapayika,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,37.73,-25.47,130.23,409.4
+P0077,Old Station,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.8452205541052112,8.36,-24.02,132.86,102.1
+P0078,Mbalkanaka,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Central Land Council,,0.7830232259184077,1.31,-23.95,132.88,99.0
+P0079,Mbunghara,Family Outstation,False,Not recorded,False,False,False,25.0,name+distance,Central Land Council,,1.0,33.81,-23.29,132.36,157.4
+P0080,Amengernterneah,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9377316879657372,4.62,-21.900000000000002,134.84,220.0
+P0081,Morris Gap,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7862395858805087,3.87,-24.11,131.44,244.4
+P0082,Motnas,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.8099300288530211,0.04,-23.95,132.77,109.4
+P0083,Mpwetyerre,Town Camp,False,Not recorded,True,True,False,13.0,name+distance,Central Land Council,,0.5713841248978554,0.01,-23.72,133.87,0.0
+P0084,Mount Barkly,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,44.15,-21.61,132.44,270.2
+P0085,Kurippi,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Central Land Council,,0.9956048712179754,20.12,-22.14,132.05,250.0
+P0086,Mount Liebig,Major,True,Y,True,False,False,199.0,name+distance,Central Land Council,,0.9771527534870557,0.01,-23.27,131.27,264.2
+P0087,Mount Nancy,Town Camp,False,Not recorded,True,False,False,24.0,name+distance,Central Land Council,,0.5471658076933947,0.05,-23.67,133.87,0.1
+P0088,Karrinyarra,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,1.0,30.09,-22.66,131.88,229.9
+P0089,Putulu,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Central Land Council,,1.0,57.15,-21.34,131.37,362.5
+P0090,Mulga Bore,Family Outstation,False,Not recorded,False,False,False,60.0,name+distance,Central Land Council,,1.0,46.39,-22.45,134.21,139.0
+P0091,Wanarkula,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,76.87,-26.0,131.59,335.9
+P0092,Mutitjulu,Major,True,Y,True,False,False,380.0,name+distance,Central Land Council,,0.5171256952377292,0.17,-25.35,131.07,329.8
+P0093,New Bore,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.9707336745068764,5.75,-23.22,131.33,259.9
+P0094,Yuwerli,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.841747847247515,20.49,-22.04,131.65,288.9
+P0095,Nguman,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,46.75,-23.54,129.76,412.1
+P0096,Ngkwarlerlanem,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7405304251150988,23.9,-21.73,134.79,235.1
+P0097,Nturiya,Major,True,Y,True,False,False,110.0,name+distance,Central Land Council,,0.7514938405331089,0.03,-22.12,133.27,181.6
+P0098,Nyirripi,Major,True,N,True,False,False,277.0,name+distance,Central Land Council,,0.9923682723486442,0.02,-22.650000000000002,130.55,354.0
+P0099,Nyewente,Town Camp,False,Not recorded,True,False,False,104.0,name+distance,Central Land Council,,0.5496806044674539,0.04,-23.69,133.86,0.7
+P0100,Papunya,Major,True,Y,True,False,False,475.0,name+distance,Central Land Council,,0.9797942022411019,0.14,-23.2,131.91,203.5
+P0101,Phillipson Bore,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Central Land Council,,0.9703194850459375,6.19,-24.1,134.43,59.2
+P0102,Pine Hill,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.999514042115636,0.52,-22.38,133.05,164.6
+P0103,Pinpirnga,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9607976986913959,7.86,-23.16,129.46,446.7
+P0104,Pmara Jutunta,Major,True,Y,True,False,False,207.0,name+distance,Central Land Council,,0.7250107563128598,0.04,-22.21,133.43,167.5
+P0105,Pulardi,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.8573579706373241,7.83,-22.56,132.38,193.9
+P0106,Punritjanta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,27.31,-24.67,129.29,467.6
+P0107,Puta Puta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,57.09,-25.07,129.64000000000001,445.8
+P0108,Puyurru,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,30.66,-21.330000000000002,130.82,404.9
+P0109,Rodna,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.49546697138781115,8.75,-23.76,132.67000000000002,117.2
+P0110,Santa Teresa,Major,True,Y,True,False,False,682.0,name+distance,Central Land Council,,0.9762590689051815,0.03,-24.13,134.37,57.0
+P0111,Atnarara,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.930081479172646,1.07,-22.03,134.79,204.7
+P0112,Arawerr,Minor,True,Not recorded,True,False,False,76.0,name+distance,Central Land Council,,0.937709433050057,4.17,-22.01,134.85,208.7
+P0113,Titjikala,Major,True,Y,True,False,False,267.0,name+distance,Central Land Council,,0.9946555394703905,0.02,-24.67,134.08,98.6
+P0114,Tjamangkurra,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Central Land Council,,0.8218953094090987,3.3,-23.97,132.81,106.3
+P0115,Tjulpungu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8672506282534991,19.15,-21.830000000000002,131.41,321.9
+P0116,Tjunti,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,33.02,-25.02,129.4,466.6
+P0117,Tjuntinanta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9601857075160195,11.22,-24.85,129.23,478.1
+P0118,Tnawurta,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,0.8373219142451929,6.37,-24.0,132.84,103.9
+P0119,Tnyimipurta,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.7021681433800444,1.55,-23.89,132.67000000000002,118.0
+P0120,Urlampe,Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Central Land Council,,1.0,163.46,-22.490000000000002,137.74,408.5
+P0121,Ukaka,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Central Land Council,,0.7461920100980153,5.38,-24.59,132.37,174.0
+P0122,Ukatjupu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,115.31,-25.91,129.11,530.6
+P0123,Ulpanyali,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Central Land Council,,0.40949526791257135,1.3,-24.23,131.5,240.8
+P0124,Undurana 1C,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Central Land Council,,0.8943603680064383,21.97,-23.76,132.13,172.0
+P0125,Arlparra,Family Outstation,False,Y,True,False,False,,name+distance,Central Land Council,,0.9409998326614203,0.03,-22.09,134.77,198.0
+P0126,Ankerrapw,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,25.46,-22.23,134.56,174.3
+P0127,Wallace Rockhole,Major,True,Y,True,False,False,120.0,name+distance,Central Land Council,,0.9147154377999963,0.01,-24.12,133.09,85.9
+P0128,Walytjatjata,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,120.84,-25.98,129.47,502.3
+P0129,Wangkari,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,28.65,-25.13,129.02,506.8
+P0130,Wanmarra,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Central Land Council,,0.04018731553873471,1.22,-24.39,131.8,216.2
+P0131,Warren Creek,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.9771527534870557,9.34,-23.27,131.18,273.6
+P0132,Warumpi,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Central Land Council,,0.9805545413631479,6.28,-23.19,131.98,198.0
+P0133,Wayililinypa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,35.12,-22.5,131.45,277.2
+P0134,Welere,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,37.96,-22.02,135.19,226.9
+P0135,Welmala,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8684383465725399,1.6,-25.68,133.26,220.1
+P0136,West Waterhouse,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Central Land Council,,0.8098594003040426,3.28,-24.0,133.11,77.4
+P0137,Willowra,Major,True,N,True,False,False,354.0,name+distance,Central Land Council,,0.9935708884707918,0.05,-21.240000000000002,132.61,297.9
+P0138,Wilora,Minor,True,N,True,False,False,112.0,name+distance,Central Land Council,,0.7858720708935804,0.05,-21.740000000000002,133.73,214.2
+P0139,Yatjalu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,39.42,-22.41,131.16,307.8
+P0140,Yatemans Bore,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,37.81,-23.69,131.61,223.9
+P0141,Yinyiripalangu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,60.27,-22.21,130.21,405.3
+P0142,Yuwalki,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,34.58,-23.56,129.54,433.9
+P0143,Yuelamu,Major,True,N,True,False,False,259.0,name+distance,Central Land Council,,0.9942264024886335,0.07,-22.26,132.21,229.7
+P0144,Yuendumu,Major,True,Y,True,False,False,892.0,name+distance,Central Land Council,,0.7717694651777078,0.0,-22.25,131.8,262.2
+P0145,Yumurrpa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,49.57,-21.63,130.78,387.3
+P0146,Ali Curung,Major,True,Y,True,False,False,580.0,name+distance,Central Land Council,,0.852056717061202,0.0,-21.0,134.41,301.2
+P0147,Alpurrurulam,Major,True,Y,True,False,False,494.0,name+distance,Central Land Council,,0.9900652989045996,0.01,-20.98,137.85,502.6
+P0148,Gulunguru,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,0.8701401018838759,0.57,-19.35,136.04,358.4
+P0149,Bajaminyi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,136.43,-17.77,137.71,235.5
+P0150,Bauhinia Downs,Family Outstation,False,Not recorded,False,False,False,14.0,name+distance,Northern Land Council,,1.0,54.01,-16.22,135.47,85.2
+P0151,Wada Warra,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,0.7110705652152332,5.79,-15.75,136.25,31.6
+P0152,Munji-Marla,Town Camp,False,Not recorded,True,True,False,7.0,name+distance,Central Land Council,,0.8093577834953318,0.02,-19.650000000000002,134.18,426.8
+P0153,Yangulinyina,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Northern Land Council,,1.0,27.95,-16.89,137.21,127.5
+P0154,Canteen Creek,Major,True,N,True,False,False,216.0,name+distance,Central Land Council,,0.9700413457330753,0.04,-20.650000000000002,135.59,379.3
+P0155,Corella Creek,Family Outstation,False,Not recorded,True,False,False,56.0,name+distance,Northern Land Council,,0.8787064628935817,3.89,-18.37,135.86,252.3
+P0156,Mara,Town Camp,False,Not recorded,True,False,False,170.0,name+distance,Northern Land Council,,0.7846603027353348,0.02,-16.05,136.3,0.4
+P0157,Marla Marla,Town Camp,False,Not recorded,True,True,False,25.0,name+distance,Central Land Council,,0.807923365917845,0.02,-19.66,134.18,426.9
+P0158,Elliott South Camp,Town Camp,False,Not recorded,True,False,False,56.0,name+distance,Northern Land Council,,0.8884153957276998,0.03,-17.56,133.56,287.0
+P0159,Elliott North Camp,Town Camp,False,Not recorded,True,False,False,197.0,name+distance,Northern Land Council,,0.866307627141686,0.0,-17.55,133.54,284.7
+P0160,Wutunugurra,Major,True,N,True,False,False,195.0,name+distance,Central Land Council,,0.9957877369420081,0.01,-20.46,135.25,383.7
+P0161,Garawa 1,Town Camp,False,Not recorded,True,False,False,110.0,name+distance,Northern Land Council,,0.8205486916082857,0.0,-16.07,136.32,0.1
+P0162,Jarra Jarra,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,76.46,-20.85,133.22,320.3
+P0163,Jingaloo,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8839558595432844,16.71,-17.11,133.61,285.2
+P0164,Kalumpurlpa,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,0.8619580896092955,21.59,-19.0,133.92000000000002,366.3
+P0165,Kangaroo Island,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,0.941241331859267,22.5,-15.89,136.54,25.3
+P0166,Kargaru,Town Camp,False,Not recorded,True,True,False,49.0,name+distance,Central Land Council,,0.8089338022015855,0.05,-19.66,134.2,428.8
+P0167,Kunayungku,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,34.91,-19.740000000000002,133.72,394.6
+P0168,Mungkarta,Minor,True,Not recorded,False,False,False,65.0,name+distance,Central Land Council,,0.6059203464870214,0.02,-20.34,134.2,371.9
+P0169,Ngalpa Ngalpa,Town Camp,False,Not recorded,True,True,False,67.0,name+distance,Central Land Council,,0.810238909663156,0.02,-19.64,134.19,427.0
+P0170,Mungalawurru,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,1.0,25.04,-19.38,133.6,359.6
+P0171,Munyalini,Family Outstation,False,Not recorded,True,False,False,50.0,name+distance,Northern Land Council,,0.7398111620438758,1.06,-16.09,136.19,6.7
+P0172,Imangara,Minor,True,N,False,False,False,81.0,name+distance,Central Land Council,,1.0,28.44,-21.05,134.68,302.6
+P0173,Nudjabarra,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,170.88,-17.98,137.97,270.5
+P0174,Marlinja,Minor,True,Not recorded,True,False,False,80.0,name+distance,Northern Land Council,,0.8690696510682101,0.44,-17.37,133.4,270.6
+P0175,Nuradidgee,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,29.93,-20.11,134.51,400.5
+P0176,Pingala,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,27.83,-19.09,133.88,367.7
+P0177,Wandangula,Minor,True,Not recorded,True,False,False,40.0,name+distance,Northern Land Council,,0.8232920695828593,0.0,-16.05,136.35,0.6
+P0178,Bujan,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,1.0,54.92,-16.27,136.88,60.7
+P0179,Robinson River,Major,True,Y,True,False,False,261.0,name+distance,Northern Land Council,,0.9905006038076917,0.02,-16.76,136.98,100.0
+P0180,Wogyala,Family Outstation,False,Not recorded,False,False,False,40.0,name+distance,Northern Land Council,,1.0,33.93,-19.01,135.18,340.4
+P0181,Jilundarina,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,112.83,-17.61,137.58,211.9
+P0182,South West Island,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,1.0,33.24,-15.69,136.69,52.1
+P0183,Tara,Minor,True,N,True,False,False,105.0,name+distance,Central Land Council,,0.8973413557989824,0.03,-21.51,134.0,240.3
+P0184,Tjoungouri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.6798138800146133,3.01,-16.17,136.04,24.1
+P0185,Village Camp,Town Camp,False,Not recorded,True,True,False,58.0,name+distance,Central Land Council,,0.8115708629745708,0.03,-19.66,134.18,427.4
+P0186,West Island,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,0.6359432689110679,12.61,-15.64,136.5,45.8
+P0187,Wollogorang,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Northern Land Council,,1.0,118.61,-17.22,137.99,215.6
+P0188,Yanyula,Town Camp,False,Not recorded,True,False,False,200.0,name+distance,Northern Land Council,,0.7885005104414351,0.01,-16.06,136.31,0.0
+P0189,Acacia Larrakia,Family Outstation,False,Y,True,False,False,34.0,name+distance,Northern Land Council,IA,0.35294853315024466,0.0,-12.81,131.17000000000002,19.2
+P0190,Alamirra,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Northern Land Council,,0.965338904406506,9.95,-11.07,132.53,228.7
+P0191,Paradise Farm,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.6069409617626302,0.92,-12.94,132.53,146.2
+P0192,Amatjatpalk,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8859644425813801,9.16,-11.59,133.46,284.7
+P0193,Ankabadbirri,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,1.0,29.85,-12.26,134.42000000000002,287.3
+P0194,Araru Point,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,78.11,-11.19,131.88,169.8
+P0195,Bagot,Town Camp,False,Not recorded,True,True,False,193.0,name+distance,Northern Land Council,F,0.0877061686217247,0.01,-12.42,130.86,2.8
+P0196,Walka,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9747990347149836,3.21,-11.18,132.59,225.6
+P0197,Belyuen,Major,True,Y,True,False,False,193.0,name+distance,Northern Land Council,L,0.2099261390606813,0.0,-12.540000000000001,130.7,24.1
+P0198,Berraja,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,29.51,-12.07,134.5,309.5
+P0199,Bolkdjam,Family Outstation,False,Not recorded,False,False,False,30.0,name+distance,Northern Land Council,,1.0,43.59,-12.41,134.42000000000002,272.9
+P0200,Bulgul,Family Outstation,False,Not recorded,False,False,False,19.0,name+distance,Northern Land Council,,1.0,29.59,-13.08,130.12,95.4
+P0201,Buluhkaduru,Family Outstation,False,Not recorded,False,False,False,35.0,name+distance,Northern Land Council,,1.0,45.76,-12.43,134.42000000000002,271.1
+P0202,Yilan,Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Northern Land Council,,1.0,30.68,-12.040000000000001,134.62,318.7
+P0203,Cannon Hill,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.7111092457870025,6.0,-12.36,132.95,208.1
+P0204,Tigers Camp,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,1.0,41.26,-11.47,132.78,223.3
+P0205,Damdam,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,1.0,28.65,-12.17,134.65,308.7
+P0206,Gumeragi,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,1.0,45.96,-11.17,132.16,192.7
+P0207,Ditchi,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8793906235899878,7.7,-14.3,129.41,236.5
+P0208,Ji-Bena,Family Outstation,False,Not recorded,False,False,False,28.0,name+distance,Northern Land Council,,1.0,33.39,-12.14,134.53,303.8
+P0209,Gamardi,Family Outstation,False,Not recorded,True,False,False,24.0,name+distance,Northern Land Council,,1.0,25.29,-12.27,134.68,301.2
+P0210,Gamargawan,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,1.0,66.28,-12.65,134.08,231.8
+P0211,Gochan Jiny Jirra,Minor,True,Not recorded,False,False,False,38.0,name+distance,Northern Land Council,,1.0,28.97,-12.200000000000001,134.46,294.9
+P0212,Gorrong-Gorrong,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,29.43,-12.120000000000001,134.5,304.1
+P0213,Marlwon,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,39.98,-12.13,133.86,275.0
+P0214,Kakodbabuldi,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,38.77,-12.41,134.16,259.3
+P0215,Gumarrirnbang,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,1.0,38.33,-12.33,134.0,260.0
+P0216,Gunbalanya,Major,True,Y,True,False,False,1312.0,name+distance,Northern Land Council,,0.8681067444805795,0.03,-12.32,133.06,220.7
+P0217,Gupanga,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,1.0,34.41,-12.08,134.58,313.6
+P0218,Gurrgurr,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,28.11,-12.21,134.01,272.9
+P0219,Humpty Doo,Family Outstation,False,Not recorded,True,False,False,7.0,name+distance,Northern Land Council,IA,0.3040834174312591,0.0,-12.63,131.26,20.0
+P0220,Ararlagu,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8859644425813801,12.77,-11.53,133.4,281.7
+P0221,Injilatparri,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8859644425813801,4.74,-11.61,133.41,279.7
+P0222,Ji-Balbal,Family Outstation,False,Not recorded,False,False,False,24.0,name+distance,Northern Land Council,,1.0,31.33,-12.3,134.62,295.2
+P0223,Ji-Marda,Family Outstation,False,Not recorded,True,False,False,58.0,name+distance,Northern Land Council,,1.0,31.21,-12.06,134.62,317.1
+P0224,Ndjudda,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8717546527855604,6.58,-11.99,134.25,304.9
+P0225,Knuckey Lagoon Indigenous Village,Town Camp,False,Not recorded,True,False,False,54.0,name+distance,Northern Land Council,F,0.10516102542448078,0.03,-12.44,130.94,7.1
+P0226,Kolorbidahdah,Family Outstation,False,Not recorded,False,False,False,25.0,name+distance,Northern Land Council,,1.0,61.13,-12.61,134.33,248.7
+P0227,Kulaluk,Town Camp,False,Not recorded,True,True,False,,name+distance,Northern Land Council,C1,0.0896623843034113,0.01,-12.39,130.85,1.7
+P0228,Kultchill,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.87881856412701,17.13,-14.43,129.57,234.1
+P0229,Mamadawerre,Family Outstation,False,Not recorded,True,False,False,30.0,name+distance,Northern Land Council,,1.0,37.17,-12.26,133.66,256.3
+P0230,Mandilbarreng,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,28.89,-12.27,133.58,252.7
+P0231,Mankorlod,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,1.0,55.2,-12.57,134.27,250.1
+P0232,Mangardubu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,26.21,-12.09,133.19,239.7
+P0233,Maningrida,Major,True,Y,True,False,False,2712.0,name+distance,Northern Land Council,,0.877782944508301,0.06,-12.05,134.22,297.6
+P0234,Manmoyi,Minor,True,Not recorded,True,False,False,40.0,name+distance,Northern Land Council,,1.0,53.95,-12.540000000000001,134.11,244.0
+P0235,Marrkolidjban,Family Outstation,False,Not recorded,True,False,False,15.0,name+distance,Northern Land Council,,1.0,25.86,-12.24,134.06,272.0
+P0236,Pandayal,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,0.8582738987982969,11.06,-13.07,130.56,53.1
+P0237,Mewirnbi,Family Outstation,False,Not recorded,True,False,False,15.0,name+distance,Northern Land Council,,0.9546350639275478,14.36,-12.13,134.77,319.9
+P0238,Mikginj Valley,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,0.6091702605024181,12.61,-12.48,133.07,209.0
+P0239,Milikapiti,Major,True,Y,True,False,False,471.0,name+distance,Tiwi Land Council,,0.9389724015506744,0.04,-11.42,130.67000000000002,104.4
+P0240,Minjilang,Major,True,N,True,False,False,290.0,name+distance,Northern Land Council,,0.9675982987871746,0.02,-11.15,132.58,226.8
+P0241,Malgawa,Family Outstation,False,Not recorded,False,False,False,17.0,name+distance,Northern Land Council,,1.0,87.8,-12.84,133.92000000000002,205.6
+P0242,Mudginberri,Family Outstation,False,Not recorded,True,False,False,60.0,name+distance,Northern Land Council,,0.41833894353630147,1.13,-12.6,132.87,189.8
+P0243,Waidaboonar,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,49.39,-11.94,132.78,201.4
+P0244,Mumeka,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,34.52,-12.36,134.14000000000001,262.7
+P0245,Wauk,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,51.94,-11.55,132.93,233.4
+P0246,Namugardabu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9703790801654105,23.85,-12.16,134.02,278.5
+P0247,Kungarrewarl,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.8651711454333066,1.59,-12.34,133.06,220.4
+P0248,Nangak,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,0.9467235330201698,17.55,-12.21,134.28,284.6
+P0249,Nangu,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.843622903754408,16.17,-14.370000000000001,129.37,244.5
+P0250,Nabarlek,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9846685545028258,1.77,-12.31,133.29,235.2
+P0251,Nadirri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,27.44,-13.950000000000001,129.77,181.7
+P0252,Nauiyu,Major,True,Y,True,False,False,444.0,name+distance,Northern Land Council,,0.8402472299937687,0.0,-13.75,130.69,109.7
+P0253,Wurrumiyanga,Major,True,Y,True,False,False,1837.0,name+distance,Tiwi Land Council,,0.9159114651689009,0.02,-11.76,130.64000000000001,70.4
+P0254,Palmerston Indigenous Village,Town Camp,False,Not recorded,True,True,False,62.0,name+distance,Northern Land Council,G,0.1205297902655926,0.03,-12.49,131.01,2.4
+P0255,Nganmarriyanga,Major,True,Y,True,False,False,458.0,name+distance,Northern Land Council,,0.7957934021172413,0.03,-14.35,129.88,207.5
+P0256,Perrederr,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,0.9916398395192944,21.23,-14.02,129.83,182.4
+P0257,Paru,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Tiwi Land Council,,0.9159114651689009,0.02,-11.75,130.65,70.9
+P0258,Patonga (Airstrip),Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.6554759860830547,1.92,-12.950000000000001,132.57,145.7
+P0259,Peppimenarti,Major,True,Y,True,False,False,209.0,name+distance,Northern Land Council,,0.8751077805591524,0.0,-14.15,130.08,177.3
+P0260,Pirlangimpi,Major,True,Y,True,False,False,436.0,name+distance,Tiwi Land Council,,0.9631450067324656,0.0,-11.41,130.42000000000002,115.2
+P0261,Railway Dam,Town Camp,False,Not recorded,True,True,False,11.0,name+distance,Northern Land Council,A,0.08670626257105665,0.0,-12.450000000000001,130.84,6.6
+P0262,Redcliff,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,26.67,-14.01,129.71,191.0
+P0263,Spring Peak,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Northern Land Council,,0.6551312581102541,4.17,-12.96,132.45,143.1
+P0264,Tree Point,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,IA,0.14701171061740156,5.19,-12.31,131.02,17.6
+P0265,Taracumbi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Tiwi Land Council,,0.8796398183628905,16.96,-11.61,130.71,83.8
+P0266,Wadeye,Major,True,Y,True,False,False,2679.0,name+distance,Northern Land Council,,0.8978836578512716,0.02,-14.24,129.52,222.9
+P0267,Amangal Indigenous Village,Town Camp,False,Not recorded,True,False,False,32.0,name+distance,Northern Land Council,,0.6566130075935376,0.01,-13.24,131.1,53.7
+P0268,Waminari,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8859644425813801,12.6,-11.77,133.4,272.0
+P0269,Warruwi,Major,True,Y,True,False,False,457.0,name+distance,Northern Land Council,,0.8859644425813801,0.01,-11.65,133.39000000000001,275.7
+P0270,Ngardinitchi,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8899545548688989,4.46,-14.19,129.48,222.1
+P0271,Wigu,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8859644425813801,5.93,-11.61,133.43,281.5
+P0272,Wilgi,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Northern Land Council,,1.0,41.83,-11.5,132.75,219.5
+P0273,Woodycupaldiya,Minor,True,Not recorded,False,False,False,45.0,name+distance,Northern Land Council,,0.9959913701255247,0.02,-13.86,130.0,156.6
+P0274,Wudapuli,Family Outstation,False,Not recorded,False,False,False,21.0,name+distance,Northern Land Council,,0.8753593912511628,0.01,-14.21,129.85,196.9
+P0275,Wurdeja,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Northern Land Council,,1.0,27.15,-12.17,134.66,309.2
+P0276,Alharrgan,Family Outstation,False,Not recorded,True,False,False,9.0,name+distance,Northern Land Council,,0.9761592749433436,19.39,-13.68,136.05,259.8
+P0277,Alyingberrma,Family Outstation,False,Not recorded,True,False,False,,name+distance,Anindilyakwa Land Council,,0.6922974392821228,5.13,-13.81,136.82,249.0
+P0278,Amanburnunga,Family Outstation,False,Not recorded,False,False,False,,name+distance,Anindilyakwa Land Council,,0.7285531126395539,4.48,-13.93,136.69,234.0
+P0279,Amirraba,Family Outstation,False,Not recorded,True,False,False,,name+distance,Anindilyakwa Land Council,,0.6342663361934061,7.15,-13.91,136.86,239.4
+P0280,Andanangki,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,1.0,50.61,-13.61,135.77,271.9
+P0281,Angurugu,Major,True,Y,True,False,False,1005.0,name+distance,Anindilyakwa Land Council,,0.6552716631275467,0.03,-13.98,136.46,225.2
+P0282,Balma,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,69.4,-13.25,135.85,308.8
+P0283,Banthula,Family Outstation,False,Not recorded,False,False,False,31.0,name+distance,Northern Land Council,,1.0,37.97,-11.84,135.87,422.9
+P0284,Baniyala,Minor,True,Not recorded,False,False,False,130.0,name+distance,Northern Land Council,,1.0,63.35,-13.200000000000001,136.23,310.3
+P0285,Bawaka,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,1.0,29.06,-12.530000000000001,136.76,385.5
+P0286,Baygurrtji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,70.83,-13.16,135.87,318.4
+P0287,Birany Birany,Minor,True,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,1.0,68.8,-12.82,136.48,352.3
+P0288,Bodia,Family Outstation,False,Not recorded,True,False,False,55.0,name+distance,Northern Land Council,,0.9089754540334856,1.86,-12.08,134.9,332.3
+P0289,Bukudal,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,78.91,-12.97,136.61,337.0
+P0290,Bularring,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9135576158614811,13.53,-12.05,135.7,393.4
+P0291,Bundatharri,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9285905614575515,13.26,-12.24,134.85,315.1
+P0292,Rorruwuy,Minor,True,Not recorded,True,False,False,35.0,name+distance,Northern Land Council,,1.0,43.46,-12.200000000000001,136.3,418.7
+P0293,Burrum,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,26.77,-12.31,135.96,395.8
+P0294,Darrangmurmanja,Family Outstation,False,Not recorded,True,False,False,,name+distance,Anindilyakwa Land Council,,0.5670818052092413,16.75,-13.72,136.59,254.4
+P0295,Dhalinybuy,Minor,True,Not recorded,False,False,False,80.0,name+distance,Northern Land Council,,1.0,39.97,-12.41,136.39000000000001,396.0
+P0296,Dhamiyaka,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9704272703818019,16.69,-12.66,135.86,363.9
+P0297,Dharrni,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9822614604239863,19.33,-13.75,136.02,252.1
+P0298,Dhipirrinjura,Family Outstation,False,Not recorded,True,False,False,45.0,name+distance,Northern Land Council,,0.9006994651546328,20.03,-12.25,135.1,331.4
+P0299,Dholtji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,36.41,-11.950000000000001,136.46,446.5
+P0300,Dhupuwamirri,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,1.0,48.7,-12.67,135.39000000000001,322.5
+P0301,Rurrangala,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,65.02,-12.9,136.25,342.5
+P0302,Borogomarra,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8978410598562613,10.38,-12.24,134.98,323.6
+P0303,Djarrakpi,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,1.0,55.36,-13.3,136.35,299.7
+P0304,Djurranalpi,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Northern Land Council,,1.0,37.28,-11.85,135.87,422.0
+P0305,Donydji,Family Outstation,False,Not recorded,True,False,False,25.0,name+distance,Northern Land Council,,1.0,47.83,-12.89,135.47,314.4
+P0306,Galawdjapin,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Northern Land Council,,0.9319165111135415,11.55,-12.290000000000001,134.82,308.7
+P0307,Gilirri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9546825475857662,9.28,-12.33,134.82,305.0
+P0308,Galiwinku,Major,True,Y,True,False,False,2453.0,name+distance,Northern Land Council,,0.9082361743322391,0.0,-12.02,135.57,384.4
+P0309,Bayagida,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8831660227295892,6.31,-12.040000000000001,134.93,337.4
+P0310,Galupa,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.7662994334898008,0.09,-12.19,136.69,421.5
+P0311,Galaru,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.7662811676221584,1.11,-12.17,136.76,425.1
+P0312,Gumuruguru,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9282110658002758,14.97,-12.06,134.76,325.5
+P0313,Gan Gan,Minor,True,Not recorded,False,False,False,90.0,name+distance,Northern Land Council,,1.0,60.17,-13.05,135.94,329.3
+P0314,Ganpura,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,1.0,29.36,-11.89,135.81,414.3
+P0315,Gapuwiyak,Major,True,Y,True,False,False,1085.0,name+distance,Northern Land Council,,0.9776178775418826,0.0,-12.5,135.81,369.4
+P0316,Mooronga,Family Outstation,False,Not recorded,True,False,False,30.0,name+distance,Northern Land Council,,1.0,25.64,-11.92,135.07,357.6
+P0317,Garriyak,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9394352267308503,12.68,-12.15,135.56,374.5
+P0318,Garrthalala,Family Outstation,False,Not recorded,True,False,False,50.0,name+distance,Northern Land Council,,1.0,60.12,-12.76,136.57,358.7
+P0319,Gatji,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9319165111135415,12.37,-12.27,134.82,310.1
+P0320,Gawa,Family Outstation,False,Not recorded,False,False,False,57.0,name+distance,Northern Land Council,,1.0,45.54,-11.76,135.9,431.1
+P0321,Gikal,Family Outstation,False,Not recorded,False,False,False,9.0,name+distance,Northern Land Council,,1.0,43.45,-12.05,136.32,435.0
+P0322,Gitan,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9967094887784694,25.0,-11.91,135.78,409.9
+P0323,Gulmarri,Family Outstation,False,Not recorded,False,False,False,9.0,name+distance,Northern Land Council,,1.0,28.8,-11.92,135.82,412.6
+P0324,Gunyangara,Minor,True,Y,True,False,False,282.0,name+distance,Northern Land Council,,0.7689362657093014,0.01,-12.22,136.71,419.2
+P0325,Gurkawuy,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,84.3,-12.98,136.5,335.1
+P0326,Gurrumuru,Minor,True,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,1.0,47.23,-12.59,136.23,376.5
+P0327,Langarra,Family Outstation,False,Not recorded,True,False,False,45.0,name+distance,Northern Land Council,,0.9077015972822929,23.66,-12.1,135.36,362.9
+P0328,Malkala,Family Outstation,False,Not recorded,True,False,False,70.0,name+distance,Anindilyakwa Land Council,,0.6401545100459658,0.18,-13.89,136.44,235.1
+P0329,Malnjangarnak,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Northern Land Council,,1.0,35.83,-12.66,134.77,274.1
+P0330,Mapuru,Minor,True,Not recorded,False,False,False,43.0,name+distance,Northern Land Council,,1.0,27.85,-12.25,135.44,356.7
+P0331,Marraya,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,43.42,-13.84,135.8,246.6
+P0332,Martjanba,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,,107.96,-11.17,136.71,532.1
+P0333,Matamata,Family Outstation,False,Not recorded,False,False,False,21.0,name+distance,Northern Land Council,,1.0,47.83,-12.08,136.27,432.4
+P0334,Mawulyumanja,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Anindilyakwa Land Council,,0.66627073047103,4.22,-13.84,136.72,243.6
+P0335,Milingimbi,Major,True,Y,True,False,False,1439.0,name+distance,Northern Land Council,,0.8393523613433869,0.0,-12.1,134.92000000000002,331.5
+P0336,Milyakburra,Major,True,N,True,False,False,161.0,name+distance,Anindilyakwa Land Council,,0.9469095124572117,0.07,-13.780000000000001,136.2,246.8
+P0337,Mirrnatja,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,1.0,37.51,-12.66,135.19,306.7
+P0338,Miwul,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,32.01,-14.030000000000001,135.91,223.5
+P0339,Mulgurram,Family Outstation,False,Not recorded,True,False,False,3.0,name+distance,Northern Land Council,,0.9416416055241742,7.74,-12.4,134.96,308.9
+P0340,Naliyindi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,35.5,-12.540000000000001,135.18,314.2
+P0341,Ngangalala,Minor,True,Not recorded,True,False,False,64.0,name+distance,Northern Land Council,,0.9143793700075159,7.14,-12.3,134.99,319.7
+P0342,Nanyingburra,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,1.0,42.86,-11.76,135.87,428.7
+P0343,Ngayawilli,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Northern Land Council,,0.9042212989779184,2.8,-11.99,135.57,387.4
+P0344,Ngadumiyerrka,Family Outstation,False,Not recorded,True,False,False,19.0,name+distance,Anindilyakwa Land Council,,0.5989448352417625,0.91,-13.82,136.46,242.9
+P0345,Ngilipitji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,77.69,-13.540000000000001,135.53,284.4
+P0346,Nikawu,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9267222691745668,6.63,-12.09,135.55,377.7
+P0347,Wurwula,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,48.59,-11.98,136.3,443.3
+P0348,Numbulwar,Major,True,Y,True,False,False,850.0,name+distance,Northern Land Council,,0.9516233338031744,0.01,-14.280000000000001,135.74,201.8
+P0349,Ramingining,Major,True,Y,True,False,False,1025.0,name+distance,Northern Land Council,,0.9222637444633774,0.01,-12.33,134.93,312.9
+P0350,Raymangirr,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,1.0,27.54,-12.34,136.0,397.4
+P0351,Dhuruputjpi,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,71.71,-13.05,136.18,326.3
+P0352,Umbakumba,Major,True,Y,True,False,False,591.0,name+distance,Anindilyakwa Land Council,,0.6897649628326644,0.02,-13.86,136.81,243.5
+P0353,Waldnarr,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,42.57,-13.77,135.81,254.3
+P0354,Wandawuy,Family Outstation,False,Not recorded,False,False,False,80.0,name+distance,Northern Land Council,,1.0,73.11,-12.89,136.36,343.9
+P0355,Wumajbarr,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Northern Land Council,,0.9573961247579877,12.07,-14.17,135.69,215.2
+P0356,Wunburri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,,71.85,-11.59,136.08,457.5
+P0357,Wurrumenbumanja,Family Outstation,False,Not recorded,False,False,False,,name+distance,Anindilyakwa Land Council,,0.7714218771504511,17.4,-14.14,136.52,208.7
+P0358,Wuyagiba,Family Outstation,False,Not recorded,False,False,False,20.0,name+distance,Northern Land Council,,1.0,43.23,-14.620000000000001,135.52,176.6
+P0359,Yanungbi,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Northern Land Council,,0.8015120643052664,7.4,-12.280000000000001,136.66,411.8
+P0360,Yathalamarra,Minor,True,Not recorded,True,False,False,66.0,name+distance,Northern Land Council,,0.9099167714601198,5.45,-12.27,134.92000000000002,316.9
+P0361,Yedikba,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Anindilyakwa Land Council,,0.6894166584641542,10.3,-14.08,136.46,214.5
+P0362,Yanbakwa,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Anindilyakwa Land Council,,1.0,25.18,-14.22,136.46,199.6
+P0363,Yimidarra,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.9516233338031744,17.9,-14.22,135.56,214.6
+P0364,Yirringa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,63.84,-11.65,136.03,449.5
+P0365,Yirrkala,Major,True,Y,True,True,False,951.0,name+distance,Northern Land Council,,0.6823963839185903,0.04,-12.25,136.89000000000001,417.6
+P0366,Badawarrka,Family Outstation,False,Not recorded,False,False,False,7.0,name+distance,Northern Land Council,,0.8986326566501889,2.95,-14.700000000000001,134.44,144.1
+P0367,Bamboo Springs,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,81.52,-16.96,129.08,188.4
+P0368,Barrapunta,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,0.9161764925309809,19.05,-13.16,134.85,242.6
+P0369,Barunga,Major,True,Y,True,False,False,427.0,name+distance,Northern Land Council,,0.4326271706672236,0.03,-14.52,132.87,25.9
+P0370,Beswick,Major,True,Y,True,False,False,624.0,name+distance,Northern Land Council,,0.6368711458408743,0.04,-14.55,133.11,0.0
+P0371,Binjari,Minor,True,Y,True,False,False,223.0,name+distance,Northern Land Council,,0.47380884554313796,0.0,-14.55,132.18,0.2
+P0372,Boomerang Lagoon,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,1.0,43.75,-14.450000000000001,135.04,208.6
+P0373,Bubble Bubble,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9319243290052103,22.62,-15.81,129.31,236.2
+P0374,Bulla,Minor,True,N,True,False,False,105.0,name+distance,Northern Land Council,,0.8552437001504632,0.02,-15.76,130.04,197.2
+P0375,Bulman,Major,True,Y,True,False,False,329.0,name+distance,Northern Land Council,,0.9922973049442412,0.02,-13.67,134.33,163.7
+P0376,Costello,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,0.9615510931332271,22.92,-14.56,134.88,191.2
+P0377,Daguragu,Major,True,Y,True,False,False,284.0,name+distance,Central Land Council,,0.8998129597892227,0.0,-17.400000000000002,130.8,0.0
+P0378,Jilkminggan,Minor,True,Y,True,False,False,354.0,name+distance,Northern Land Council,,0.41438332440274017,0.0,-14.950000000000001,133.3,46.8
+P0379,Manyallaluk,Minor,True,Y,True,False,False,108.0,name+distance,Northern Land Council,,0.9933578739738376,0.02,-14.27,132.83,40.8
+P0380,Gorpulyul,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,36.91,-13.35,134.15,172.4
+P0381,Gilwi,Family Outstation,False,Not recorded,True,False,False,36.0,name+distance,Northern Land Council,,0.5239215290151698,4.48,-15.790000000000001,130.53,178.4
+P0382,Jodetluk,Family Outstation,False,Not recorded,True,False,False,40.0,name+distance,Northern Land Council,,0.09658409385110713,0.21,-14.36,132.43,0.3
+P0383,Hodgson River Station,Minor,True,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,27.71,-15.47,134.1,145.5
+P0384,Jowar,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.893982267854682,4.94,-14.73,134.43,142.9
+P0385,Kalkarindji,Major,True,Y,True,False,False,392.0,name+distance,Central Land Council,,0.903741634480549,0.02,-17.45,130.83,0.0
+P0386,Picininny Bore,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,159.9,-19.830000000000002,129.78,284.1
+P0387,Walpiri,Town Camp,False,Not recorded,True,False,False,60.0,name+distance,Northern Land Council,,0.35503023759254715,0.03,-14.47,132.27,0.0
+P0388,Kybrook Farm,Minor,True,Y,True,False,False,72.0,name+distance,Northern Land Council,,0.7318316817713687,0.03,-13.86,131.82,71.4
+P0389,Lajamanu,Major,True,Y,True,False,False,703.0,name+distance,Central Land Council,,0.9731342333770879,0.04,-18.34,130.64000000000001,98.4
+P0390,Liku,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,46.73,-17.91,130.5,60.1
+P0391,Lingara,Family Outstation,False,Not recorded,True,False,False,52.0,name+distance,Northern Land Council,,0.999246386061967,0.01,-16.490000000000002,130.64000000000001,100.5
+P0392,Lul-Tju,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Central Land Council,,0.9731342333770879,6.21,-18.38,130.59,103.9
+P0393,Maria Lagoon,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.7939996771728705,16.06,-15.3,135.44,121.9
+P0394,Marralum,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,69.06,-15.39,129.25,276.1
+P0395,Mataranka Town Camp,Town Camp,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.3319924590705805,0.12,-14.93,133.07,39.7
+P0396,Miali Brumby,Town Camp,False,Not recorded,True,True,False,192.0,name+distance,Northern Land Council,,0.3684325826198325,0.04,-14.46,132.26,0.0
+P0397,Amanbidji,Major,True,N,False,False,False,83.0,name+distance,Northern Land Council,,0.9892213841374186,0.0,-16.43,129.62,164.8
+P0398,Minyerri,Major,True,Y,True,False,False,726.0,name+distance,Northern Land Council,,0.9736273365246687,0.0,-15.22,134.08,126.7
+P0399,Mistake Creek,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Central Land Council,,1.0,96.71,-17.11,129.04,189.0
+P0400,Mole Hill,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,0.8220416316036492,1.9,-14.870000000000001,133.83,84.3
+P0401,Momob,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,31.5,-13.36,134.27,180.6
+P0402,Mount Catt,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,0.9796540009746524,17.96,-13.8,134.43,164.6
+P0403,Mumpumampu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,44.26,-14.38,135.33,209.5
+P0404,Duck Ponds,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,82.49,-18.77,131.28,151.8
+P0405,Nulawan,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Northern Land Council,,0.9712285845026091,21.2,-14.790000000000001,134.93,197.9
+P0406,Ngukurr,Major,True,Y,True,False,False,1350.0,name+distance,Northern Land Council,,0.9149138875433729,0.03,-14.73,134.73,175.7
+P0407,Nummerloori,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,29.0,-14.59,134.98,201.5
+P0408,Parnta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,38.23,-18.68,130.65,136.1
+P0409,Pigeon Hole,Minor,True,N,False,False,False,141.0,name+distance,Northern Land Council,,0.986733302027545,0.06,-16.81,131.22,74.8
+P0410,Pine Creek Compound,Town Camp,False,Not recorded,True,False,False,20.0,name+distance,Northern Land Council,,0.7461292017126595,0.01,-13.82,131.83,75.0
+P0411,Rittarangu,Minor,True,N,False,False,False,160.0,name+distance,Northern Land Council,,0.896754594031997,0.02,-14.71,134.57,157.4
+P0412,Rockhole,Minor,True,Not recorded,True,False,False,170.0,name+distance,Northern Land Council,,0.446998749163896,0.01,-14.52,132.19,0.1
+P0413,Jiwaranpa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,154.32,-19.56,129.93,250.5
+P0414,Mungurrupa,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,1.0,109.31,-20.580000000000002,129.73,364.8
+P0415,Muruning,Family Outstation,False,Not recorded,True,False,False,23.0,name+distance,Northern Land Council,,0.5979627436068021,0.11,-15.68,130.48,191.4
+P0416,Turkey Lagoon,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9353023505880064,20.41,-14.530000000000001,134.75,176.9
+P0417,Wanmarri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,57.14,-14.450000000000001,135.23,208.8
+P0418,Weemol,Minor,True,Y,True,False,False,329.0,name+distance,Northern Land Council,,0.9922973049442412,0.01,-13.64,134.31,162.9
+P0419,Werenbun,Family Outstation,False,Not recorded,True,False,False,40.0,name+distance,Northern Land Council,,0.5499451178826484,0.02,-14.18,132.16,23.2
+P0420,Yarralin,Major,True,Y,True,False,False,344.0,name+distance,Northern Land Council,,0.9929943618621666,0.0,-16.45,130.88,102.8
+P0421,Yinguwunarri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8544871839062325,4.48,-16.61,131.82,135.7
+P0422,Un-Marr,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9635111971357483,17.29,-14.06,129.91,180.3
+P0423,Dhudupu,Family Outstation,False,Not recorded,True,False,False,9.0,name+distance,Northern Land Council,,0.9014298093103809,1.82,-12.0,135.57,386.2
+P0424,Gonguruwuy,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,60.56,-12.07,136.15,428.9
+P0425,Djarrung,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Northern Land Council,,1.0,34.82,-14.81,131.54,51.8
+P0426,Yudu Yudu,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Northern Land Council,,0.7904274482788224,6.86,-12.23,136.64000000000001,416.7
+P0427,Hoppys Camp,Town Camp,False,Not recorded,True,True,False,60.0,name+distance,Central Land Council,,0.5407920608121222,0.03,-23.68,133.88,0.1
+P0428,Ilpeye Ilpeye Estate,Town Camp,False,Not recorded,True,False,False,60.0,name+distance,Central Land Council,,0.5590765087924816,0.01,-23.7,133.91,1.1
+P0429,Myatt,Family Outstation,False,Not recorded,True,False,False,63.0,name+distance,Northern Land Council,,0.5073096851620424,0.02,-15.71,130.48,188.1
+P0430,Tinkarli,Town Camp,False,Not recorded,True,True,False,66.0,name+distance,Central Land Council,,0.8019863968913383,0.01,-19.64,134.2,427.8
+P0431,Wuppa,Town Camp,False,Not recorded,True,True,False,69.0,name+distance,Central Land Council,,0.8033400489322232,0.01,-19.64,134.2,427.5
+P0432,Flicks Hole,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,43.21,-15.620000000000001,134.09,156.4
+P0433,Burrumburru,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,137.89,-17.740000000000002,137.78,237.6
+P0434,Manaburdurma,Town Camp,False,Not recorded,True,True,False,45.0,name+distance,Northern Land Council,,0.4021245061128765,0.01,-12.67,132.84,181.7
+P0435,Murtulki,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8675983878398162,18.69,-19.92,134.39000000000001,420.4
+P0436,Murun Murula,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,154.92,-18.5,137.52,291.9
+P0437,Wangalinji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,152.45,-18.400000000000002,137.47,279.3
+P0438,Gumuluji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,140.25,-17.94,137.48,235.4
+P0439,Alatyeye,Family Outstation,False,Not recorded,False,False,False,7.0,name+distance,Central Land Council,,0.8756311789294587,14.45,-23.1,134.22,71.8
+P0440,Mamadi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,117.89,-17.85,129.64000000000001,132.2
+P0441,Jungarrayi Warrnu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,55.05,-22.69,131.43,269.5
+P0442,Larrpayanji,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8809427833257438,7.49,-14.780000000000001,134.68,170.8
+P0443,Woolaning,Family Outstation,False,Not recorded,False,False,False,9.0,name+distance,Northern Land Council,,0.7706740236141659,0.34,-13.11,130.66,47.2
+P0444,Bobs Yard,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8180112071607089,2.65,-16.01,130.61,152.8
+P0445,Barrak Barrak,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.7516188126475993,21.19,-15.870000000000001,130.36,173.7
+P0446,Bucket Springs,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,30.9,-15.74,129.16,252.6
+P0447,Policemans Hole,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9621817810360191,24.62,-15.780000000000001,129.11,253.9
+P0448,Mt Maiyo,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,141.51,-17.69,129.4,151.5
+P0449,Irrerlirre,Family Outstation,False,Not recorded,False,False,False,20.0,name+distance,Central Land Council,,0.9872017340727259,21.96,-22.85,135.13,155.7
+P0450,Jangirulu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8517169255020153,11.93,-18.13,133.61,301.3
+P0451,Ulbulla,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8610587913166351,4.05,-25.68,133.2,222.2
+P0452,Wunara,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Central Land Council,,0.7026351257364334,0.9,-19.990000000000002,136.62,429.0
+P0453,Werre-Therre,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.7917330071850637,2.16,-23.54,133.63,26.4
+P0454,Ilperle,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Central Land Council,,1.0,48.42,-22.93,135.72,199.9
+P0455,Jomet (Urpalarwn),Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.7024294072037206,7.16,-15.42,133.11,93.6
+P0456,Undoolya Bore,Family Outstation,False,Not recorded,False,False,False,20.0,name+distance,Central Land Council,,0.6947246437008323,0.85,-23.75,134.12,16.0
+P0457,Artekerre,Family Outstation,False,Not recorded,True,False,False,24.0,name+distance,Central Land Council,,0.86628400542478,0.67,-23.26,133.77,45.5
+P0458,Burt Creek,Family Outstation,False,Not recorded,False,False,False,24.0,name+distance,Central Land Council,,0.8563755823538305,0.59,-23.2,133.75,52.6
+P0459,Alkuptija,Family Outstation,False,Not recorded,False,False,False,24.0,name+distance,Central Land Council,,0.8111228643398554,2.6,-23.07,133.69,68.1
+P0460,Wooliana,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.8460478027426002,1.67,-13.67,130.64000000000001,103.3
+P0461,Nemarluk,Family Outstation,False,Not recorded,True,False,False,23.0,name+distance,Northern Land Council,,0.8583689632818463,6.1,-14.24,130.0,190.0
+P0462,Merrepen,Family Outstation,False,Not recorded,False,False,False,50.0,name+distance,Northern Land Council,,0.880480997377313,10.18,-14.22,129.97,190.3
+P0463,Kuy,Family Outstation,False,Not recorded,True,False,False,1.0,name+distance,Northern Land Council,,0.8851902089624084,23.29,-14.040000000000001,129.6,201.2
+P0464,Yederr,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,25.37,-14.02,129.72,190.3
+P0465,Walkabout Bore,Family Outstation,False,Not recorded,False,False,False,26.0,name+distance,Central Land Council,,1.0,35.51,-24.38,133.82,65.3
+P0466,Likkaparta,Minor,True,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.6774745607315553,2.7,-19.34,134.54,402.5
+P0467,Kiana,Family Outstation,False,Not recorded,False,False,False,18.0,name+distance,Northern Land Council,,1.0,47.03,-17.240000000000002,136.18,124.0
+P0468,Goolminyini,Family Outstation,False,Not recorded,False,False,False,40.0,name+distance,Northern Land Council,,0.6610510463258229,1.65,-16.16,136.1,18.2
+P0469,Mimina,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,0.9812670722713576,16.25,-16.8,136.83,93.2
+P0470,Inkawenyerre,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9440516265416601,13.26,-21.82,134.85,228.0
+P0471,Iylentye,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9353770552104989,8.35,-21.990000000000002,134.73,205.9
+P0472,Camel Camp,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,29.21,-22.27,134.55,169.6
+P0473,Atheley,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9376509521718065,4.27,-21.92,134.87,219.3
+P0474,Pungalindum,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9416862887562276,8.57,-22.07,134.69,195.8
+P0475,Ngappamilarnu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,73.77,-19.86,133.28,369.2
+P0476,Purrukuwurru,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,29.21,-19.95,135.7,427.8
+P0477,Junkaji,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,0.7712279192696626,11.06,-20.45,134.14000000000001,359.2
+P0478,Arrawajin,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,29.02,-20.52,134.98,368.1
+P0479,Kalinjarri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7570097788925797,12.7,-20.400000000000002,134.37,367.1
+P0480,Illeuwurru,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,42.34,-21.61,134.39000000000001,234.8
+P0481,Gudjekbin,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,50.58,-12.25,133.8,261.0
+P0482,Gul Gul,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,1.0,26.54,-11.13,132.34,208.8
+P0483,Pickertaramoor,Minor,True,Not recorded,True,False,False,,name+distance,Tiwi Land Council,,0.9824023403118218,0.93,-11.77,130.9,65.0
+P0484,Mirridi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,76.69,-19.02,130.78,171.9
+P0485,Kulang,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8765902566580906,18.23,-24.72,129.01,496.7
+P0486,Walu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,42.98,-24.740000000000002,129.53,446.5
+P0487,Walkalba,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.8123953835598007,10.0,-22.16,131.82,266.5
+P0488,Winparku,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,26.65,-23.43,131.46,242.0
+P0489,Pinja,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,59.33,-18.81,130.37,156.6
+P0490,Kurrurldul,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,46.68,-12.49,134.24,255.7
+P0491,Awumbunyji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,36.26,-14.450000000000001,135.44,197.8
+P0492,Chilla Well,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,41.96,-21.53,130.97,378.8
+P0493,5 Mile Bore,Family Outstation,False,Not recorded,False,False,False,27.0,name+distance,Central Land Council,,0.9817911858311413,7.43,-23.23,131.98,195.6
+P0494,Ulambara,Family Outstation,False,Not recorded,True,False,False,11.0,name+distance,Central Land Council,,0.9773340330387569,5.11,-23.28,131.93,199.6
+P0495,Amundurngua,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.9727549281148552,14.83,-23.27,131.42000000000002,249.2
+P0496,Tjintirtjintirpa,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.9772817389551453,1.93,-23.29,131.27,264.0
+P0497,Ngutjul,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9647216362313614,7.6,-23.3,129.47,444.0
+P0498,Muyin,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,39.5,-23.16,129.0,492.6
+P0499,Ngankiritja,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.9919521529364422,1.75,-23.46,131.88,199.7
+P0500,Tarawara,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,34.31,-23.55,131.41,245.2
+P0501,Camels Hump,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,44.56,-23.75,131.59,225.7
+P0502,Alkngarriintja,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.769210742548856,7.29,-23.96,132.46,140.0
+P0503,Ntakarra,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Central Land Council,,0.7058006365513906,1.15,-23.900000000000002,132.68,117.3
+P0504,Ipalala,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.7700091349636867,1.93,-23.93,132.68,118.0
+P0505,Ulpunda,Family Outstation,False,Not recorded,True,False,False,15.0,name+distance,Central Land Council,,0.8099300288530211,0.24,-23.95,132.77,109.8
+P0506,Palm Paddock,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Central Land Council,,0.8523248973459793,13.37,-24.09,132.68,121.8
+P0507,Deleye,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,0.9952000227192299,10.44,-13.77,129.98,150.9
+P0508,Kuwuma,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Northern Land Council,,1.0,29.22,-13.6,130.37,109.2
+P0509,Kwombom,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,31.49,-13.96,130.29,147.0
+P0510,Wudaduk,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,0.9731110371365664,19.0,-14.030000000000001,129.94,174.8
+P0511,Chuluk,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,35.86,-13.66,130.27,121.7
+P0512,16 Mile Camp,Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Central Land Council,,0.8466824072255301,0.56,-23.46,133.83,22.3
+P0513,Blacktank Bore,Family Outstation,False,Not recorded,False,False,False,18.0,name+distance,Central Land Council,,0.9502274763394657,21.94,-23.32,134.02,40.2
+P0514,Turners Camp,Family Outstation,False,Not recorded,False,False,False,18.0,name+distance,Central Land Council,,1.0,27.27,-23.31,134.07,44.2
+P0515,Williams Well,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.8797456031210168,0.7,-23.67,134.28,33.2
+P0516,Akarnenehe Well,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,30.24,-23.06,136.19,238.7
+P0517,Antere,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9947281417972296,18.85,-25.66,134.41,213.9
+P0518,Oak Valley,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,1.0,34.94,-24.38,133.93,64.9
+P0519,Mount Peachy,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,1.0,36.92,-24.39,133.87,66.1
+P0520,Pwertentye,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,38.8,-23.37,134.79,93.9
+P0521,Barridjowkeng,Family Outstation,False,Not recorded,False,False,False,7.0,name+distance,Northern Land Council,,1.0,32.12,-12.35,134.18,266.0
+P0522,Ji-Malawa,Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Northern Land Council,,0.9947211163510342,24.65,-12.120000000000001,134.67000000000002,314.4
+P0523,Kabalyarra,Family Outstation,False,Not recorded,True,False,False,1.0,name+distance,Northern Land Council,,0.8902705935154087,1.53,-12.07,134.21,295.3
+P0524,Yaminyi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,67.45,-12.790000000000001,134.36,234.6
+P0525,Yikarrakkal,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Northern Land Council,,1.0,50.0,-12.5,134.11,247.7
+P0526,Red Lily,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.49572172191347286,4.3,-12.86,132.57,154.7
+P0527,Hunters Camp,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.41006002013681575,0.4,-12.65,132.83,183.0
+P0528,Mumukala,Family Outstation,False,Not recorded,True,False,False,9.0,name+distance,Northern Land Council,,0.37477357930762073,1.99,-12.61,132.67000000000002,175.2
+P0529,Ngipin,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8859644425813801,9.08,-11.6,133.46,284.8
+P0530,Buymarr,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,50.7,-12.700000000000001,136.64000000000001,366.3
+P0531,Gutjangan,Family Outstation,False,Not recorded,True,False,False,25.0,name+distance,Northern Land Council,,0.53879233931542,9.9,-12.08,136.81,434.6
+P0532,Dharawa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,34.67,-11.85,135.85,419.8
+P0533,Dhayirri,Family Outstation,False,Not recorded,True,False,False,14.0,name+distance,Northern Land Council,,0.9115268707338271,7.59,-11.96,135.62,393.3
+P0534,Galawarra,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.920863985842515,2.54,-12.040000000000001,135.59,384.9
+P0535,Mudhamul,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,54.55,-12.16,136.17000000000002,423.5
+P0536,Bishops Bore,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.6126669609492391,5.53,-14.61,133.07,6.4
+P0537,Baghetti,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,0.9902539419852148,17.22,-13.76,134.46,169.9
+P0538,Doolgarina,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,48.86,-16.23,136.77,47.8
+P0539,Ijarra,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.7289997273999469,6.98,-16.22,136.01,29.9
+P0540,North Island,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,,50.08,-15.56,136.85,73.9
+P0541,Wada Wadalla,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8335138061305182,10.71,-15.93,136.43,13.9
+P0542,Manangoora,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,1.0,55.16,-16.05,136.86,54.0
+P0543,Wurlbu,Family Outstation,False,Not recorded,True,False,False,1.0,name+distance,Northern Land Council,,0.7626565372781174,0.75,-16.07,136.28,0.0
+P0544,Dillinya,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8363290542885083,16.98,-15.860000000000001,132.05,129.6
+P0545,Lija Mukumparla,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,60.75,-17.330000000000002,135.08,185.4
+P0546,Kurraya,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Central Land Council,,0.9804282128262545,20.59,-19.77,134.48,438.3
+P0547,Ankweleyelengkwe,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.8308347803376325,0.86,-21.6,133.76,230.2
+P0548,Jemelke,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Central Land Council,,0.8572143672352048,0.12,-21.53,133.87,236.9
+P0549,Minmarama Park,Town Camp,False,Not recorded,True,True,False,,name+distance,Northern Land Council,F,0.08814782100039568,0.0,-12.41,130.85,2.9
+P0550,Iron Stone,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.6818234492298036,9.23,-12.89,130.44,55.9
+P0551,Mobarn,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.991799347768972,8.59,-13.58,134.35,171.2
+P0552,Mariah,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9886010352729184,23.45,-11.23,132.38,204.6
+P0553,Blue Bush,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Central Land Council,,1.0,36.03,-19.02,133.74,350.5
+P0554,Milmilngkan,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,50.52,-12.52,134.25,252.8
+P0555,Lake Katherine,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,60.4,-14.27,135.07,213.8
+P0556,Sabina,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9950922527476836,7.29,-13.86,129.93,161.8
+P0557,Wulkabimirri,Family Outstation,False,Not recorded,True,False,False,55.0,name+distance,Northern Land Council,,0.9513315738523672,0.43,-12.36,134.91,308.9
+P0558,Nguyarramini,Family Outstation,False,Not recorded,False,False,False,20.0,name+distance,Central Land Council,,0.8080875314493356,17.33,-20.09,134.39000000000001,401.6
+P0559,Punjarriji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,28.51,-20.31,134.51,379.0
+P0560,Bloodwood Bore,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,35.26,-25.77,134.29,223.0
+P0561,Beer St Bore,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9936105852982188,5.0,-25.580000000000002,134.53,208.2
+P0562,Halfway Camp,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9943070528430813,24.64,-25.69,134.36,216.4
+P0563,Charlotte Waters,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,48.31,-25.91,134.89000000000001,255.4
+P0564,Mcdonalds Yard,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,44.34,-17.78,130.59,43.1
+P0565,Mallarrami,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,48.2,-11.78,136.54,465.6
+P0566,Alice Well,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,1.0,27.41,-24.88,134.23,124.5
+P0567,Irrmarne,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,119.97,-21.650000000000002,136.39000000000001,340.6
+P0568,Pantyinteme,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.9175957013863612,15.97,-24.45,133.11,105.7
+P0569,Mt Eaglebeak,Family Outstation,False,Not recorded,False,False,False,30.0,name+distance,Central Land Council,,0.9931541509200172,24.15,-22.96,135.2,153.3
+P0570,Lizard Bore,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.9723726989450351,14.34,-23.3,131.13,277.2
+P0571,Murranji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,64.09,-16.84,132.81,218.5
+P0572,Pertarratenge,Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Central Land Council,,0.8879448185928479,4.45,-24.41,133.32,88.7
+P0573,Petyale,Family Outstation,False,Not recorded,False,False,False,16.0,name+distance,Central Land Council,,0.8099475684472713,3.32,-22.0,133.43,190.1
+P0574,Rutjingka,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.7308691986497512,1.78,-23.92,132.82,104.1
+P0575,Yulara Pulka,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.36606789003973567,8.05,-25.25,130.89000000000001,339.4
+P0576,Yalukun,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,33.89,-12.26,136.01,402.9
+P0577,Bardalumba,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Anindilyakwa Land Council,,0.6479787681405642,0.0,-13.82,136.45,242.4
+P0578,Gulngarring,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.6002841311797017,0.99,-13.14,131.1,42.7
+P0579,Wurankuwu,Minor,True,Not recorded,True,False,False,4.0,name+distance,Tiwi Land Council,,1.0,27.15,-11.620000000000001,130.28,103.9
+P0580,Ngarnka,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,121.53,-20.18,129.91,315.8
+P0581,Katjutari,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Central Land Council,,1.0,34.16,-23.740000000000002,132.0,184.3
+P0582,Luntharra,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Central Land Council,,1.0,30.08,-23.740000000000002,132.04,180.3
+P0583,Merral Ntarrakala,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.7434705710246013,2.4,-23.91,132.83,102.8
+P0584,Natjitnama,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.869906367300254,8.84,-24.02,132.98,90.9
+P0585,Rarangantjuta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8245798533278971,2.23,-23.98,133.15,73.7
+P0586,Mount Twellar,Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Central Land Council,,0.7754769940236397,2.37,-23.54,133.62,27.5
+P0587,Wataru,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Central Land Council,,0.956018069657735,1.89,-24.86,129.06,495.0
+P0588,Oondaloo,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.9578770658902106,1.36,-24.89,129.06,495.2
+P0589,Eagle Valley,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9674232466099281,5.91,-24.93,129.1,493.1
+P0590,Tjauwata,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9674232466099281,5.52,-24.92,129.12,490.4
+P0591,Emu Point,Family Outstation,False,Not recorded,True,False,False,130.0,name+distance,Northern Land Council,,1.0,26.71,-14.17,130.33,166.3
+P0592,Kelerrk,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,1.0,34.24,-13.96,130.33,145.4
+P0593,Mulingi,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,0.9950922527476836,9.08,-13.93,129.95,165.8
+P0594,Nadilmuk,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Northern Land Council,,0.8848038296960167,8.51,-11.99,134.29,306.5
+P0595,Nabbarla Kunindabba,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9271144650240296,18.06,-12.06,134.4,305.1
+P0596,Barrkira,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,1.0,31.7,-12.01,136.46,440.0
+P0597,Watdagawuy,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9131506697350658,15.72,-11.94,135.7,401.4
+P0598,Wanakutja,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9737677633654673,8.4,-11.11,132.51,224.5
+P0599,Timor Springs,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9625584815543528,5.26,-11.1,132.57,230.3
+P0600,Sandy Bay,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.9801798338839455,6.05,-11.21,132.58,223.0
+P0601,Arrgamurrmur,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.966141293499123,4.19,-11.17,132.61,227.9
+P0602,Marramarrani,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9832873280606312,16.64,-11.3,132.55,214.2
+P0603,Adjamarragu,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.9755783158892168,11.17,-11.15,132.48,218.2
+P0604,Dhambala,Family Outstation,False,Not recorded,True,False,False,16.0,name+distance,Northern Land Council,,0.920863985842515,2.31,-12.05,135.56,381.8
+P0605,Mandedjkadjang,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,1.0,30.55,-12.26,134.03,267.9
+P0606,Yilila,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Northern Land Council,,1.0,32.63,-13.68,135.91,261.1
+P0607,Marrkalawa,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,1.0,57.36,-13.57,135.71,276.9
+P0608,Patonga (Homestead),Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.6179105756674285,3.06,-12.96,132.58,144.8
+P0609,Connells Lagoon,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,1.0,49.55,-18.89,136.55,306.8
+P0610,Maperte,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,34.86,-22.54,136.38,280.0
+P0611,Hatches Creek,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Central Land Council,,1.0,42.68,-20.85,135.21,342.5
+P0612,Iluwurru,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,59.32,-19.03,136.65,323.4
+P0613,Kurntapurra,Family Outstation,False,Not recorded,False,False,False,14.0,name+distance,Northern Land Council,,0.8128565845110629,4.12,-19.39,135.4,374.0
+P0614,Namerinni,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.697860724012314,14.33,-18.57,133.72,326.8
+P0615,Ngurrara,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,0.7997771772144749,1.37,-19.42,135.41,377.0
+P0616,Wakurlpu,Family Outstation,False,Not recorded,True,False,False,7.0,name+distance,Central Land Council,,0.8274522646776786,0.22,-20.63,134.22,339.3
+P0617,Foxalls Well,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.9764246389666885,12.68,-23.07,134.82,115.2
+P0618,Arrunge,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.8028731299194987,7.56,-22.5,132.28,206.2
+P0619,Fossil Head,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,27.91,-14.540000000000001,129.52,247.2
+P0620,Kubuyirr,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9932842677585034,12.28,-14.120000000000001,129.78,193.8
+P0621,Ngarinthi,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8727266934516555,21.63,-14.46,129.42000000000002,247.9
+P0622,Old Mission,Family Outstation,False,Y,True,False,False,7.0,name+distance,Northern Land Council,,0.8696604471075162,10.94,-14.13,129.5,216.2
+P0623,Ngunthak,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8646484482491353,19.72,-14.4,129.36,247.9
+P0624,Angatyepe,Family Outstation,False,Not recorded,True,False,False,16.0,name+distance,Central Land Council,,0.5299457607987262,0.7,-23.740000000000002,133.73,10.5
+P0625,Angkerle Arrenge (A),Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.8185937256636722,0.57,-23.75,133.48,35.5
+P0626,Angkerle Arrenge (B),Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.80135597877157,0.31,-23.740000000000002,133.48,35.5
+P0627,Arrillhjere,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Central Land Council,,0.7208541329375333,1.18,-23.78,133.63,21.0
+P0628,Elitjia,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Central Land Council,,0.7560457861192638,0.55,-23.78,133.62,22.0
+P0629,Irriltyere (A),Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.544265562083904,0.34,-23.75,133.69,13.8
+P0630,Irriltyere (B),Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.5574689847041029,1.15,-23.76,133.69,14.8
+P0631,Iteyepintye,Family Outstation,False,Not recorded,True,False,False,24.0,name+distance,Central Land Council,,0.7577557711676597,0.86,-23.76,133.6,23.4
+P0632,Itperlyenge,Family Outstation,False,Not recorded,True,False,False,15.0,name+distance,Central Land Council,,0.7642054693472264,0.91,-23.76,133.61,22.3
+P0633,Kwale Kwale,Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Central Land Council,,0.7936118524244493,0.76,-23.77,133.57,26.0
+P0634,Payeperrentye (B),Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Central Land Council,,0.8175037893923393,1.0,-23.77,133.56,27.9
+P0635,Perte Therre,Family Outstation,False,Not recorded,True,False,False,15.0,name+distance,Central Land Council,,0.6119223796564834,0.5,-23.76,133.65,18.8
+P0636,Tnerte,Family Outstation,False,Not recorded,True,False,False,16.0,name+distance,Central Land Council,,0.5368389797665531,0.63,-23.75,133.72,11.2
+P0637,Twetye (A),Family Outstation,False,Not recorded,True,False,False,15.0,name+distance,Central Land Council,,0.5346501907467156,0.57,-23.740000000000002,133.71,12.8
+P0638,Twetye (B),Family Outstation,False,Not recorded,True,False,False,20.0,name+distance,Central Land Council,,0.5312675950717564,0.5,-23.740000000000002,133.7,13.7
+P0639,Tywenpe (A),Family Outstation,False,Not recorded,False,False,False,15.0,name+distance,Central Land Council,,0.5299365990004901,0.59,-23.73,133.73,10.6
+P0640,Inbina Atwatye,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Central Land Council,,0.5335126256746957,0.25,-23.740000000000002,133.71,12.0
+P0641,Tywenpe (C),Family Outstation,False,Not recorded,True,False,False,25.0,name+distance,Central Land Council,,0.5343257997360427,0.64,-23.740000000000002,133.69,14.5
+P0642,Tywenpe (D),Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Central Land Council,,0.5624387660570584,1.03,-23.76,133.67000000000002,16.2
+P0643,Itchy Koo Park,Family Outstation,False,Not recorded,True,False,False,30.0,name+distance,Central Land Council,,0.5775281751422261,0.88,-23.77,133.66,17.6
+P0644,Kudantiga,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.8381810965026218,18.08,-14.43,129.43,244.8
+P0645,Wumirdin,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,0.8899403670633416,6.67,-14.19,129.56,215.7
+P0646,Barraratjpi,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,1.0,64.84,-13.22,136.39000000000001,308.3
+P0647,Yartalu Yartalu,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,1.0,57.84,-20.57,130.36,348.2
+P0648,Pwerte Marnte Marnte,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,1.0,25.74,-24.37,133.72,66.4
+P0649,Kalumbulani,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.954894204009489,6.68,-16.88,131.22,69.0
+P0650,Doojum,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,32.13,-15.73,129.16,254.1
+P0651,Burta Wurta,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,37.2,-17.54,130.48,36.4
+P0652,Gimbat,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,35.49,-13.58,132.61,79.0
+P0653,Banatjarl,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.3392671667716981,13.96,-14.48,132.65,20.4
+P0654,Kalpitapta,Family Outstation,False,Not recorded,False,False,False,44.0,name+distance,Central Land Council,,1.0,36.76,-20.900000000000002,135.35,343.2
+P0655,Snake Well,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Central Land Council,,0.8576765375385953,16.55,-23.16,133.92000000000002,55.6
+P0656,Bunhanura,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Northern Land Council,,0.9550121982905179,16.15,-12.370000000000001,135.72,371.0
+P0657,Fitzroy Station,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Northern Land Council,,0.38413691610977935,4.24,-15.56,130.93,150.5
+P0658,Menngen,Family Outstation,False,Not recorded,True,False,False,30.0,name+distance,Northern Land Council,,0.7697050186798939,17.47,-15.36,131.27,108.1
+P0659,Wiitin,Family Outstation,False,Not recorded,True,False,False,1.0,name+distance,Central Land Council,,0.7895995110507784,1.16,-19.54,134.24,425.2
+P0660,Spotted Tiger,Family Outstation,False,Not recorded,False,False,False,9.0,name+distance,Central Land Council,,0.9755014202373227,6.51,-23.04,134.92000000000002,124.7
+P0661,Dhulmulmiya,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,29.78,-12.530000000000001,136.73,385.7
+P0662,Dhaniya,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,31.57,-12.55,136.74,383.4
+P0663,Daliwuy Bay,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.7010112284762502,9.42,-12.34,136.92000000000002,408.5
+P0664,Mount Jean,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9907589178704754,19.12,-13.530000000000001,134.17000000000002,159.5
+P0665,Scott Point,Family Outstation,False,Not recorded,False,False,False,,name+distance,Anindilyakwa Land Council,,0.7573673995031807,11.98,-13.75,136.85,255.8
+P0666,Akwalirrumanja,Family Outstation,False,Not recorded,True,False,False,13.0,name+distance,Anindilyakwa Land Council,,0.6922974392821228,1.03,-13.86,136.78,242.4
+P0667,Angwura,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Anindilyakwa Land Council,,0.7341213211656794,3.22,-13.92,136.73,235.3
+P0668,Imperrenth,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8247328263571858,55.89,-21.21,134.97,295.2
+P0669,Uminyuluk,Family Outstation,False,Not recorded,False,False,False,7.0,name+distance,Northern Land Council,,0.9962843225754081,6.3,-13.83,130.05,150.6
+P0670,Garanydjirr,Family Outstation,False,Not recorded,True,False,False,1.0,name+distance,Northern Land Council,,0.9143793700075159,10.78,-12.280000000000001,135.02,323.1
+P0671,Mu-Gurta,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,37.29,-12.26,134.51,292.1
+P0672,Djinkarr,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,0.945726479507495,18.18,-12.21,134.3,285.1
+P0673,Jarramagorndarra,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,,1.0,27.92,-12.290000000000001,134.65,297.9
+P0674,Kumurrulu,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Northern Land Council,,1.0,28.42,-12.27,134.07,268.9
+P0675,Armorran,Family Outstation,False,Not recorded,True,False,False,10.0,name+distance,Northern Land Council,,0.9569283705758101,11.22,-11.76,133.38,270.8
+P0676,Ngarlu Ngarlu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9481621804104039,23.25,-11.870000000000001,133.41,269.9
+P0677,Tommyhawk Swamp,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9757471199814844,20.75,-22.19,134.59,179.2
+P0678,Mulggan,Town Camp,False,Not recorded,True,False,False,150.0,name+distance,Northern Land Council,,0.3047913002338788,0.14,-14.92,133.07,38.9
+P0679,Cow Lagoon,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,0.8069870202022774,12.83,-16.21,135.95,34.9
+P0680,Hingstons Place,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Central Land Council,,0.8063760896639677,0.41,-19.62,134.2,426.2
+P0681,Napagunpa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,43.42,-19.1,133.62,344.4
+P0682,Pakulki,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,0.8104727955708732,7.21,-19.5,134.42000000000002,424.2
+P0683,Buni-Inwunbuluk,Family Outstation,False,Not recorded,True,False,False,5.0,name+distance,Northern Land Council,,1.0,38.89,-11.41,132.83,231.9
+P0684,Murgenella Plains,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,52.55,-11.71,132.91,224.3
+P0685,Irgul Point,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.9833735204415899,21.38,-11.34,132.53,209.4
+P0686,Adbanae,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,67.79,-11.24,131.98,173.3
+P0687,Kapalga,Family Outstation,False,Not recorded,True,False,False,12.0,name+distance,Northern Land Council,,0.24528203444647573,2.92,-12.700000000000001,132.37,142.9
+P0688,Djirrbiyak,Family Outstation,False,Not recorded,True,False,False,30.0,name+distance,Northern Land Council,,0.42172547011512074,0.99,-12.73,132.76,172.9
+P0689,Walangurrminy,Family Outstation,False,Not recorded,True,False,False,13.0,name+distance,Northern Land Council,,0.5633561283140187,0.05,-12.97,130.78,28.0
+P0690,Yakala,Family Outstation,False,Not recorded,True,False,False,6.0,name+distance,Central Land Council,,0.7028606450686286,1.46,-23.89,132.66,118.7
+P0691,Undurana 2A,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Central Land Council,,0.9578178071818378,24.19,-23.76,132.11,174.2
+P0692,Budjanga,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,1.0,47.2,-16.18,136.77,46.1
+P0693,Milibunthurra,Family Outstation,False,Not recorded,True,False,False,3.0,name+distance,Northern Land Council,,0.8285004712545263,11.36,-15.96,136.42000000000002,10.6
+P0694,Sandridge,Family Outstation,False,Not recorded,True,False,False,7.0,name+distance,Northern Land Council,,0.8162755250311186,1.36,-16.04,136.35,0.1
+P0695,Jimilaya,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,31.21,-15.610000000000001,136.67000000000002,58.0
+P0696,Mooloowa,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,,66.31,-15.620000000000001,137.0,82.7
+P0697,Uguie,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,74.04,-15.83,137.04,77.0
+P0698,Garawa 2,Town Camp,False,Not recorded,True,False,False,56.0,name+distance,Northern Land Council,,0.8205486916082857,0.03,-16.07,136.32,0.0
+P0699,Garrinjinny,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Northern Land Council,,0.5466691653175606,2.64,-16.67,135.65,91.2
+P0700,Mariniri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9894878650250912,12.97,-16.67,136.9,87.0
+P0701,Wulaburri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,41.5,-16.41,136.84,63.8
+P0702,Wundigalla,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,1.0,31.67,-16.48,137.04,86.3
+P0703,Pantharrpilenhe,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Central Land Council,,1.0,38.71,-23.37,134.79,93.7
+P0704,Warlpeyangkrere,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,87.78,-22.55,136.99,335.3
+P0705,Yinyikay,Family Outstation,False,Not recorded,False,False,False,18.0,name+distance,Northern Land Council,,1.0,50.84,-12.21,136.23,418.0
+P0706,Kumunu,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Central Land Council,,0.4077956092725622,7.13,-18.76,133.64000000000001,328.2
+P0707,Muckaty,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,0.7266749002016002,5.24,-18.64,133.9,347.4
+P0708,Yirra Bandoo,Family Outstation,False,Not recorded,True,False,False,,name+distance,Northern Land Council,H7,0.14254905380954505,0.45,-12.57,131.02,0.3
+P0709,Darrandarra,Family Outstation,False,Not recorded,True,False,True,,name+distance,Northern Land Council,IB,0.2781722442401795,0.15,-12.74,130.95,0.8
+P0710,10 Mile Outstation,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,0.8719858367431018,16.58,-22.47,132.38,201.2
+P0711,Ileparratye,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,0.7922302711076801,3.23,-22.02,133.43,187.8
+P0712,4 Mile Camp,Family Outstation,False,Not recorded,True,False,False,8.0,name+distance,Tiwi Land Council,,0.91741297738744,2.89,-11.78,130.6,70.3
+P0713,Kabulwarnamyo,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,76.39,-12.76,133.84,209.8
+P0714,Leichardt,Family Outstation,False,Not recorded,False,False,False,1.0,name+distance,Northern Land Council,,1.0,30.26,-13.85,130.28,137.5
+P0715,Corkwood Bore,Family Outstation,False,Not recorded,True,False,False,27.0,name+distance,Central Land Council,,0.9096333469303419,7.49,-23.31,133.87,38.3
+P0716,Yulbara,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,68.16,-15.780000000000001,137.0,74.7
+P0717,Babungi,Family Outstation,False,Not recorded,False,False,False,5.0,name+distance,Northern Land Council,,,65.15,-15.74,136.98,74.1
+P0718,Conder Point,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Tiwi Land Council,,1.0,49.87,-11.65,131.33,93.0
+P0719,Takapimiliyi,Family Outstation,False,Not recorded,False,False,False,3.0,name+distance,Tiwi Land Council,,0.8890476664328881,10.95,-11.82,130.8,60.0
+P0720,Penyeme,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,1.0,50.27,-22.79,135.67000000000002,203.9
+P0721,Atji Creek,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,0.972795527739067,11.35,-23.400000000000002,131.98,190.7
+P0722,Uluperte,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,116.14,-23.76,135.7,175.2
+P0723,Kewulyi,Family Outstation,False,Not recorded,False,False,False,25.0,name+distance,Northern Land Council,,0.8744440412921474,4.64,-14.93,134.01,104.1
+P0724,Ilpurla,Family Outstation,False,Not recorded,False,False,False,10.0,name+distance,Central Land Council,,1.0,39.28,-24.32,132.71,128.9
+P0725,Burudu,Family Outstation,False,Not recorded,False,False,False,4.0,name+distance,Northern Land Council,,1.0,48.35,-19.6,136.93,389.7
+P0726,Putjamirra,Family Outstation,False,Not recorded,True,False,False,3.0,name+distance,Tiwi Land Council,,0.9281243085523568,19.86,-11.22,130.37,135.3
+P0727,Annerre,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8693264253245246,6.86,-21.26,134.0,267.6
+P0728,10 Mile,Family Outstation,False,Not recorded,False,False,False,12.0,name+distance,Central Land Council,,1.0,51.21,-20.41,134.76,374.0
+P0729,Arkanta,Family Outstation,False,Not recorded,False,False,False,8.0,name+distance,Central Land Council,,1.0,41.09,-24.52,132.82,132.8
+P0730,Ganiyarrang,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,40.5,-14.48,135.02,206.5
+P0731,Irklancha Atwacha,Town Camp,False,Not recorded,True,True,False,,name+distance,Central Land Council,,0.559440405116751,0.06,-23.69,133.91,1.1
+P0732,Nama,Family Outstation,False,Not recorded,True,False,False,40.0,name+distance,Northern Land Council,,0.8633901479724337,0.01,-14.23,129.86,197.9
+P0733,Buffalo Farm,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.4767892414862358,9.42,-12.81,132.59,160.5
+P0734,Hawk Dreaming,Family Outstation,False,Not recorded,True,False,False,2.0,name+distance,Northern Land Council,,0.7111092457870025,4.9,-12.370000000000001,132.94,207.2
+P0735,Kunoth,Town Camp,False,Not recorded,True,True,False,16.0,name+distance,Central Land Council,,0.558448470101436,0.01,-23.69,133.88,0.0
+P0736,Adelaide River,Village,True,Not recorded,True,False,False,32.0,distance<=1km,Northern Land Council,,0.6550691699056729,0.03,-13.24,131.1,53.1
+P0737,Alice Springs,Town,True,Y,True,True,False,16.0,distance<=1km,Central Land Council,,0.5491431119686463,0.06,-23.7,133.88,0.0
+P0738,Alyangula,Town,True,Not recorded,True,False,False,,unmatched,Anindilyakwa Land Council,,0.645887134122224,0.04,-13.85,136.42000000000002,239.4
+P0739,Batchelor,Village,True,Not recorded,True,False,False,,unmatched,Northern Land Council,,0.557509090586159,0.02,-13.05,131.03,30.6
+P0740,Borroloola,Village,True,Y,True,False,False,200.0,distance<=1km,Northern Land Council,,0.8019592095470487,0.02,-16.07,136.31,0.0
+P0741,Cattle Creek,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,52.98,-17.6,131.55,74.6
+P0742,Daly Waters,Village,True,Not recorded,True,False,False,,unmatched,Northern Land Council,,0.8459287501248262,0.01,-16.25,133.37,187.3
+P0743,Darwin,City,False,Y,True,True,False,11.0,distance<=1km,Northern Land Council,A,0.08731125215022711,0.02,-12.46,130.84,7.4
+P0744,Elliott,Village,True,Y,True,False,False,197.0,distance<=1km,Northern Land Council,,0.8768730092971248,0.01,-17.55,133.54,285.2
+P0745,Jabiru,Village,True,Not recorded,True,True,False,,unmatched,Northern Land Council,,0.4047585556938603,0.09,-12.68,132.83,180.5
+P0746,Katherine,Town,True,Y,True,True,False,60.0,distance<=1km,Northern Land Council,,0.36319411164765714,0.05,-14.47,132.27,0.0
+P0747,Kulgera,Village,True,Not recorded,True,False,False,,unmatched,Central Land Council,,0.913189908660023,0.04,-25.84,133.3,236.0
+P0748,Kurinelli,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,27.2,-20.61,135.04,360.4
+P0749,Larrimah,Village,True,Not recorded,True,False,False,,unmatched,Northern Land Council,,0.7267406718893707,0.07,-15.58,133.22,111.2
+P0750,Moolooloo,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9837397858895299,21.75,-16.34,131.52,136.2
+P0751,Ngurrutiji,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,30.78,-20.12,134.52,400.4
+P0752,Nhulunbuy,Town,True,Y,True,True,False,,unmatched,Northern Land Council,,0.7662811676221584,0.04,-12.19,136.78,423.1
+P0753,Palmerston,Town,True,Not recorded,True,True,False,,unmatched,Northern Land Council,M,0.11594711676668923,0.0,-12.48,130.98,3.9
+P0754,Pine Creek,Village,True,Y,True,False,False,20.0,distance<=1km,Northern Land Council,,0.7430980033024994,0.0,-13.82,131.83,74.2
+P0755,Tennant Creek,Town,True,Y,True,True,False,7.0,distance<=1km,Central Land Council,,0.8084913667205895,0.02,-19.650000000000002,134.19,427.4
+P0756,Ti Tree,Village,True,Not recorded,True,False,False,,unmatched,Central Land Council,,0.7212597049783123,0.02,-22.13,133.42000000000002,176.6
+P0757,Timber Creek,Village,True,Y,True,False,False,,unmatched,Northern Land Council,,0.5687805596160004,0.01,-15.66,130.48,192.9
+P0758,Warby,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,42.92,-16.15,136.73,41.8
+P0759,Yulara,Town,True,Not recorded,True,False,False,,unmatched,Central Land Council,,0.5311964539220881,0.11,-25.240000000000002,130.99,330.2
+P0760,Impadna,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,36.86,-25.150000000000002,133.57,154.9
+P0761,Wollagalonng Outstation,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,42.19,-21.37,133.44,259.2
+P0762,Newcastle Waters,Village,True,Not recorded,True,False,False,80.0,distance<=1km,Northern Land Council,,0.8677629404107604,0.0,-17.37,133.41,271.4
+P0763,Mataranka,Village,True,Not recorded,True,False,False,,distance<=1km,Northern Land Council,,0.3319924590705805,0.02,-14.92,133.07,39.5
+P0764,Ngarilikirlangu,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.7850338483557142,13.62,-22.13,131.77,272.8
+P0765,Double D,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Central Land Council,,0.8269232037997589,54.97,-21.23,134.95,292.2
+P0766,Sandy Bore,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Central Land Council,,0.813975665754836,20.37,-24.560000000000002,132.52,159.2
+P0767,Black Rock Landing,Family Outstation,False,Not recorded,True,False,False,4.0,name+distance,Northern Land Council,,0.8894287301640017,19.31,-15.92,136.51,20.7
+P0768,Ngunga,Family Outstation,False,Not recorded,True,False,False,3.0,name+distance,Central Land Council,,0.9771527534870557,1.66,-23.26,131.25,266.1
+P0769,Crabhole,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,1.0,60.97,-16.22,137.1,81.6
+P0770,Snake Lagoon,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Northern Land Council,,1.0,61.48,-16.2,136.91,61.8
+P0771,Wallaces Lagoon,Family Outstation,False,Not recorded,False,False,False,2.0,name+distance,Northern Land Council,,1.0,31.8,-16.12,136.64000000000001,30.7
+P0772,Brumby Plains,Family Outstation,False,Not recorded,False,False,False,6.0,name+distance,Central Land Council,,1.0,79.7,-16.96,129.11,185.8
+P0773,Gulardi,Family Outstation,False,Not recorded,True,False,False,23.0,name+distance,Northern Land Council,,0.5405507474922197,0.43,-15.71,130.48,187.3
+P0774,Irrowa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.6743361220512191,0.56,-24.63,132.33,179.6
+P0775,Iljitjarri,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.8069781687732918,18.76,-24.53,132.49,160.5
+P0776,Alyarpere,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.9161198523638424,12.89,-23.71,134.49,54.0
+P0777,Urrermerne,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,0.911675081382737,11.7,-23.96,134.07,22.4
+P0778,20 Mile,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,0.9878221876969275,21.78,-16.09,136.55,20.7
+P0779,Bushcamp,Family Outstation,False,Not recorded,True,False,False,,name+distance,Central Land Council,,0.8218189096153085,3.15,-19.72,134.15,428.7
+P0780,Atnarpa,Family Outstation,False,Not recorded,False,False,False,,name+distance,Central Land Council,,1.0,30.78,-23.52,134.79,87.4
+P0781,Lily Hole,Family Outstation,False,Not recorded,False,False,False,,name+distance,Northern Land Council,,1.0,29.92,-17.25,133.75,296.7

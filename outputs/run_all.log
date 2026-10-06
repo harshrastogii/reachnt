@@ -1,0 +1,33 @@
+1. Geography
+2. Synthetic requests (read by the triage reader)
+3. Reader evaluation
+4. Cost calibration against Nous (2017)
+5. Policies
+  Cheapest jobs first                                  $    558/job  urgent P90 remote  62.0 d  harm-days    215975  (59s)
+  Cheapest first + urgent guarantee                    $    727/job  urgent P90 remote   7.0 d  harm-days     88699  (75s)
+  Need first, official remote allowance                $    732/job  urgent P90 remote  13.0 d  harm-days     78933  (34s)
+  Need first + urgent guarantee (ReachNT default)      $    843/job  urgent P90 remote   3.0 d  harm-days     75786  (43s)
+  Need first + urgent guarantee, tighter budget        $    777/job  urgent P90 remote   6.0 d  harm-days     95040  (39s)
+  ReachNT: need first + urgent guarantee + H3 run zones $    775/job  urgent P90 remote   3.0 d  harm-days     61689  (116s)
+  ReachNT, tighter budget (H3 run zones)               $    721/job  urgent P90 remote   3.0 d  harm-days     78488  (92s)
+  Cheapest jobs first + H3 run zones                   $    554/job  urgent P90 remote  38.0 d  harm-days    170557  (77s)
+  Need first, cost-aware (lam 0.8)                     $    564/job  urgent P90 remote  34.0 d  harm-days    154927  (43s)
+  Need first (lam 0.4)                                 $    691/job  urgent P90 remote  16.0 d  harm-days     86138  (34s)
+  Need first (lam 0.2)                                 $    785/job  urgent P90 remote  13.0 d  harm-days     67498  (46s)
+  Need first (lam 0.1)                                 $    870/job  urgent P90 remote  10.0 d  harm-days     61781  (53s)
+  Need first (lam 0.05)                                $    929/job  urgent P90 remote  10.0 d  harm-days     60516  (54s)
+  Need first, cost ignored                             $   1002/job  urgent P90 remote   9.5 d  harm-days     59524  (50s)
+6. Sensitivity
+7. Figures
+Traceback (most recent call last):
+  File "/Volumes/T7SHIELD/projects/fairfix-nt/run_all.py", line 68, in <module>
+    main(quick="--quick" in sys.argv)
+  File "/Volumes/T7SHIELD/projects/fairfix-nt/run_all.py", line 59, in main
+    figures.build_all(numbers)
+  File "/Volumes/T7SHIELD/projects/fairfix-nt/src/reachnt/figures.py", line 165, in build_all
+    ax.legend(loc="lower left", fontsize=8, title="Communities by access\n(dot size = houses; hexagon = H3 res 4)", title_fontsize=8.5,
+    ^^^^^^^^^^^
+  File "/Volumes/T7SHIELD/projects/fairfix-nt/src/reachnt/figures.py", line 60, in frontier
+    for k, (lab, colr) in [("cheapest_1", POLICY_STYLE["cheapest_1"]), ("floor_1", POLICY_STYLE["floor_1"])]:
+                                                                                   ~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'floor_1'

@@ -1,0 +1,264 @@
+# Hazard taxonomy used to read free-text fault reports.
+#
+# category: NT DHLGCD FS17 response category (immediate / urgent / routine). source: FS17 examples + RTA 1999 (NT) s63.
+# hlp: Healthabitat order: 0 = Safety, 1..9 = Healthy Living Practices (1 washing people, 2 washing clothes,
+#      3 removing waste water, 4 food, 5 crowding, 6 pests, 7 dust, 8 temperature, 9 trauma). source: Healthabitat.
+# harm: HHSRS-style harm points (0-100) inside a category, from the HHSRS class weights (I 10000, II 1000,
+#       III 300, IV 10) mapped to a 0-100 scale and judged per hazard. ASSUMPTION, open to co-design.
+# trade: who fixes it. Job mix follows Grealy et al. 2022 Table 3 (APY Lands).
+# rta_s63: true if the RTA 1999 (NT) s63 "emergency repairs" list covers it (tenant can seek a Tribunal order).
+# patterns: lower-case regular expressions, shared by the Python engine and the web prototype.
+
+hazards:
+  electrical_danger:
+    label: Exposed wires, sparks or shocks
+    category: immediate
+    hlp: 0
+    harm: 95
+    trade: electrician
+    hours: 2.5
+    rta_s63: true
+    patterns:
+      - "spark"
+      - "exposed wire|wires? (hanging|out|showing|exposed)|bare wire|live wire"
+      - "(electric|electrical) shock|got (a )?shock|zapp?ed|tingl"
+      - "burning smell.*(power|switch|plug|meter|fuse)|(power|switch|plug|meter|fuse).*burning smell|smoke (from|coming).*(power|switch|plug|meter|fuse)"
+      - "(power ?point|switch ?board|fuse ?box|meter box).*(melt|smok|black|burn)"
+  gas_leak:
+    label: Gas leak
+    category: immediate
+    hlp: 0
+    harm: 95
+    trade: plumber
+    hours: 2
+    rta_s63: true
+    patterns:
+      - "gas (leak|smell)|smell(s|ing)? (of )?gas|gas bottle.*(leak|hiss)"
+  structural_danger:
+    label: Something about to fall or collapse
+    category: immediate
+    hlp: 0
+    harm: 85
+    trade: carpenter
+    hours: 6
+    rta_s63: true
+    patterns:
+      - "ceiling (fall|fell|falling|coming down|caved|collaps)|roof (fall|fell|caved|collaps)"
+      - "(floor|verandah|veranda|stairs?|steps|deck).*(collaps|gave way|caved|rotten|falling)"
+      - "wall (crack|falling|collaps)"
+  sewage_overflow:
+    label: Sewage overflowing
+    category: immediate
+    hlp: 3
+    harm: 80
+    trade: plumber
+    hours: 3
+    rta_s63: true
+    patterns:
+      - "sewage|sewerage|poo (water|coming|everywhere)|septic"
+      - "toilet.*(overflow|flood)|(overflow|flood).*toilet"
+      - "(drain|pipe).*(coming up|backing up|smell)"
+  burst_pipe:
+    label: Burst or leaking water pipe
+    category: immediate
+    hlp: 1
+    harm: 60
+    trade: plumber
+    hours: 2.5
+    rta_s63: true
+    patterns:
+      - "burst|pipe.*(broke|broken|split|spray|gushing)|water (spraying|gushing|pouring|everywhere)"
+      - "(water )?main.*(leak|broke)|leaking (water )?main"
+  no_water:
+    label: No water to the house
+    category: urgent
+    hlp: 1
+    harm: 70
+    trade: plumber
+    hours: 3
+    rta_s63: true
+    patterns:
+      - "no (running )?water|water (is )?(off|not working|stopped)|taps? (dry|not running)|no water (in|at|to) (the )?house"
+  no_power:
+    label: No power to the house
+    category: urgent
+    hlp: 0
+    harm: 65
+    trade: electrician
+    hours: 2.5
+    rta_s63: true
+    patterns:
+      - "no (power|electricity|lights?)|power (is )?(off|out|gone|keeps tripping)|(keeps|keep) tripping|trips? the power"
+  hot_water:
+    label: No hot water
+    category: urgent
+    hlp: 1
+    harm: 55
+    trade: plumber
+    hours: 3
+    rta_s63: true
+    patterns:
+      - "hot water|(cold|no) shower water|water (is )?cold|\\bhws\\b|hot water system|solar (hot|heater)"
+  toilet_blocked:
+    label: Toilet blocked or not flushing
+    category: urgent
+    hlp: 3
+    harm: 55
+    trade: plumber
+    hours: 2
+    rta_s63: true
+    patterns:
+      - "toilet.*(block|not flush|won.?t flush|broken|cistern|leak)|(blocked|broken) toilet|\\bloo\\b"
+      - "drain.*block|blocked drain"
+  shower_broken:
+    label: Shower or taps not working
+    category: urgent
+    hlp: 1
+    harm: 45
+    trade: plumber
+    hours: 2
+    rta_s63: false
+    patterns:
+      - "shower.*(broke|not working|no water|leak|block)|(broken|no) shower"
+      - "tap.*(broke|stuck|won.?t (turn|stop)|leak|drip)|dripping tap|tap(s)? (tight|hard to turn)"
+  smoke_alarm:
+    label: Smoke alarm not working
+    category: urgent
+    hlp: 0
+    harm: 60
+    trade: electrician
+    hours: 1
+    rta_s63: true
+    patterns:
+      - "smoke (alarm|detector)|fire alarm|alarm (beep|chirp)"
+  security:
+    label: Door or window will not lock
+    category: urgent
+    hlp: 9
+    harm: 50
+    trade: carpenter
+    hours: 3
+    rta_s63: true
+    patterns:
+      - "(door|lock|window|screen door).*(won.?t lock|can.?t lock|not lock|broken lock|kicked|smashed|off (the )?hinge|broken)"
+      - "(broken|smashed|no) (door|lock|window)|locked out"
+  broken_glass:
+    label: Broken glass
+    category: urgent
+    hlp: 9
+    harm: 55
+    trade: carpenter
+    hours: 2
+    rta_s63: true
+    patterns:
+      - "broken glass|glass (broke|smashed|everywhere|on the floor)|window (smashed|broken|cracked)"
+  roof_leak:
+    label: Roof leak or storm damage
+    category: urgent
+    hlp: 0
+    harm: 50
+    trade: carpenter
+    hours: 5
+    rta_s63: true
+    patterns:
+      - "roof.*(leak|hole|lifted|blown)|leak.*(roof|ceiling)|rain (coming|comes|getting) in|water (coming )?through (the )?ceiling"
+      - "storm|cyclone|flood(ed|ing)? (house|room|inside)|tree (fell|fallen|on)"
+  stove_broken:
+    label: Stove or oven not working
+    category: urgent
+    hlp: 4
+    harm: 45
+    trade: electrician
+    hours: 2
+    rta_s63: true
+    patterns:
+      - "(stove|oven|cooktop|hot ?plate|element)s?.*(not working|broke|dead|no good|won.?t|don.?t)|(no|broken) (stove|oven|cooktop)|can.?t cook"
+  aircon_fan:
+    label: Air-con or fan not working
+    category: routine
+    hlp: 8
+    harm: 35
+    trade: aircon
+    hours: 2.5
+    rta_s63: false
+    patterns:
+      - "air ?con|aircon|a/c|cooler|evap|fan.*(not working|broke|dead|no good|stopped)|(broken|no) fan|too hot inside|house (is )?(too )?hot"
+  laundry:
+    label: Laundry or washing machine taps
+    category: routine
+    hlp: 2
+    harm: 30
+    trade: plumber
+    hours: 2
+    rta_s63: false
+    patterns:
+      - "washing machine|laundry|wash(ing)? clothes|trough|wash ?tub|laundry tub"
+  kitchen:
+    label: Kitchen sink, bench or cupboards
+    category: routine
+    hlp: 4
+    harm: 25
+    trade: carpenter
+    hours: 3
+    rta_s63: false
+    patterns:
+      - "kitchen|sink|bench|cupboard|fridge (power|plug|point)"
+  power_point:
+    label: Power point or light not working
+    category: routine
+    hlp: 0
+    harm: 30
+    trade: electrician
+    hours: 1.5
+    rta_s63: false
+    patterns:
+      - "power ?point|plug|socket|light (not working|broke|blown)|lights? (out|broken)|globe"
+  pests:
+    label: Pests (cockroaches, termites, rats)
+    category: routine
+    hlp: 6
+    harm: 25
+    trade: pest
+    hours: 2
+    rta_s63: false
+    patterns:
+      - "cockroach|roach|termite|white ant|rats?\\b|mice|mouse|bed ?bug|\\bants\\b|pest|snake"
+  screens_dust:
+    label: Fly screens, gaps or dust
+    category: routine
+    hlp: 7
+    harm: 20
+    trade: carpenter
+    hours: 2
+    rta_s63: false
+    patterns:
+      - "fly ?screen|insect screen|screen.*(rip|torn|hole|missing)|dust|gap under (the )?door"
+  general:
+    label: Other repair
+    category: routine
+    hlp: 9
+    harm: 15
+    trade: general
+    hours: 2
+    rta_s63: false
+    patterns:
+      - "paint|cupboard door|handle|hinge|fence|gate|curtain|tile|crack"
+
+modifiers:
+  vulnerable:
+    patterns:
+      - "bab(y|ies)|newborn|little ones|kids|children|grand ?kids|toddler|pregnant"
+      - "old (people|lady|man|nana|granny|grandmother|grandfather)|elder|nanna|nana|granny|aged"
+      - "wheel ?chair|disab|dialysis|renal|sick|unwell|hospital|walking frame|can.?t walk|blind"
+  crowded:
+    patterns:
+      - "\\b(1[0-9]|[89]) (people|of us|living)|lots of people|big family|full house|crowded"
+  repeat:
+    patterns:
+      - "again|still|already (rang|called|told|reported)|reported (it )?(before|already|last)|weeks ago|months ago|third time|second time|nobody came|no one came"
+  negation:
+    patterns:
+      - "(not|no longer|isn.?t|stopped) (spark|leak|smok|overflow)ing( now)?|fixed (it )?now"
+  danger_words:   # generic safety net: if any appears and the reading is not Immediate, a person checks. ASSUMPTION
+    patterns:
+      - "smok|melt|burn|spark|shock|zap|smell|fume|hiss|collaps|fell|falling|caved|sewage|sewerage|flood|gush|pour|spray|live wire|fire"

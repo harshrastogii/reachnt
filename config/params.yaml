@@ -1,0 +1,123 @@
+# ReachNT parameters.
+# Every value is tagged: `source` means it comes from a document or dataset (see research/RESEARCH.md),
+# `ASSUMPTION` means we chose it; the ones that move results are swept in simulate.sensitivity().
+
+seed: 20261007
+
+# ------------------------------------------------------------------ service clocks
+clocks:
+  # NT DHLGCD Fact sheet FS17 (10/25). source
+  official:
+    immediate_hours: 4
+    urgent_business_days: {town: 2, remote: 5}
+    routine_business_days: {town: 10, remote: 25}
+  # ReachNT default: one clock for everyone (the remote allowance becomes an owned policy choice). ASSUMPTION
+  equal:
+    immediate_hours: 4
+    urgent_business_days: {town: 2, remote: 2}
+    routine_business_days: {town: 10, remote: 10}
+
+# ------------------------------------------------------------------ geography
+hubs:   # crew bases. source: NT regional service towns (as in Underlink restore.depots)
+  Darwin:        {lat: -12.46, lon: 130.84, town_houses: 2604}   # town_houses: ABS 2021 Census I13, households renting from the state housing authority, ILOC703xx (Darwin + Palmerston)
+  Katherine:     {lat: -14.47, lon: 132.26, town_houses: 265}    # ILOC70500502 Katherine exc. Town Camps
+  Tennant Creek: {lat: -19.65, lon: 134.19, town_houses: 162}    # ILOC70700504
+  Alice Springs: {lat: -23.70, lon: 133.88, town_houses: 798}    # ILOC7080xx Alice Springs suburbs
+  Nhulunbuy:     {lat: -12.18, lon: 136.78, town_houses: 35}     # ILOC70600502
+islands:        # no road access; fly-in (or barge for bulk). source: geography
+  - WURRUMIYANGA
+  - MILIKAPITI
+  - PIRLANGIMPI
+  - ANGURUGU
+  - UMBAKUMBA
+  - MILYAKBURRA
+  - GALIWINKU
+  - MILINGIMBI
+  - WARRUWI
+  - MINJILANG
+travel:
+  circuity: 1.2              # ASSUMPTION road km / straight-line km
+  road_speed_kmh: 70         # ASSUMPTION blended speed hub -> community (highway + unsealed access + stops).
+                             # The NTG places table cannot separate sealed highway from unsealed access road.
+  drive_hours_per_day: 9     # ASSUMPTION (fatigue rules)
+  flight_speed_kmh: 300      # ASSUMPTION light twin
+  airstrip_radius_km: 8      # ASSUMPTION airstrip "serves" a community within this distance (OurAirports)
+  remote_band_hours: 2       # source: Nous 2017 "Remote > 2 hours travel from regional centre"
+  very_remote_band_hours: 6  # source: Nous 2017 "Very Remote > 6 hours"
+access:
+  # Known closures: NT Annual Traffic Report 2023 restriction register (CC BY), category "Road Closed",
+  # matched to the road a community depends on. Months are inclusive.
+  register_closures:
+    LAJAMANU:      {road: LAJAMANU ROAD, months: [11, 12, 1, 2, 3, 4]}
+    GUNBALANYA:    {road: "OENPELLI ROAD (Cahills Crossing)", months: [11, 12, 1, 2, 3, 4, 5]}
+    AMANBIDJI:     {road: AMANBIDJI ACCESS ROAD, months: [1, 2, 3, 4, 5]}
+    ALPURRURULAM:  {road: SANDOVER HIGHWAY, months: [12, 1, 2, 3, 4]}
+    YARRALIN:      {road: BUCHANAN HIGHWAY, months: [12, 1]}
+    NAUIYU:        {road: DALY RIVER LOW LEVEL ROAD, months: [2, 3, 4]}
+    WADEYE:        {road: "DALY RIVER LOW LEVEL ROAD (Port Keats route)", months: [2, 3, 4]}
+    PEPPIMENARTI:  {road: "DALY RIVER LOW LEVEL ROAD (Port Keats route)", months: [2, 3, 4]}
+    NGANMARRIYANGA: {road: "DALY RIVER LOW LEVEL ROAD (Port Keats route)", months: [2, 3, 4]}
+    NGUKURR:       {road: ROPER HIGHWAY, months: [3]}
+    NUMBULWAR:     {road: ROPER HIGHWAY, months: [3]}
+    KALKARINDJI:   {road: BUNTINE HIGHWAY, months: [3]}
+    DAGURAGU:      {road: BUNTINE HIGHWAY, months: [3]}
+    APATULA (FINKE): {road: GHAN HERITAGE ROAD, months: [2]}
+  # Roads the register does not cover (council and access roads): a Top End community (north of this
+  # latitude) more than this many hours from its hub is treated as cut on a share of wet-season weeks. ASSUMPTION
+  wet_min_hours: 2.0
+  wet_lat_north_of: -17.5
+  wet_months: [12, 1, 2, 3]
+  wet_cut_week_share: 0.35   # ASSUMPTION; swept [0.2, 0.35, 0.5]
+
+# ------------------------------------------------------------------ H3 (Uber's hexagonal grid, h3geo.org)
+h3:
+  house_res: 10            # a house is stored as its res-10 cell (~0.015 km2, ~76 m edge), never as an address
+  settlement_res: 7        # ~5.2 km2: the community footprint
+  run_res: 4               # ~1,770 km2, ~26 km edge: run zones are built on this grid
+  run_k: 2                 # two communities share a run if their res-4 cells are within 2 rings (about 90 km). ASSUMPTION
+  public_res: 6            # ~36 km2: anything shown outside the department is aggregated to res 6 ...
+  public_min_count: 5      # ... and suppressed below 5 (k-anonymity)
+  nearby_k: 3              # "while you're there": res-5 rings searched around a tradesperson's current cell
+  house_ring_k: 4          # synthetic houses are scattered within 4 res-10 rings of the community centre (~500 m)
+  town_ring_k: 30
+
+# ------------------------------------------------------------------ demand
+demand:
+  reports_per_house_year: 4.0      # ASSUMPTION responsive requests only (APY all-work rate is ~26/house/yr incl. planned, Grealy 2022)
+  wet_season_uplift: 1.25          # ASSUMPTION more roof leaks, storm damage, aircon and pest reports Nov-Apr
+  weeks: 52
+  start_month: 7                   # simulate Jul..Jun (financial year)
+
+# ------------------------------------------------------------------ crews and costs
+crews:
+  # Trades per hub and trade are sized from expected weekly job hours: n = ceil(capacity_factor x hours / 40).
+  # A factor near 1 means "too few trades": the crew can clear the work only if it spends little time travelling.
+  capacity_factor: 1.3        # ASSUMPTION; swept [1.15, 1.3, 1.5]
+  hours_per_week: 40
+  min_per_hub: 1
+costs:
+  labour_per_hour: 130       # ASSUMPTION trade rate incl. on-costs (AUD)
+  hours_per_day: 8
+  vehicle_per_km: 1.10       # ASSUMPTION 4WD running cost
+  overnight_per_night: 320   # ASSUMPTION remote accommodation + allowance
+  charter_per_hour: 2200     # ASSUMPTION light twin charter (round trip hours billed)
+  town_travel_per_job: 40    # ASSUMPTION in-town driving per job
+  calibration_target:        # source: Nous 2017 - travel up to 96% of per-unit emergency cost; planned 11-37%
+    single_job_travel_share_very_remote: 0.96
+    batched_travel_share_range: [0.11, 0.37]
+
+# ------------------------------------------------------------------ planning
+planning:
+  max_onsite_days_per_trip: 5
+  solver_time_limit_s: 2.0
+  due_soon_days: 7           # jobs whose clock ends within this many days get the deadline bonus
+  deadline_bonus: 400        # points added to a due-soon job under guarantee policies
+  floor_bonus: 6000          # "floor" policy: an urgent job about to breach the equal clock is worth this much more than a routine job ($-points)
+  ageing_points_per_day: 3   # points per day past half the clock, so nothing waits forever
+  lambda_grid: [0.0, 0.02, 0.05, 0.1, 0.2, 0.4, 0.8]   # points per dollar of travel; the equity-efficiency dial
+
+triage:
+  confidence_threshold: 0.55     # below this the report goes to a person
+  vulnerable_points: 25
+  crowded_points: 10
+  repeat_points: 10

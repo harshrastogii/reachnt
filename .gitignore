@@ -1,0 +1,22 @@
+# macOS / exFAT metadata
+._*
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+
+# Local tooling and secrets
+.claude/
+.vercel/
+.env
+.env.*
+node_modules/
+
+# Retired Claude artifact build (portal now deploys from web/ to Vercel)
+outputs/artifact/

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ReachNT</title>
+<meta name="theme-color" content="#0d1418">
+<meta name="description" content="ReachNT: remote NT repair triage. Urgent repairs first, shared trips, and a reason for every wait.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="styles.css?v=31">
+</head>
+<body>
+<div id="splash" class="glass"><svg width="34" height="34" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/></svg><b>ReachNT</b><span>Loading this week's repairs…</span></div>
+<div id="map" role="region" aria-label="Map of remote communities and this week's trips"></div>
+
+<header class="topbar glass">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+      <path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/>
+    </svg>
+    <b>ReachNT</b><small id="hubname">Katherine hub</small>
+  </div>
+  <div class="seg" id="role" role="group" aria-label="Who is using it">
+    <span class="thumb" aria-hidden="true"></span>
+    <button data-role="coord" aria-pressed="true">Coordinator</button>
+    <button data-role="field" aria-pressed="false">Tradesperson</button>
+    <button data-role="tenant" aria-pressed="false">Tenant</button>
+  </div>
+  <div class="spacer hide-sm"></div>
+  <label class="pill hide-sm" for="policy">Plan <select id="policy" aria-label="Setting in force"></select></label>
+  <div class="seg hide-sm" id="week" role="group" aria-label="Week">
+    <span class="thumb" aria-hidden="true"></span>
+    <button data-week="12" aria-pressed="false">Late Sept · dry</button>
+    <button data-week="30" aria-pressed="true">Early Feb · wet</button>
+  </div>
+  <span class="pill syn" title="Communities, houses, roads, deadlines and costs are real. The repair requests are made up for this demo.">Demo data</span>
+  <button class="iconbtn" id="about-open" aria-label="How ReachNT works">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 7v4.5M8 4.6v.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</header>
+
+<section class="panel left glass" id="coord" aria-label="Coordinator">
+  <div class="panel-head">
+    <nav class="tabs" role="tablist" aria-label="Coordinator views">
+      <button role="tab" data-tab="queue" aria-selected="true">This week</button>
+      <button role="tab" data-tab="trips" aria-selected="false">Trips</button>
+      <button role="tab" data-tab="reader" aria-selected="false">Try a report</button>
+      <button role="tab" id="tradeoff-open" aria-selected="false">Compare settings</button>
+    </nav>
+  </div>
+  <div class="panel-body" id="coord-body"></div>
+</section>
+
+<aside class="panel right glass hide" id="detail" aria-label="Job detail"></aside>
+<section class="panel phone glass hide" id="field" aria-label="Tradesperson run sheet"></section>
+<section class="panel phone glass hide" id="tenant" aria-label="Tenant repair tracker"></section>
+
+<div class="maplegend glass" id="legend"></div>
+<div class="mapchips glass" id="layers" role="group" aria-label="Map layers">
+  <button data-layer="week" aria-pressed="true">This week</button>
+  <button data-layer="year" aria-pressed="false">Whole year</button>
+  <button data-layer="reach" aria-pressed="false">Driving time</button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<section class="sheet glass" id="tradeoff" aria-label="Trade-off" aria-hidden="true">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <div style="flex:1">
+      <div class="eyebrow">One synthetic year · all five hubs · 70 communities</div>
+      <h2>Compare ways of planning the year</h2>
+    </div>
+    <button class="iconbtn" data-close="tradeoff" aria-label="Close">✕</button>
+  </div>
+  <div class="body" id="tradeoff-body"></div>
+</section>
+<section class="sheet glass" id="about" aria-label="How ReachNT works" aria-hidden="true">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <div style="flex:1"><div class="eyebrow">ReachNT · Team Top Enders (AIC015)</div><h2>How it works</h2></div>
+    <button class="iconbtn" data-close="about" aria-label="Close">✕</button>
+  </div>
+  <div class="body" id="about-body"></div>
+</section>
+<div class="toast glass" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"></script>
+<script>window.maplibregl || document.write('<script src="vendor/maplibre-gl.js"><\/script>')</script>
+<script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+<script>window.h3 || document.write('<script src="vendor/h3-js.umd.js"><\/script>')</script>
+<script src="data/app.js?v=31"></script>
+<script src="app.js?v=31"></script>
+</body>
+</html>

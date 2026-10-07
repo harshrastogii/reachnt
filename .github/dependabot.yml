@@ -1,0 +1,9 @@
+# Weekly check for security updates to the Python packages and the GitHub Actions used in CI.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: weekly }

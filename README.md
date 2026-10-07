@@ -47,6 +47,7 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 | Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns |
 | Python solution | `src/reachnt/`, `run_all.py`, `notebooks/01_walkthrough.ipynb`, `tests/` |
 | Database design | `docs/DATABASE.md`, `docs/schema.sql` |
+| Validation checks and gaps | `docs/VALIDATION.md` (security, accessibility, map accuracy, reader stress tests, data and simulation integrity, what a pilot still needs) |
 | Background research | `research/RESEARCH.md`; links to the documents we read in full in `research/sources/README.md` |
 
 ## Run it
@@ -54,7 +55,7 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 ```bash
 pip install -r requirements.txt
 python run_all.py                     # every number, figure and the portal data (~15 min on 8 cores)
-pytest -q tests                       # 24 checks, all passing
+pytest -q tests                       # 55 checks, all passing (also run by GitHub Actions on every push)
 python run_all.py --quality           # only the quality measures (ROC/PR-AUC, calibration, solver gap, 5 random years)
 python -m http.server 8731 --directory web   # then open http://localhost:8731
 python docs/report/build_pdf.py

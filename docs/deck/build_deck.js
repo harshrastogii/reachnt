@@ -1,244 +1,381 @@
-// Build the ReachNT pitch deck from outputs/numbers.json (same numbers as the report and the portal).
+// ReachNT pitch deck: 10-minute pitch + 5-minute Q&A, CDU IT Code Fair 2026, Artificial Intelligence Challenge.
+// Every number comes from outputs/numbers.json, the same file the report and the portal read.
 //   NODE_PATH=~/.cache/cq-deck/node_modules PPTX_SKILL=<pptx skill dir> node docs/deck/build_deck.js
+// Speaker notes carry the script; docs/deck/PITCH_SCRIPT.md has the same script with timings and Q&A prep.
 const fs = require("fs");
 const path = require("path");
 const pptxgen = require("pptxgenjs");
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const N = JSON.parse(fs.readFileSync(path.join(ROOT, "outputs", "numbers.json"), "utf8"));
-const FM = fs.readFileSync(path.join(ROOT, "docs", "report", "reachnt_report.md"), "utf8");
-const TEAM = (FM.match(/^team:\s*(.+)$/m) || [, "Team XX"])[1].trim();
-const TEAM_NAME = (FM.match(/^team_name:\s*(.+)$/m) || [, ""])[1].trim();
 const EX = JSON.parse(fs.readFileSync(path.join(ROOT, "outputs", "deck_example.json"), "utf8"));
 const SHOT = (n) => path.join(ROOT, "docs", "deck", "shots", n + ".png");
-const P = N.policies;
-const C0 = P["cheapest_1"], G = P["guarantee_0.2"], R = P["guarantee_0.2_h3"], F = P["floor_1"], RT = P["guarantee_0.5_h3"];
+const P = N.policies, Q = N.quality;
+const C0 = P["cheapest_1"], G = P["guarantee_0.2"], R = P["guarantee_0.2_h3"];
 const money = (x) => "$" + Math.round(x).toLocaleString("en-AU");
 const pct = (x) => Math.round(x * 100) + "%";
+const k = (x) => Math.round(x / 1000) + "k";
 const band = (pol, b) => Math.round((pol.bands.find((x) => x.band === b) || {}).urgent_p90 || 0);
+const H = Q.reader.heldout, PL = Q.simulation.planner, PR = Q.simulation.paired;
+const TEAM = "Team AIC015 Top Enders";
 
 const THEME = {
   name: "ReachNT", headFontFace: "Arial", bodyFontFace: "Calibri",
   colors: { dk1: "14181D", lt1: "FFFFFF", dk2: "4A525C", lt2: "F1F3F5", accent1: "0E8FB8", accent2: "D97706", accent3: "1F9D4C",
             accent4: "0A7AFF", accent5: "6E56CF", accent6: "E5352B", hlink: "0A7AFF", folHlink: "6E56CF" },
 };
-const HEX = { ink: "14181D", ink2: "4A525C", muted: "7B8490", line: "DDE1E6", soft: "F1F3F5", blue: "0A7AFF",
-              hex: "0E8FB8", hexSoft: "DFF2F8", cost: "D97706", costSoft: "FBEEDD", good: "1F9D4C",
-              violet: "6E56CF", white: "FFFFFF", night: "0D1418" };
+const HEX = { ink: "14181D", ink2: "4A525C", muted: "6B7480", line: "DDE1E6", soft: "F1F3F5", blue: "0A7AFF",
+              hex: "0E8FB8", hexSoft: "DFF2F8", cost: "D97706", costSoft: "FBEEDD", good: "1F9D4C", goodSoft: "E3F4E8",
+              violet: "6E56CF", violetSoft: "ECE8FA", bad: "E5352B", white: "FFFFFF", night: "0D1418", nightCard: "1A242B" };
 
 const pres = new pptxgen();
-pres.layout = "LAYOUT_WIDE";
-pres.title = "ReachNT"; pres.author = `${TEAM} ${TEAM_NAME}`;
-pres.subject = "CDU IT Code Fair 2026, AI Challenge: housing maintenance triage";
+pres.layout = "LAYOUT_WIDE";   // 13.33 x 7.5 in
+pres.title = "ReachNT"; pres.author = TEAM;
+pres.subject = "CDU IT Code Fair 2026, Artificial Intelligence Challenge: housing maintenance triage";
 pres.theme = { headFontFace: THEME.headFontFace, bodyFontFace: THEME.bodyFontFace };
 const C = pres.SchemeColor;
-const foot = `ReachNT · ${TEAM} ${TEAM_NAME} · synthetic requests, real geography`;
-const darkFoot = `CDU IT Code Fair 2026 · AI Challenge · ${TEAM} ${TEAM_NAME}`;
+const foot = `ReachNT · ${TEAM} · repair requests are synthetic; communities, roads and costs are real`;
+const darkFoot = `CDU IT Code Fair 2026 · Artificial Intelligence Challenge · ${TEAM}`;
 
+// ---------------------------------------------------------------- layouts
 pres.defineSlideMaster({ title: "Dark", background: { color: HEX.night }, objects: [
-  { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.0, w: 11.7, h: 1.5, fontSize: 54, bold: true, color: C.background1, fontFace: "Arial", valign: "bottom", align: "left" }, text: "" } },
-  { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 3.65, w: 11.0, h: 1.6, fontSize: 22, color: "C9CFD6", valign: "top", align: "left" }, text: "" } },
-  { text: { text: darkFoot, options: { x: 0.8, y: 6.7, w: 11.7, h: 0.4, fontSize: 12, color: "9AA3AD" } } },
+  { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 1.6, w: 7.4, h: 1.4, fontSize: 60, bold: true, color: C.background1, fontFace: "Arial", valign: "bottom", align: "left" }, text: "" } },
+  { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 3.15, w: 6.6, h: 1.8, fontSize: 22, color: "C9CFD6", valign: "top", align: "left" }, text: "" } },
+  { text: { text: darkFoot, options: { x: 0.8, y: 6.75, w: 11.7, h: 0.35, fontSize: 12, color: "9AA3AD" } } },
 ] });
-pres.defineSlideMaster({ title: "DarkList", background: { color: HEX.night }, objects: [
-  { placeholder: { options: { name: "title", type: "title", x: 0.8, y: 0.7, w: 11.7, h: 1.2, fontSize: 38, bold: true, color: C.background1, fontFace: "Arial", valign: "top", align: "left" }, text: "" } },
-  { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 2.1, w: 11.7, h: 4.3, fontSize: 19, color: "E3E7EB", valign: "top", align: "left" }, text: "" } },
-  { text: { text: darkFoot, options: { x: 0.8, y: 6.7, w: 11.7, h: 0.4, fontSize: 12, color: "9AA3AD" } } },
-] });
-pres.defineSlideMaster({ title: "Content", background: { color: HEX.white }, margin: [0.5, 0.6, 0.6, 0.6], objects: [
-  { placeholder: { options: { name: "title", type: "title", x: 0.6, y: 0.4, w: 12.1, h: 0.95, fontSize: 32, bold: true, color: C.text1, fontFace: "Arial", valign: "top", align: "left" }, text: "" } },
-  { text: { text: foot, options: { x: 0.6, y: 7.0, w: 9, h: 0.3, fontSize: 10, color: HEX.muted } } },
-], slideNumber: { x: 12.2, y: 7.0, w: 0.5, h: 0.3, fontSize: 10, color: HEX.muted } });
+pres.defineSlideMaster({ title: "Content", background: { color: HEX.white }, objects: [
+  { placeholder: { options: { name: "title", type: "title", x: 0.6, y: 0.4, w: 12.1, h: 0.95, fontSize: 28, bold: true, color: C.text1, fontFace: "Arial", valign: "top", align: "left" }, text: "" } },
+  { text: { text: foot, options: { x: 0.6, y: 7.02, w: 10, h: 0.3, fontSize: 10, color: HEX.muted } } },
+], slideNumber: { x: 12.2, y: 7.02, w: 0.5, h: 0.3, fontSize: 10, color: HEX.muted } });
 pres.defineSlideMaster({ title: "Shot", background: { color: HEX.night }, objects: [
-  { placeholder: { options: { name: "title", type: "title", x: 0.6, y: 0.35, w: 12.1, h: 0.8, fontSize: 30, bold: true, color: C.background1, fontFace: "Arial", valign: "top", align: "left" }, text: "" } },
-  { text: { text: foot, options: { x: 0.6, y: 7.0, w: 9, h: 0.3, fontSize: 10, color: "9AA3AD" } } },
-], slideNumber: { x: 12.2, y: 7.0, w: 0.5, h: 0.3, fontSize: 10, color: "9AA3AD" } });
+  { placeholder: { options: { name: "title", type: "title", x: 0.6, y: 0.4, w: 12.1, h: 0.85, fontSize: 30, bold: true, color: C.background1, fontFace: "Arial", valign: "top", align: "left" }, text: "" } },
+  { text: { text: foot, options: { x: 0.6, y: 7.02, w: 10, h: 0.3, fontSize: 10, color: "9AA3AD" } } },
+], slideNumber: { x: 12.2, y: 7.02, w: 0.5, h: 0.3, fontSize: 10, color: "9AA3AD" } });
 
-const card = (s, x, y, w, h, fill, name) => s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, fill: { color: fill }, line: { color: fill }, rectRadius: 0.08, objectName: name });
-const text = (s, t, o) => s.addText(t, { margin: 0, isTextBox: true, valign: "top", ...o });
-function stat(s, x, y, w, big, label, color, name) {
-  text(s, big, { x, y, w, h: 0.95, fontSize: 46, bold: true, fontFace: "Arial", color, objectName: name + "-n" });
-  text(s, label, { x, y: y + 1.0, w, h: 1.3, fontSize: 16, color: HEX.ink2, objectName: name + "-l" });
+// ---------------------------------------------------------------- helpers
+const text = (s, t, o) => s.addText(t, { margin: 0, isTextBox: true, valign: "top", fontFace: "Calibri", ...o });
+const card = (s, x, y, w, h, fill, name, line) => s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, fill: { color: fill }, line: { color: line || fill }, rectRadius: 0.1, objectName: name });
+// the deck's motif: a hexagon, as in the product and in Uber's H3 grid
+function hexIcon(s, x, y, d, fill, label, name, fontSize = 18, fontColor = HEX.white) {
+  s.addShape(pres.shapes.HEXAGON, { x, y, w: d, h: d * 0.88, fill: { color: fill }, line: { color: fill }, objectName: name });
+  if (label !== undefined) text(s, String(label), { x, y, w: d, h: d * 0.88, align: "center", valign: "middle", fontSize, bold: true, color: fontColor, fontFace: "Arial", objectName: name + "-t" });
 }
+function stat(s, x, y, w, big, label, color, name, size = 48) {
+  text(s, big, { x, y, w, h: 0.95, fontSize: size, bold: true, fontFace: "Arial", color, objectName: name + "-n" });
+  text(s, label, { x, y: y + 1.0, w, h: 1.1, fontSize: 15, color: HEX.ink2, objectName: name + "-l" });
+}
+const shot = (s, n, x, y, w, h, name, extra = {}) => s.addImage({ path: SHOT(n), x, y, w, h, objectName: name, altText: name, ...extra });
 
-// 1 ----------------------------------------------------------------------------
+// ================================================================ 1 title
 pres.addSection({ title: "Opening" });
 let s = pres.addSlide({ masterName: "Dark", sectionTitle: "Opening" });
+shot(s, "coord", 6.6, 0, 6.73, 7.5, "map-backdrop", { transparency: 35, sizing: { type: "cover", w: 6.73, h: 7.5 } });
+s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 7.2, h: 7.5, fill: { color: HEX.night }, line: { color: HEX.night }, objectName: "title-veil" });
 s.addText("ReachNT", { placeholder: "title" });
-s.addText([{ text: "Remote repair triage that ranks by need, shares trips with H3 hexagons, and makes someone sign for who waits", options: { breakLine: true } },
-           { text: "Harsh Rastogi · Aashish", options: { fontSize: 16, color: "9AA3AD" } }], { placeholder: "body" });
-s.addNotes("Remote NT housing repairs: too few trades, huge distances. Any schedule built for efficiency quietly sends remote tenants to the back. ReachNT ranks by need, uses Uber's H3 hexagons to share trips, prices the equity trade-off, makes a named person sign it, and tells every tenant why they waited.");
+s.addText("Urgent repairs fixed on time out bush, without letting cost quietly decide who waits", { placeholder: "body" });
+text(s, "Harsh Rastogi · Aashish", { x: 0.8, y: 5.25, w: 6.4, h: 0.4, fontSize: 16, color: "9AA3AD", objectName: "names" });
+text(s, "reachnt.vercel.app", { x: 0.8, y: 5.7, w: 6.4, h: 0.4, fontSize: 16, color: "64D2FF", bold: true, objectName: "url" });
+s.addNotes(`[AASHISH, about 30 seconds]
+Good morning. I'm Aashish, this is Harsh, and we're Team Top Enders.
+Imagine a family in a remote community in the Northern Territory. The water to their house stops. They ring the repairs line. In town, a plumber would be there in a couple of days. For them, it can take weeks.
+Our project, ReachNT, is about why that happens, and what AI can do about it.`);
 
-// 2 ----------------------------------------------------------------------------
+// ================================================================ 2 the problem
 pres.addSection({ title: "Problem" });
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Problem" });
-s.addText("Town jobs always look cheaper, so remote tenants wait", { placeholder: "title" });
-[["5,058", "remote public housing dwellings in 73 NT communities (DHLGCD)", HEX.ink],
- ["5 vs 2", "business days for an urgent repair, remote vs town, in the official NT standard (FS17)", HEX.cost],
- ["8.5×", "what an emergency repair costs in a very remote community vs a remote one (Nous 2017)", HEX.cost],
- ["96%", "of an emergency job's cost can be travel; batched planned work 11–37% (Nous 2017)", HEX.blue]].forEach(([n, l, col], i) => {
-  const x = 0.6 + i * 3.08; card(s, x, 1.75, 2.85, 3.3, HEX.soft, `prob-${i}`); stat(s, x + 0.25, 2.0, 2.4, n, l, col, `prob-${i}`);
-});
-text(s, "Santa Teresa tenants listed 600+ repairs in 2015. The courts held public housing must be at least safe, and the High Court allowed compensation for the distress of unrepaired homes (2023).",
-  { x: 0.6, y: 5.35, w: 12.1, h: 0.9, fontSize: 16, color: HEX.ink2, italic: true, objectName: "st" });
-s.addNotes("The official clock already gives remote houses 2.5 times longer. Costs explain why. Left alone, a cost-optimised schedule pushes remote work back further, and nobody signs off on it.");
+s.addText("Remote repairs cost more, so they quietly fall to the back", { placeholder: "title" });
+stat(s, 0.6, 1.75, 2.8, String(N.communities), "remote communities in our model, with " + N.remote_houses.toLocaleString() + " public houses", HEX.hex, "s-com");
+stat(s, 3.6, 1.75, 2.8, "8.5×", "what an emergency repair costs in a very remote community, against a remote one (Nous Group, 2017)", HEX.cost, "s-cost");
+stat(s, 6.6, 1.75, 2.8, "96%", "of an emergency job's cost can be travel alone (Nous Group, 2017)", HEX.cost, "s-travel");
+stat(s, 9.6, 1.75, 3.1, "6 h", "drive from Katherine to Kalkarindji, one of the 16 communities its tradespeople serve", HEX.violet, "s-drive");
+card(s, 0.6, 4.55, 12.1, 2.1, HEX.soft, "story-card");
+hexIcon(s, 0.95, 4.95, 0.9, HEX.cost, "!", "story-hex", 26);
+text(s, "A real kind of message, from our simulated year", { x: 2.15, y: 4.8, w: 10.2, h: 0.35, fontSize: 13, color: HEX.muted, bold: true, objectName: "story-label" });
+text(s, `“${EX.short.split("\n")[0]}”`, { x: 2.15, y: 5.15, w: 10.2, h: 0.5, fontSize: 18, bold: true, color: HEX.ink, objectName: "story-sms" });
+text(s, EX.why, { x: 2.15, y: 5.65, w: 10.2, h: 0.85, fontSize: 15, color: HEX.ink2, objectName: "story-why" });
+s.addNotes(`[AASHISH, about 50 seconds]
+Here's the problem in four numbers.
+There are ${N.communities} remote communities in our model, with about ${(Math.round(N.remote_houses / 100) * 100).toLocaleString()} public houses.
+Repairs there cost far more. Government research found emergency repairs in very remote communities cost eight and a half times as much, and travel can be almost the whole bill.
+Katherine's tradespeople, for example, drive up to six hours to reach some communities.
+So here is the kind of message a tenant gets from our simulation: no water to the house, waited ${EX.short.match(/Waiting (\\d+) days/) ? EX.short.match(/Waiting (\\d+) days/)[1] : "57"} days, held up by travel cost. Notice the last line: nobody signed off on that. It just happened.`);
 
-// 3 ----------------------------------------------------------------------------
+// ================================================================ 3 why it happens
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Problem" });
-s.addText("Left to “cheapest jobs first”, nobody decides who waits", { placeholder: "title" });
-card(s, 0.6, 1.7, 5.9, 2.7, HEX.costSoft, "trap-r");
-stat(s, 0.95, 2.0, 5.3, `${Math.round(C0.urgent_p90_remote)} days`, `Urgent repairs in remote communities: 90% done within this. Cut off in the wet: ${band(C0, "Remote, cut in the wet")} days.`, HEX.cost, "trap-r");
-card(s, 6.8, 1.7, 5.9, 2.7, HEX.soft, "trap-t");
-stat(s, 7.15, 2.0, 5.3, `${Math.round(C0.urgent_p90_town)} days`, "Urgent repairs in the five hub towns. Same schedule, same crews.", HEX.ink, "trap-t");
-text(s, `One synthetic year on real NT geography: 70 communities, ${(N.remote_houses + N.town_houses).toLocaleString()} houses, ${N.requests.toLocaleString()} requests, ${N.crews_total} tradespeople. Cheapest-first costs ${money(C0.cost_per_job)} a job, the lowest of any setting, which is why it looks reasonable on a cost report. ${pct(C0.overdue_official_remote)} of remote urgent repairs pass even the official 5-day remote clock.`,
-  { x: 0.6, y: 4.7, w: 12.1, h: 1.3, fontSize: 17, color: HEX.ink2, objectName: "trap-note" });
+s.addText("Plan for the cheapest jobs, and remote tenants wait weeks", { placeholder: "title" });
+s.addChart(pres.charts.BAR, [{ name: "Days until 9 in 10 urgent repairs are fixed", labels: ["Town", "Near town", "Remote (road)", "Very remote", "Cut off in the wet", "Islands"],
+  values: ["Town", "Near town (road)", "Remote (road)", "Very remote (road)", "Remote, cut in the wet", "Island (fly-in)"].map((b) => band(C0, b)) }], {
+  x: 0.6, y: 1.5, w: 7.4, h: 5.2, barDir: "bar", chartColors: [HEX.cost], showValue: true, dataLabelPosition: "outEnd", dataLabelColor: HEX.ink,
+  dataLabelFontSize: 14, dataLabelFontFace: "+mn-lt", catAxisLabelColor: HEX.ink2, catAxisLabelFontSize: 14, catAxisLabelFontFace: "+mn-lt",
+  valAxisHidden: true, valGridLine: { style: "none" }, catGridLine: { style: "none" }, catAxisOrientation: "maxMin",
+  showTitle: true, title: "Cheapest jobs first: days until 9 in 10 urgent repairs are fixed", titleFontSize: 14, titleColor: HEX.ink, titleFontFace: "+mn-lt", objectName: "wait-chart" });
+card(s, 8.4, 1.6, 4.3, 2.35, HEX.costSoft, "trap-card");
+text(s, `${Math.round(C0.urgent_p90_remote)} days`, { x: 8.7, y: 1.8, w: 3.8, h: 0.8, fontSize: 44, bold: true, fontFace: "Arial", color: HEX.cost, objectName: "trap-n" });
+text(s, `for 9 in 10 urgent remote repairs, against ${Math.round(C0.urgent_p90_town)} days in town`, { x: 8.7, y: 2.65, w: 3.8, h: 1.0, fontSize: 16, color: HEX.ink, objectName: "trap-l" });
+card(s, 8.4, 4.2, 4.3, 2.45, HEX.soft, "why-card");
+text(s, [{ text: "Why: ", options: { bold: true, color: HEX.ink } },
+         { text: "a schedule built to fix the most jobs for the money always picks town first. It's efficient on paper, and no one ever decides that remote families should wait.", options: { color: HEX.ink2 } }],
+  { x: 8.7, y: 4.45, w: 3.8, h: 2.0, fontSize: 16, objectName: "why-text" });
+s.addNotes(`[AASHISH, about 50 seconds]
+Why does this happen? Because the obvious way to plan repairs is to fix the most jobs for your money.
+We simulated a whole year of repairs across the Territory. When you plan for the cheapest jobs, town tenants get urgent repairs in ${Math.round(C0.urgent_p90_town)} days. Remote tenants wait up to ${Math.round(C0.urgent_p90_remote)}. That's the orange bars.
+The important part is on the right. No one decided this. Nobody wrote a rule saying remote families wait. It's a side effect of chasing efficiency, and nobody is accountable for it.
+That's the gap we set out to close.`);
 
-// 4 ----------------------------------------------------------------------------
+// ================================================================ 4 solution
 pres.addSection({ title: "Solution" });
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Solution" });
-s.addText("Rank by need. Share trips with hexagons. Price the gap", { placeholder: "title" });
-[["Read", "Phrase rules + a text model turn a free-text report into a fault, trade and health practice. Unsure or dangerous: a person.", HEX.blue],
- ["Most urgent first", "Danger, health, who lives there and time waited set the order. Where someone lives never does.", HEX.blue],
- ["Share trips", "Nearby communities get one visit instead of two. The plan works around trades, wet-season roads and airstrips.", HEX.hex],
- ["Show the cost of fairness", "Each way of planning, side by side: dollars per repair against who waits.", HEX.cost],
- ["Sign and explain", "A named role signs a setting. Each week a job waits, the reason is logged and the tenant can see it.", HEX.good]].forEach(([t, b, col], i) => {
-  const x = 0.6 + i * 2.46;
-  card(s, x, 1.75, 2.3, 4.0, HEX.soft, `step-${i}`);
-  s.addShape(pres.shapes.HEXAGON, { x: x + 0.2, y: 1.95, w: 0.6, h: 0.52, fill: { color: col }, line: { color: col }, objectName: `step-h-${i}` });
-  text(s, String(i + 1), { x: x + 0.2, y: 1.95, w: 0.6, h: 0.52, fontSize: 18, bold: true, color: HEX.white, align: "center", valign: "middle", objectName: `step-n-${i}` });
-  text(s, t, { x: x + 0.2, y: 2.65, w: 1.95, h: 0.75, fontSize: 18, bold: true, fontFace: "Arial", color: HEX.ink, objectName: `step-t-${i}` });
-  text(s, b, { x: x + 0.2, y: 3.45, w: 1.95, h: 2.2, fontSize: 14, color: HEX.ink2, objectName: `step-b-${i}` });
+s.addText("ReachNT: rank by need, share trips, and put a name on the trade-off", { placeholder: "title" });
+const steps = [
+  ["1", "Read", "Reads what the tenant said, in their words, and picks the fault and how urgent it is. Unsure? A person calls back.", HEX.hex],
+  ["2", "Rank by need", "Danger, health, who lives there and time waited set the order. Distance and cost are never in the score.", HEX.good],
+  ["3", "Plan shared trips", "Each week it plans who goes where. Neighbouring communities share one trip, found with Uber's H3 hexagons.", HEX.violet],
+  ["4", "Explain and sign", "A named coordinator signs how much cost may count. Every tenant can see why their repair waited.", HEX.cost],
+];
+steps.forEach(([n, h, b, col], i) => {
+  const x = 0.6 + i * 3.08;
+  card(s, x, 1.75, 2.88, 4.3, HEX.soft, `step-${n}`);
+  hexIcon(s, x + 0.3, 2.05, 0.95, col, n, `step-hex-${n}`, 24);
+  text(s, h, { x: x + 0.3, y: 3.1, w: 2.4, h: 0.5, fontSize: 21, bold: true, fontFace: "Arial", color: HEX.ink, objectName: `step-h-${n}` });
+  text(s, b, { x: x + 0.3, y: 3.65, w: 2.35, h: 2.3, fontSize: 15, color: HEX.ink2, objectName: `step-b-${n}` });
 });
-s.addNotes("Urgency and logistics are separate steps. A single priority score that mixes them is how distance gets in without anyone choosing it. A unit test fails if location appears in the urgency function.");
+text(s, "One tool, three views: the coordinator plans, the tradesperson gets a run sheet that works without signal, and the tenant gets a straight answer.",
+  { x: 0.6, y: 6.3, w: 12.1, h: 0.5, fontSize: 16, italic: true, color: HEX.ink2, objectName: "views" });
+s.addNotes(`[HARSH, about 50 seconds]
+Thanks Aashish. ReachNT does four things.
+One: it reads the repair report the way the tenant said it, and works out the fault and how urgent it is. If it isn't sure, a person calls back.
+Two: it ranks repairs by need alone. Danger, health, who lives in the house, how long they've waited. Where you live is never part of your score.
+Three: every week it plans the trips. And when two communities are close, one tradesperson visits both on one trip. That's where H3 comes in, which I'll come back to.
+Four: cost still matters, but a named person has to sign how much it counts. And every tenant can see why their repair is where it is.`);
 
-// 5 H3 ----------------------------------------------------------------------------
-s = pres.addSlide({ masterName: "Content", sectionTitle: "Solution" });
-s.addText("H3: Uber's hexagon grid, used for remote repairs", { placeholder: "title" });
-s.addImage({ path: path.join(ROOT, "outputs", "figures", "fig1_map.png"), x: 0.3, y: 1.35, w: 7.0, h: 7.0 * (1100 / 1410), objectName: "h3map" });
-[["Shared trips", "Two communities whose hexagons are no more than 2 apart (about 90 km) get one visit: Katherine → A → B → home. 68 pairs, e.g. Ngukurr + Rittarangu."],
- ["Why hexagons", "Six neighbours, all the same distance away, so “within k rings” is a fair circle. Square grids such as S2 have neighbours at two distances."],
- ["While you're out there", "A tradesperson's phone lists open jobs within 3 resolution-5 rings of their run."],
- ["A house is a hexagon", "Records hold a 76 m resolution-10 cell, never an address. Public views use 36 km² cells, hidden below 5 jobs."]].forEach(([t, b], i) => {
-  const y = 1.45 + i * 1.32;
-  s.addShape(pres.shapes.HEXAGON, { x: 7.5, y: y + 0.05, w: 0.42, h: 0.36, fill: { color: HEX.hex }, line: { color: HEX.hex }, objectName: `h3-dot-${i}` });
-  text(s, t, { x: 8.1, y, w: 4.7, h: 0.42, fontSize: 18, bold: true, fontFace: "Arial", color: HEX.ink, objectName: `h3-t-${i}` });
-  text(s, b, { x: 8.1, y: y + 0.42, w: 4.7, h: 0.85, fontSize: 14, color: HEX.ink2, objectName: `h3-b-${i}` });
+// ================================================================ 5 the AI that knows when to ask
+pres.addSection({ title: "Technology" });
+s = pres.addSlide({ masterName: "Content", sectionTitle: "Technology" });
+s.addText("AI that reads tenants' words, and knows when to ask a person", { placeholder: "title" });
+const flow = [["What the tenant said", "“no sparks now but the switch is black and kids touch it”", HEX.soft, HEX.ink],
+              ["Word rules + a learning model", "Rules catch known phrases; a logistic regression model catches wording the rules miss", HEX.hexSoft, HEX.ink],
+              ["Sure, and not dangerous?", "Ranked straight away", HEX.goodSoft, HEX.ink],
+              ["Unsure or risky?", "A person checks today. It never downgrades danger on its own", HEX.costSoft, HEX.ink]];
+[[0.6, 1.7], [0.6, 3.25], [0.6, 4.8], [3.85, 4.8]].forEach(([x, y], i) => {
+  const w = i < 2 ? 6.4 : 3.15;
+  card(s, x, y, w, 1.3, flow[i][2], `flow-${i}`);
+  text(s, flow[i][0], { x: x + 0.25, y: y + 0.15, w: w - 0.5, h: 0.4, fontSize: 16, bold: true, color: HEX.ink, objectName: `flow-h-${i}` });
+  text(s, flow[i][1], { x: x + 0.25, y: y + 0.55, w: w - 0.5, h: 0.7, fontSize: 14, color: HEX.ink2, italic: i === 0, objectName: `flow-b-${i}` });
 });
-s.addNotes("H3 is free and open source, with bindings for Python, JavaScript and Postgres. In a place with few people and huge distances, the win is grouping work fairly in every direction. H3 does not know roads; we pair it with the road-closure register.");
+s.addShape(pres.shapes.LINE, { x: 3.8, y: 3.0, w: 0, h: 0.25, line: { color: HEX.muted, width: 1.5, endArrowType: "triangle" }, objectName: "arrow-1" });
+s.addShape(pres.shapes.LINE, { x: 3.8, y: 4.55, w: 0, h: 0.25, line: { color: HEX.muted, width: 1.5, endArrowType: "triangle" }, objectName: "arrow-2" });
+stat(s, 7.5, 1.7, 5.2, (H.danger.net_recall * 100).toFixed(1) + "%", "of dangerous reports caught, on wording the AI had never seen, because doubtful ones go to a person", HEX.good, "s-caught", 50);
+stat(s, 7.5, 3.65, 2.5, H.danger.roc_auc.toFixed(2), "ROC-AUC for the model alone on new wording (1.00 on familiar)", HEX.hex, "s-auc", 40);
+stat(s, 10.2, 3.65, 2.5, pct(N.reader.heldout.combined.to_person), "of unfamiliar reports sent to a person", HEX.cost, "s-person", 40);
+text(s, "We never show tenants a confidence percentage: when the model said it was 90% sure, it was right about half the time. Being honest about that is part of the design.",
+  { x: 7.5, y: 5.6, w: 5.2, h: 1.1, fontSize: 14, italic: true, color: HEX.ink2, objectName: "honest" });
+s.addNotes(`[HARSH, about 60 seconds]
+Now the AI. Tenants don't fill in forms. They say things like "no sparks now but the switch is black and the kids touch it".
+ReachNT reads that with two methods: word rules for phrases we know, and a learning model for wording the rules miss.
+The key design choice is that it knows when to ask. If it's unsure, or anything sounds dangerous, a person checks the same day. And it never downgrades danger on its own. In that example, "no sparks" doesn't make it safe.
+We tested it on wording it had never seen. The model alone is decent, a ROC-AUC of ${H.danger.roc_auc.toFixed(2)}. With the person in the loop, the system caught ${(H.danger.net_recall * 100).toFixed(1)} percent of dangerous reports.
+And we're honest about its limits: its confidence isn't reliable, so we never show tenants a percentage.`);
 
-// 6 price --------------------------------------------------------------------------
-pres.addSection({ title: "Findings" });
-s = pres.addSlide({ masterName: "Content", sectionTitle: "Findings" });
-s.addText("Fairness costs a little more, and shared trips cut the cost", { placeholder: "title" });
-s.addImage({ path: path.join(ROOT, "outputs", "figures", "fig2_frontier.png"), x: 0.4, y: 1.4, w: 8.3, h: 8.3 * (3.3 / 7.2), objectName: "frontier" });
-card(s, 9.0, 1.45, 3.75, 5.3, HEX.hexSoft, "price");
-s.addText([
-  { text: "ReachNT vs cheapest-first", options: { bold: true, fontSize: 15, color: HEX.ink, breakLine: true } },
-  { text: `+${money(R.cost_per_job - C0.cost_per_job)} per repair (+${pct(R.cost_per_job / C0.cost_per_job - 1)})`, options: { fontSize: 22, bold: true, color: HEX.cost, breakLine: true } },
-  { text: `−${pct(1 - R.harm_days_total / C0.harm_days_total)} days living with faults`, options: { fontSize: 22, bold: true, color: HEX.good, breakLine: true } },
-  { text: `9 in 10 urgent remote repairs fixed within ${Math.round(C0.urgent_p90_remote)} → ${Math.round(R.urgent_p90_remote)} days`, options: { fontSize: 14, color: HEX.ink2, breakLine: true } },
-  { text: " ", options: { fontSize: 8, breakLine: true } },
-  { text: "What shared trips added", options: { bold: true, fontSize: 15, color: HEX.ink, breakLine: true } },
-  { text: `${money(G.cost_per_job)} → ${money(R.cost_per_job)} per repair`, options: { fontSize: 20, bold: true, color: HEX.hex, breakLine: true } },
-  { text: `days living with faults ${Math.round(G.harm_days_total / 1000)}k → ${Math.round(R.harm_days_total / 1000)}k`, options: { fontSize: 14, color: HEX.ink2, breakLine: true } },
-  { text: `Tighter budget: ${money(RT.cost_per_job)} per repair, cheaper than cheapest-first with a deadline (${money(F.cost_per_job)}).`, options: { fontSize: 13, color: HEX.ink2 } },
-], { x: 9.2, y: 1.65, w: 3.4, h: 5.0, valign: "top", margin: 0, isTextBox: true, objectName: "price-t" });
-s.addNotes("Every point is one setting run over the same synthetic year. Days living with faults add up every day a household lived with an unfixed fault; dangerous faults count more. The coordinator chooses a point; ReachNT sits at the knee.");
+// ================================================================ 6 H3
+s = pres.addSlide({ masterName: "Content", sectionTitle: "Technology" });
+s.addText("Why we built it on Uber's H3 hexagon grid", { placeholder: "title" });
+// left: squares vs hexagons, drawn
+text(s, "Squares", { x: 0.6, y: 1.55, w: 2.6, h: 0.35, fontSize: 15, bold: true, color: HEX.ink, objectName: "sq-label" });
+for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+  const centre = r === 1 && c === 1, edge = (r === 1) !== (c === 1);
+  s.addShape(pres.shapes.RECTANGLE, { x: 0.6 + c * 0.78, y: 1.95 + r * 0.78, w: 0.72, h: 0.72, fill: { color: centre ? HEX.ink : edge ? HEX.hexSoft : HEX.costSoft }, line: { color: HEX.white }, objectName: `sq-${r}-${c}` });
+}
+text(s, "8 neighbours at 2 different distances", { x: 0.6, y: 4.35, w: 2.6, h: 0.6, fontSize: 13, color: HEX.ink2, objectName: "sq-note" });
+text(s, "Hexagons", { x: 3.6, y: 1.55, w: 2.8, h: 0.35, fontSize: 15, bold: true, color: HEX.ink, objectName: "hx-label" });
+const hx = 0.78, hy = hx * 0.88;
+[[1, 0], [2, 0], [0.5, 1], [1.5, 1], [2.5, 1], [1, 2], [2, 2]].forEach(([c, r], i) => {
+  const centre = c === 1.5 && r === 1;
+  s.addShape(pres.shapes.HEXAGON, { x: 3.45 + c * hx, y: 1.95 + r * hy * 1.02, w: hx, h: hy, rotate: 90, fill: { color: centre ? HEX.ink : HEX.hexSoft }, line: { color: HEX.white, width: 1.5 }, objectName: `hx-${i}` });
+});
+text(s, "6 neighbours, all the same distance away", { x: 3.6, y: 4.35, w: 2.8, h: 0.6, fontSize: 13, color: HEX.ink2, objectName: "hx-note" });
+card(s, 0.6, 5.15, 5.8, 1.55, HEX.soft, "fair-card");
+text(s, [{ text: "Why it matters: ", options: { bold: true, color: HEX.ink } },
+         { text: "“two hexagons away” is the same distance in every direction, so deciding which communities can share a trip is fair to all of them.", options: { color: HEX.ink2 } }],
+  { x: 0.85, y: 5.35, w: 5.3, h: 1.2, fontSize: 15, objectName: "fair-text" });
+// right: four jobs H3 does
+const uses = [["Shared trips", `Communities within 2 hexagons (about 90 km) can share a trip, saving $${PR.cost_saved_by_sharing.min.toFixed(0)}–$${PR.cost_saved_by_sharing.max.toFixed(0)} per repair`, HEX.violet],
+              ["Privacy", "A house is stored as a small hexagon, not a street address", HEX.good],
+              ["Public numbers", "Waits are published per larger hexagon, only where there are at least 5 repairs", HEX.hex],
+              ["Field and maps", "\"Nearby jobs\" for tradespeople, the driving-time map, and fast database lookups", HEX.cost]];
+uses.forEach(([h, b, col], i) => {
+  const y = 1.6 + i * 1.3;
+  hexIcon(s, 6.9, y + 0.1, 0.72, col, undefined, `use-hex-${i}`);
+  text(s, h, { x: 7.85, y, w: 4.85, h: 0.4, fontSize: 17, bold: true, color: HEX.ink, objectName: `use-h-${i}` });
+  text(s, b, { x: 7.85, y: y + 0.42, w: 4.85, h: 0.8, fontSize: 14, color: HEX.ink2, objectName: `use-b-${i}` });
+});
+s.addNotes(`[AASHISH, about 60 seconds]
+This was my favourite decision. Early on I suggested Uber's H3, an open-source map grid made of hexagons, and Harsh built the whole system around it.
+Why hexagons? Look at the squares on the left: the middle square has neighbours at two different distances, the sides and the corners. A hexagon's six neighbours are all exactly the same distance away.
+That matters for fairness. When we say two communities are "within two hexagons" of each other, that means the same distance in every direction, so the rule for sharing a trip treats every community the same.
+And one grid does four jobs: it finds shared trips, it stores a house as a hexagon instead of an address for privacy, it lets us publish waiting times for areas without exposing any household, and it powers the maps and the "nearby jobs" list for tradespeople.`);
 
-// 7 bands --------------------------------------------------------------------------
-s = pres.addSlide({ masterName: "Content", sectionTitle: "Findings" });
-s.addText("Where the wait lands, by how hard the place is to reach", { placeholder: "title" });
-const order = ["Town", "Near town (road)", "Remote (road)", "Very remote (road)", "Remote, cut in the wet", "Island (fly-in)"];
-s.addChart(pres.charts.BAR, [
-  { name: "Cheapest jobs first", labels: order, values: order.map((b) => band(C0, b)) },
-  { name: "Urgent first, one community per trip", labels: order, values: order.map((b) => band(G, b)) },
-  { name: "ReachNT: urgent first, shared trips", labels: order, values: order.map((b) => band(R, b)) },
-], { x: 0.6, y: 1.5, w: 12.1, h: 5.2, barDir: "bar", barGrouping: "clustered", chartColors: [HEX.cost, HEX.blue, HEX.hex],
-  catAxisOrientation: "maxMin", catAxisLabelColor: HEX.ink2, valAxisLabelColor: HEX.ink2, catAxisLabelFontSize: 13, valAxisLabelFontSize: 11,
-  catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt", valGridLine: { color: HEX.line, size: 0.75 }, catGridLine: { style: "none" },
-  showValue: true, dataLabelPosition: "outEnd", dataLabelFontSize: 10, dataLabelColor: HEX.ink2, dataLabelFontFace: "+mn-lt",
-  showLegend: true, legendPos: "b", legendFontSize: 12, legendFontFace: "+mn-lt", legendColor: HEX.ink2,
-  showTitle: true, title: "Days until 9 in 10 urgent repairs are fixed", titleFontSize: 14, titleColor: HEX.ink, titleFontFace: "+mn-lt", objectName: "bands" });
-s.addNotes("Shared trips help most where communities have a neighbour within two rings: cut-in-the-wet communities go from 7 to 3 days. Small very remote road communities stay hardest; that points to local trades.");
+// ================================================================ 7 planning + shared trips
+s = pres.addSlide({ masterName: "Content", sectionTitle: "Technology" });
+s.addText("Every week, an optimiser plans the trips", { placeholder: "title" });
+// diagram: hub with two separate return trips vs one shared loop
+const D = (x, y, label, col, name) => { hexIcon(s, x, y, 0.75, col, undefined, name); text(s, label, { x: x - 0.4, y: y + 0.72, w: 1.55, h: 0.35, fontSize: 13, align: "center", color: HEX.ink2, objectName: name + "-l" }); };
+text(s, "Two separate trips", { x: 0.6, y: 1.55, w: 3.0, h: 0.35, fontSize: 15, bold: true, color: HEX.ink, objectName: "sep-label" });
+D(0.8, 3.6, "Hub", HEX.ink, "sep-hub"); D(2.6, 2.1, "Community A", HEX.violet, "sep-a"); D(3.2, 4.4, "Community B", HEX.violet, "sep-b");
+s.addShape(pres.shapes.LINE, { x: 1.55, y: 2.6, w: 1.05, h: 1.25, flipV: true, line: { color: HEX.cost, width: 2.5 }, objectName: "sep-l1" });
+s.addShape(pres.shapes.LINE, { x: 1.55, y: 4.1, w: 1.65, h: 0.6, line: { color: HEX.cost, width: 2.5 }, objectName: "sep-l2" });
+text(s, "Two drives there and back", { x: 0.6, y: 5.3, w: 3.4, h: 0.35, fontSize: 13, color: HEX.cost, bold: true, objectName: "sep-note" });
+text(s, "One shared trip", { x: 4.4, y: 1.55, w: 3.0, h: 0.35, fontSize: 15, bold: true, color: HEX.ink, objectName: "run-label" });
+D(4.6, 3.6, "Hub", HEX.ink, "run-hub"); D(6.4, 2.1, "Community A", HEX.violet, "run-a"); D(7.0, 4.4, "Community B", HEX.violet, "run-b");
+s.addShape(pres.shapes.LINE, { x: 5.35, y: 2.6, w: 1.05, h: 1.25, flipV: true, line: { color: HEX.hex, width: 2.5 }, objectName: "run-l1" });
+s.addShape(pres.shapes.LINE, { x: 6.9, y: 2.95, w: 0.45, h: 1.45, line: { color: HEX.hex, width: 2.5 }, objectName: "run-l2" });
+s.addShape(pres.shapes.LINE, { x: 5.35, y: 4.1, w: 1.65, h: 0.6, line: { color: HEX.hex, width: 2.5 }, objectName: "run-l3" });
+text(s, "One loop: hub → A → B → hub", { x: 4.4, y: 5.3, w: 3.6, h: 0.35, fontSize: 13, color: HEX.hex, bold: true, objectName: "run-note" });
+text(s, "Google OR-Tools (CP-SAT) chooses which communities get a visit and which jobs are done, within each tradesperson's 40 hours, road closures and airstrips.",
+  { x: 0.6, y: 5.85, w: 7.4, h: 0.85, fontSize: 14, color: HEX.ink2, objectName: "ortools" });
+stat(s, 8.7, 1.65, 4.0, money(G.cost_per_job - R.cost_per_job), "saved per repair by shared trips, against the same plan without them", HEX.hex, "s-saved");
+stat(s, 8.7, 3.4, 4.0, pct(1 - R.harm_days_total / G.harm_days_total), "fewer days households live with a fault, because the saving buys more visits", HEX.good, "s-share-harm");
+stat(s, 8.7, 5.15, 4.0, (PL.optimal_share * 100).toFixed(1) + "%", `of ${PL.plans.toLocaleString()} weekly plans proved the best possible, in milliseconds`, HEX.violet, "s-optimal", 40);
+s.addNotes(`[HARSH, about 50 seconds]
+Every week an optimiser, Google's OR-Tools, plans the trips: which communities get a visit, which jobs get done, within each tradesperson's hours, road closures in the wet, and airstrips.
+Here's the shared trip. Instead of driving out to community A and back, then out to community B and back, one tradesperson does one loop. The H3 grid tells us which pairs are close enough.
+That saves about ${money(G.cost_per_job - R.cost_per_job)} on every repair, and because the savings buy more visits, households spend ${pct(1 - R.harm_days_total / G.harm_days_total)} fewer days living with faults.
+And it's fast: the solver proved ${(PL.optimal_share * 100).toFixed(1)} percent of over ${Math.floor(PL.plans / 1000)} thousand weekly plans to be the best possible plan.`);
 
-// 8 portal --------------------------------------------------------------------------
+// ================================================================ 8 results
+pres.addSection({ title: "Results" });
+s = pres.addSlide({ masterName: "Content", sectionTitle: "Results" });
+s.addText("Fairness costs a little more, and saves months of waiting", { placeholder: "title" });
+const plans = [["Cheapest first", C0, HEX.cost], ["Urgent first, no sharing", G, HEX.blue], ["ReachNT", R, HEX.hex]];
+s.addChart(pres.charts.BAR, [{ name: "Days households lived with a fault (thousands)", labels: plans.map((p) => p[0]), values: plans.map((p) => Math.round(p[1].harm_days_total / 1000)) }], {
+  x: 0.6, y: 1.5, w: 6.3, h: 4.6, barDir: "col", chartColors: plans.map((p) => p[2]), showValue: true, dataLabelPosition: "outEnd", dataLabelColor: HEX.ink,
+  dataLabelFontSize: 16, dataLabelFontFace: "+mn-lt", dataLabelFormatCode: '0"k"', catAxisLabelColor: HEX.ink2, catAxisLabelFontSize: 14, catAxisLabelFontFace: "+mn-lt",
+  valAxisHidden: true, valGridLine: { style: "none" }, catGridLine: { style: "none" }, barGapWidthPct: 60,
+  showTitle: true, title: "Days households lived with a fault in a year (thousands)", titleFontSize: 14, titleColor: HEX.ink, titleFontFace: "+mn-lt", objectName: "harm-chart" });
+const rows = [["", "Cheapest first", "ReachNT"],
+              ["Average cost per repair", money(C0.cost_per_job), money(R.cost_per_job)],
+              ["9 in 10 urgent remote repairs fixed within", Math.round(C0.urgent_p90_remote) + " days", Math.round(R.urgent_p90_remote) + " days"],
+              ["Days living with a fault", k(C0.harm_days_total), k(R.harm_days_total)]];
+s.addTable(rows.map((r, i) => r.map((c, j) => ({ text: c, options: { bold: i === 0 || j === 0, color: j === 2 && i > 0 ? HEX.hex : HEX.ink, fill: { color: i === 0 ? HEX.soft : HEX.white } } }))), {
+  x: 7.3, y: 1.6, w: 5.4, colW: [2.6, 1.4, 1.4], fontSize: 15, fontFace: "Calibri", border: { type: "solid", color: HEX.line, pt: 1 }, rowH: 0.55, valign: "middle", objectName: "result-table" });
+card(s, 7.3, 4.25, 5.4, 1.85, HEX.hexSoft, "verdict-card");
+text(s, `+${pct(R.cost_per_job / C0.cost_per_job - 1)} cost, ${pct(1 - R.harm_days_total / C0.harm_days_total)} fewer days with a fault`, { x: 7.55, y: 4.45, w: 5.0, h: 0.5, fontSize: 20, bold: true, color: HEX.ink, objectName: "verdict" });
+text(s, `It held in all five random years we tested: ${pct(PR.fault_days_cut_vs_cheapest.min)}–${pct(PR.fault_days_cut_vs_cheapest.max)} fewer fault-days, for ${pct(PR.cost_rise_vs_cheapest.min)}–${pct(PR.cost_rise_vs_cheapest.max)} more per repair.`,
+  { x: 7.55, y: 5.0, w: 5.0, h: 0.95, fontSize: 15, color: HEX.ink2, objectName: "years" });
+text(s, `One simulated year on real NT geography: ${N.requests.toLocaleString()} synthetic repair requests, ${N.communities} communities, 5 trade hubs.`, { x: 0.6, y: 6.3, w: 12.1, h: 0.4, fontSize: 13, color: HEX.muted, objectName: "basis" });
+s.addNotes(`[HARSH, about 60 seconds]
+So what does it buy? We ran one year of synthetic repair requests over the real Territory: real communities, roads, wet-season closures and costs, and ${N.requests.toLocaleString()} made-up requests.
+Planning for the cheapest jobs costs ${money(C0.cost_per_job)} a repair. ReachNT costs ${money(R.cost_per_job)}. About ${pct(R.cost_per_job / C0.cost_per_job - 1)} more.
+For that, nine in ten urgent remote repairs are fixed within ${Math.round(R.urgent_p90_remote)} days instead of ${Math.round(C0.urgent_p90_remote)}, and households live with faults for ${pct(1 - R.harm_days_total / C0.harm_days_total)} fewer days. That's the chart.
+We didn't trust one lucky year, so we ran five. The result held every time.
+We're not saying cost doesn't matter. We're saying the trade-off should be visible, priced, and signed by a person.`);
+
+// ================================================================ 9 product
 pres.addSection({ title: "Product" });
 s = pres.addSlide({ masterName: "Shot", sectionTitle: "Product" });
-s.addText("The coordinator sees the week on the real map", { placeholder: "title" });
-s.addImage({ path: SHOT("coord"), x: 0.6, y: 1.2, w: 9.2, h: 9.2 * (900 / 1440), objectName: "shot-coord" });
-text(s, [{ text: "3D hexagon columns", options: { bold: true, color: HEX.white, breakLine: true } },
-         { text: "Height is open repairs; colour is booked, waiting or cut off.", options: { color: "C9CFD6", breakLine: true } },
-         { text: " ", options: { breakLine: true, fontSize: 8 } },
-         { text: "Shared trips", options: { bold: true, color: HEX.white, breakLine: true } },
-         { text: "Blue lines join communities sharing a trip this week.", options: { color: "C9CFD6", breakLine: true } },
-         { text: " ", options: { breakLine: true, fontSize: 8 } },
-         { text: "Satellite imagery", options: { bold: true, color: HEX.white, breakLine: true } },
-         { text: "Esri online; Digital Earth Australia tiles bundled for offline use.", options: { color: "C9CFD6" } }],
-  { x: 10.1, y: 1.3, w: 2.7, h: 5.4, fontSize: 14, objectName: "shot-coord-t" });
+s.addText("Live now, on a real satellite map, and on any phone", { placeholder: "title" });
+shot(s, "coord", 0.6, 1.4, 7.6, 4.75, "shot-coord");
+const phones = [["coord_phone", "Coordinator"], ["field_phone", "Tradesperson"], ["tenant_phone", "Tenant"]];
+phones.forEach(([n, l], i) => {
+  const x = 8.55 + i * 1.42;
+  shot(s, n, x, 1.4, 1.3, 2.81, `shot-${n}`);
+  text(s, l, { x: x - 0.1, y: 4.3, w: 1.5, h: 0.3, fontSize: 12, align: "center", color: "C9CFD6", objectName: `shot-l-${i}` });
+});
+const feats = ["Works without signal: the run sheet saves updates on the phone and sends them later",
+               "Every repair and run sheet saves as a PDF",
+               "Plain words, WCAG 2.2 AA checked, no confidence percentages"];
+feats.forEach((f, i) => text(s, f, { x: 8.55, y: 4.85 + i * 0.62, w: 4.2, h: 0.6, fontSize: 13, color: "E3E7EB", bullet: true, objectName: `feat-${i}` }));
+text(s, "reachnt.vercel.app", { x: 0.6, y: 6.3, w: 7.6, h: 0.4, fontSize: 16, bold: true, color: "64D2FF", objectName: "shot-url" });
+s.addNotes(`[HARSH, about 90 seconds, including a short live demo if there's time]
+This is the working prototype, live at reachnt dot vercel dot app.
+On the left is the coordinator's week: each hexagon is a community, the number is repairs waiting, green means a tradesperson goes this week, and the blue lines are shared trips.
+[Live demo, keep it short: tap a community; open Compare and show the four plans; switch to Tenant and show the timeline.]
+On the right, the same app on a phone. The tradesperson gets a numbered run sheet that works out bush with no signal, and the tenant sees their repair, every week it waited, and the real reason.`);
 
-// 9 phones --------------------------------------------------------------------------
-s = pres.addSlide({ masterName: "Shot", sectionTitle: "Product" });
-s.addText("On the phone: a run sheet for trades, a tracker for tenants", { placeholder: "title" });
-s.addImage({ path: SHOT("field_phone"), x: 0.7, y: 1.2, w: 2.6, h: 2.6 * (844 / 390), objectName: "shot-field" });
-s.addImage({ path: SHOT("tenant_phone"), x: 3.6, y: 1.2, w: 2.6, h: 2.6 * (844 / 390), objectName: "shot-tenant" });
-text(s, [{ text: "Tradesperson", options: { bold: true, color: HEX.white, fontSize: 18, breakLine: true } },
-         { text: "Only their own stops on the map, numbered in order. Each job shows what the tenant said, with Done or Couldn't do it. Save the run sheet as a PDF; updates made with no signal are sent later.", options: { color: "C9CFD6", breakLine: true } },
-         { text: " ", options: { breakLine: true, fontSize: 10 } },
-         { text: "Tenant", options: { bold: true, color: HEX.white, fontSize: 18, breakLine: true } },
-         { text: "A text message and a timeline built from the weekly reason log:", options: { color: "C9CFD6", breakLine: true } },
-         { text: `“${EX.why}”`, options: { color: HEX.white, italic: true } }],
-  { x: 6.7, y: 1.3, w: 6.1, h: 5.5, fontSize: 15, objectName: "shot-phones-t" });
-s.addNotes("Demo: switch to Tradesperson, then Tenant. Change the setting at the top and the tenant's answer changes, because the reason changes. Sign a setting in Trade-off and the answer names you.");
-
-// 10 data -------------------------------------------------------------------------
+// ================================================================ 10 trust
 pres.addSection({ title: "Trust" });
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Trust" });
-s.addText("Names, phones and addresses stay locked away, on free tools", { placeholder: "title" });
-[["Vault (pii)", "Name, phone, address, language. Encrypted with pgcrypto. Read only by intake staff through a function that logs every read.", HEX.violet],
- ["Work (ops)", "Jobs, trips, reasons, the signed ledger. A house is an ID + a 76 m H3 hexagon. Trades see their run; tenants see their own jobs.", HEX.hex],
- ["Public", "Waits by 36 km² hexagon and access band. Cells under 5 jobs hidden.", HEX.good]].forEach(([t, b, col], i) => {
-  const x = 0.6 + i * 4.1;
-  card(s, x, 1.6, 3.85, 2.9, HEX.soft, `zone-${i}`);
-  text(s, t, { x: x + 0.25, y: 1.8, w: 3.4, h: 0.5, fontSize: 20, bold: true, fontFace: "Arial", color: col, objectName: `zone-t-${i}` });
-  text(s, b, { x: x + 0.25, y: 2.35, w: 3.4, h: 2.0, fontSize: 15, color: HEX.ink2, objectName: `zone-b-${i}` });
+s.addText("People stay in charge, and tenants can push back", { placeholder: "title" });
+shot(s, "tenant_phone", 0.6, 1.45, 2.4, 5.2, "trust-phone");
+const trust = [["A named person signs the trade-off", "How much cost may count is a signed decision, kept in a tamper-evident record", HEX.cost],
+               ["Tenants can ask for a review", "A person, not the computer, answers within 10 working days", HEX.violet],
+               ["People check the AI every week", "1 in 20 reports the computer read alone is re-read by a person", HEX.hex],
+               ["No job closed on \"no one home\"", "The time and what was tried are recorded; the tenant is told; the job stays open", HEX.good],
+               ["Personal details locked away", "Names, phones and addresses in an encrypted vault; the house is just a hexagon", HEX.ink]];
+trust.forEach(([h, b, col], i) => {
+  const y = 1.45 + i * 1.04;
+  hexIcon(s, 3.4, y + 0.08, 0.62, col, undefined, `trust-hex-${i}`);
+  text(s, h, { x: 4.25, y, w: 8.4, h: 0.4, fontSize: 18, bold: true, color: HEX.ink, objectName: `trust-h-${i}` });
+  text(s, b, { x: 4.25, y: y + 0.42, w: 8.4, h: 0.5, fontSize: 15, color: HEX.ink2, objectName: `trust-b-${i}` });
 });
-text(s, [{ text: "Stack: ", options: { bold: true, color: HEX.ink } },
-         { text: "PostgreSQL + PostGIS + h3-pg + pgcrypto, all free and open source. Run it on NT Government servers for $0 in licences, or pilot on Neon's Sydney region (supports all four; free tier 1 GB). A year of data is under 1 GB. Analytics in DuckDB with its H3 extension; the field app keeps data on the phone when there's no signal.", options: { color: HEX.ink2 } }],
-  { x: 0.6, y: 4.8, w: 12.1, h: 1.6, fontSize: 16, objectName: "stack" });
-s.addNotes("Every piece is open source, hosted in Australia, and sized for a territory with few people. Paid platforms would add a licence for every coordinator, contractor and housing officer.");
+s.addNotes(`[AASHISH, about 50 seconds]
+Because this affects people's homes, we built it so people stay in charge.
+A named coordinator signs how much cost is allowed to count, and that signature is kept.
+Tenants can ask for a review, and a person answers within ten working days.
+Every week a person re-reads a sample of what the AI read on its own, to catch mistakes early.
+A tradesperson can't close a job just by saying no one was home. They record when they came and what they tried, and the tenant is told.
+And personal details sit in an encrypted vault. Everywhere else, a house is just a hexagon on the map.`);
 
-// 11 limits -------------------------------------------------------------------------
+// ================================================================ 11 honest limits
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Trust" });
-s.addText("What it cannot do yet", { placeholder: "title" });
-const Rd = N.reader;
-const Qh = N.quality.reader.heldout;
-[["AUC " + Qh.danger.roc_auc.toFixed(2), `for spotting a dangerous fault in wording the model never saw (${N.quality.reader.seen.danger.roc_auc.toFixed(2)} on familiar wording). A person checks ${pct(Rd.heldout.combined.to_person)} of those reports, so ${pct(Qh.danger.net_recall)} of dangerous ones are still caught.`, HEX.cost],
- ["Synthetic", "repair requests: no public NT work-order data exists. Geography, roads, clocks and costs are real; comparisons are the finding, not the absolute numbers.", HEX.violet],
- ["No co-design", "yet. Real reports come in Kriol, Aboriginal English and other languages. Tenants, Aboriginal Housing NT, land councils and the AIS shape the words first.", HEX.blue]].forEach(([n, l, col], i) => {
-  const x = 0.6 + i * 4.1;
-  card(s, x, 1.7, 3.85, 3.7, HEX.soft, `lim-${i}`);
-  text(s, n, { x: x + 0.25, y: 1.95, w: 3.4, h: 0.9, fontSize: 32, bold: true, fontFace: "Arial", color: col, objectName: `lim-n-${i}` });
-  text(s, l, { x: x + 0.25, y: 2.95, w: 3.4, h: 2.3, fontSize: 16, color: HEX.ink2, objectName: `lim-l-${i}` });
-});
-text(s, "We used satellite imagery of Country, not Aboriginal art. Any artwork would be commissioned and licensed through an Aboriginal art centre.", { x: 0.6, y: 5.7, w: 12.1, h: 0.6, fontSize: 14, color: HEX.muted, italic: true, objectName: "art" });
+s.addText("What we tested, and what we can't claim yet", { placeholder: "title" });
+card(s, 0.6, 1.55, 5.85, 5.1, HEX.goodSoft, "tested-card");
+text(s, "Tested", { x: 0.9, y: 1.8, w: 5.3, h: 0.5, fontSize: 22, bold: true, fontFace: "Arial", color: HEX.good, objectName: "tested-h" });
+const tested = ["80 automated checks on every code change: data, the reader, the planner, the server",
+                "Five random years of requests; the result held in all five",
+                "Every community's position checked against satellite photos",
+                "Accessibility: 0 WCAG 2.2 AA issues in every view",
+                "Security: locked-down site, validated inputs, sign-in rules ready"];
+tested.forEach((t, i) => text(s, t, { x: 0.9, y: 2.45 + i * 0.82, w: 5.3, h: 0.75, fontSize: 15, color: HEX.ink, bullet: true, objectName: `tested-${i}` }));
+card(s, 6.85, 1.55, 5.85, 5.1, HEX.costSoft, "limits-card");
+text(s, "Not yet", { x: 7.15, y: 1.8, w: 5.3, h: 0.5, fontSize: 22, bold: true, fontFace: "Arial", color: HEX.cost, objectName: "limits-h" });
+const limits = ["The repair requests are synthetic: no public NT repair data exists",
+                "The reader is tested in English only. Tenants speak Kriol, Aboriginal English and many languages",
+                "No community has reviewed it yet. That comes first, not last",
+                "Our test kit is ready the day real reports arrive, labelled with the Aboriginal Interpreter Service"];
+limits.forEach((t, i) => text(s, t, { x: 7.15, y: 2.45 + i * 1.0, w: 5.3, h: 0.95, fontSize: 15, color: HEX.ink, bullet: true, objectName: `limit-${i}` }));
+s.addNotes(`[HARSH, about 50 seconds]
+We want to be straight about what we've proven and what we haven't.
+On the left: we have eighty automated checks that run on every change, we tested five random years, we checked every community's location against satellite photos, and the site passes accessibility checks.
+On the right: the repair requests are synthetic, because no public repair data exists. The reader is tested in English only, and many tenants speak Kriol or Aboriginal English. And no community has reviewed this yet.
+That's why our first recommendation is about people, not code.`);
 
-// 12 close ---------------------------------------------------------------------------
+// ================================================================ 12 recommendations
 pres.addSection({ title: "Close" });
-s = pres.addSlide({ masterName: "DarkList", sectionTitle: "Close" });
-s.addText("Make the remote allowance a signed decision", { placeholder: "title" });
-s.addText([
-  { text: "DHLGCD: publish the triage rules; keep need and logistics separate; plan shared trips with H3; report urgent waits by access band; review the remote allowance each quarter with its cost.", options: { bullet: true, breakLine: true } },
-  { text: "Contractors: log why each job waits; price charters, batching and shared trips into contracts; train local trades where waits are longest.", options: { bullet: true, breakLine: true } },
-  { text: "Communities: co-design the tenant answer and fault words; hold the ledger to account.", options: { bullet: true } },
-], { placeholder: "body", paraSpaceAfter: 14 });
-s.addNotes("ReachNT does not pick. It shows the trade-off, makes someone own it, and lets every tenant ask why.");
+s = pres.addSlide({ masterName: "Content", sectionTitle: "Close" });
+s.addText("What we recommend", { placeholder: "title" });
+const recs = [["1", "Make the trade-off a signed decision", "Publish the triage rules, and record who decides how much cost may count, so remote waits are never an accident.", HEX.cost],
+              ["2", "Pilot in one region, with communities", "Start with the Katherine hub's 16 communities, co-designed with tenants, Aboriginal Housing NT, land councils and the Interpreter Service.", HEX.hex],
+              ["3", "Test the AI on real words first", "Score the reader on real reports in Kriol and Aboriginal English before it reads a single one on its own.", HEX.violet]];
+recs.forEach(([n, h, b, col], i) => {
+  const y = 1.6 + i * 1.7;
+  card(s, 0.6, y, 12.1, 1.5, HEX.soft, `rec-${n}`);
+  hexIcon(s, 0.95, y + 0.3, 0.95, col, n, `rec-hex-${n}`, 24);
+  text(s, h, { x: 2.25, y: y + 0.22, w: 10.2, h: 0.45, fontSize: 21, bold: true, fontFace: "Arial", color: HEX.ink, objectName: `rec-h-${n}` });
+  text(s, b, { x: 2.25, y: y + 0.72, w: 10.2, h: 0.7, fontSize: 16, color: HEX.ink2, objectName: `rec-b-${n}` });
+});
+s.addNotes(`[AASHISH, about 40 seconds]
+Three recommendations.
+One: make the trade-off a signed decision. Publish the rules, and record who decides how much cost counts.
+Two: pilot it in one region, the Katherine hub's sixteen communities, and design it with tenants, Aboriginal Housing NT, land councils and interpreters.
+Three: test the AI on real words before it reads anything on its own.`);
+
+// ================================================================ 13 close
+s = pres.addSlide({ masterName: "Dark", sectionTitle: "Close" });
+shot(s, "tenant_desk", 6.6, 0, 6.73, 7.5, "close-backdrop", { transparency: 30, sizing: { type: "cover", w: 6.73, h: 7.5 } });
+s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 7.2, h: 7.5, fill: { color: HEX.night }, line: { color: HEX.night }, objectName: "close-veil" });
+text(s, "Where someone lives shouldn't decide how long they wait", { x: 0.8, y: 0.75, w: 6.0, h: 2.3, fontSize: 36, bold: true, fontFace: "Arial", color: HEX.white, valign: "bottom", objectName: "close-title" });
+s.addText(`ReachNT fixes 9 in 10 urgent remote repairs within ${Math.round(R.urgent_p90_remote)} days instead of ${Math.round(C0.urgent_p90_remote)}, for ${pct(R.cost_per_job / C0.cost_per_job - 1)} more, and makes someone own that choice.`, { placeholder: "body" });
+text(s, "reachnt.vercel.app  ·  github.com/harshrastogii/reachnt", { x: 0.8, y: 5.55, w: 6.4, h: 0.4, fontSize: 16, color: "64D2FF", bold: true, objectName: "close-links" });
+text(s, "Thank you. Questions welcome.", { x: 0.8, y: 6.0, w: 6.4, h: 0.4, fontSize: 18, color: "FFFFFF", objectName: "thanks" });
+s.addNotes(`[HARSH, about 20 seconds]
+To finish: where someone lives shouldn't decide how long they wait for water, power or a safe home.
+ReachNT fixes urgent remote repairs in days instead of months, for a cost we can see and name, and it makes someone own that choice.
+Thank you. We're happy to take questions.`);
 
 (async () => {
-  const out = path.join(__dirname, `DataChallenge_${TEAM}_Slides.pptx`);
+  const out = path.join(ROOT, "docs", "deck", "DataChallenge_Team AIC015_Slides.pptx");
   await pres.writeFile({ fileName: out });
-  if (process.env.PPTX_SKILL) {
-    const { applyTheme } = require(path.join(process.env.PPTX_SKILL, "scripts", "apply_theme.js"));
-    await applyTheme(out, THEME);
-  }
+  const skill = process.env.PPTX_SKILL;
+  if (skill) { const { applyTheme } = require(path.join(skill, "scripts", "apply_theme.js")); await applyTheme(out, THEME); }
   console.log("wrote", out);
 })();

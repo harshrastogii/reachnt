@@ -43,7 +43,7 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 | Deliverable | Where |
 |---|---|
 | Report (PDF, A4, 8 body pages) | `docs/report/DataChallenge_Team AIC015_Report.pdf` (source `reachnt_report.md`, build `build_pdf.py`) |
-| Slide deck | `docs/deck/DataChallenge_Team AIC015_Slides.pptx` and `.pdf` (build `build_deck.js`); run sheet `pitch_run_sheet.md` |
+| Slide deck | `docs/deck/DataChallenge_Team AIC015_Slides.pptx` and `.pdf` (build `build_deck.js`); script with timings and Q&A prep `PITCH_SCRIPT.md` |
 | Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns |
 | Python solution | `src/reachnt/`, `run_all.py`, `notebooks/01_walkthrough.ipynb`, `tests/` |
 | Database design | `docs/DATABASE.md`, `docs/schema.sql` |

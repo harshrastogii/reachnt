@@ -104,7 +104,7 @@ def on_page(canvas, doc):
     n = canvas.getPageNumber()
     canvas.drawString(MARGIN, H - 1.2 * cm, "ReachNT: remote repair triage")
     canvas.drawRightString(W - MARGIN, H - 1.2 * cm, f"{TEAM}  |  Page {n}")
-    canvas.drawString(MARGIN, 1.1 * cm, "CDU IT Code Fair 2026, AI Challenge · Team Top Enders")
+    canvas.drawString(MARGIN, 1.1 * cm, "CDU IT Code Fair 2026, Artificial Intelligence Challenge · Team Top Enders")
     canvas.drawRightString(W - MARGIN, 1.1 * cm, f"{TEAM}  |  Page {n}")
     canvas.setStrokeColor(RULE); canvas.setLineWidth(0.4)
     canvas.line(MARGIN, H - 1.4 * cm, W - MARGIN, H - 1.4 * cm)
@@ -174,7 +174,7 @@ def build():
 
     doc = SimpleDocTemplate(str(OUT), pagesize=A4, leftMargin=MARGIN, rightMargin=MARGIN, topMargin=MARGIN, bottomMargin=MARGIN,
                             title="ReachNT: remote repair triage", author=TEAM,
-                            subject="CDU IT Code Fair 2026, AI Challenge · Team Top Enders")
+                            subject="CDU IT Code Fair 2026, Artificial Intelligence Challenge · Team Top Enders")
     doc.initialFontName, doc.initialFontSize = "Arial", 11   # no stray Helvetica in the PDF
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
     print("wrote", OUT)

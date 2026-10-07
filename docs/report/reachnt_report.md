@@ -2,13 +2,13 @@
 title: ReachNT
 subtitle: Remote repair triage that ranks by need, shares trips with H3 hexagons, and makes someone sign for who waits
 kind: Data analysis report
-event: "CDU IT Code Fair 2026, AI Challenge: Housing maintenance triage"
+event: "CDU IT Code Fair 2026, Artificial Intelligence Challenge: Housing maintenance triage"
 team: Team AIC015
 team_name: Top Enders
 members:
   - "Harsh Rastogi (386401): research (including the deep dive into H3), data pipeline, trip-planning engine, ReachNT portal, report"
   - "Aashish (385593): research; proposed Uber's H3 hexagon grid, which became ReachNT's shared-trip method"
-date: 7 October 2026
+date: 8 October 2026
 acknowledgement: We acknowledge the Larrakia people, Traditional Owners of the land on which Charles Darwin University's Darwin campuses stand, and the Traditional Owners of all the Country this report discusses. This report contains no images, names or voices of people. All repair requests in it are synthetic.
 ---
 
@@ -71,7 +71,7 @@ FIGURE: outputs/figures/fig1_map.png | 12.5 | Figure 1. The 70 communities by ac
 
 ## 2.2 Reading a fault report
 
-Phrase rules, written from the FS17 examples and the s 63 emergency list, match 22 fault types and four modifiers (vulnerable occupant, crowded house, repeat report, negation). A TF-IDF and logistic regression model (scikit-learn) catches wording the rules miss. A person reads the report when no rule matches and the model is under 55% sure, when the two disagree on category, when the model gives 25% or more to a dangerous fault, or when a danger word (smoke, melting, sparks, sewage) appears in a reading that is not Immediate. Both the Python engine and the portal use the same rules file.
+Phrase rules, written from the FS17 examples and the s 63 emergency list, match 23 fault types (including damp and mould, which England's 2025 Awaab's Law singles out) and four modifiers (vulnerable occupant, crowded house, repeat report, negation). A TF-IDF and logistic regression model (scikit-learn) catches wording the rules miss. A person reads the report when no rule matches and the model is under 55% sure, when the two disagree on category, when the model gives 25% or more to a dangerous fault, or when a danger word (smoke, melting, sparks, sewage) appears in a reading that is not Immediate. A negated danger ("no sparks now") stays Immediate and goes to a person: the reader never downgrades danger on its own. Both the Python engine and the portal use the same rules file.
 
 ## 2.3 Need-only urgency
 
@@ -105,7 +105,7 @@ Settings differ in how each job is valued, in λ, and in whether shared trips ar
 
 ## 2.6 Simulation, explanation and the ledger
 
-Requests arrive at 4 per house per year, 25% more in the wet season, with faults drawn from the APY job mix; 30% use wording the reader was not trained on. One year (52 weeks plus 8 to clear the backlog) runs under each setting, with {{N['crews_total']}} tradespeople sized at 1.3 times expected job hours. The solver is single-threaded with a fixed seed, so every run gives the same numbers.
+Requests arrive at 4 per house per year, 25% more in the wet season, with faults drawn from the APY job mix; 30% use wording the reader was not trained on. One year (52 weeks plus 8 to clear the backlog) runs under each setting, with {{N['crews_total']}} tradespeople sized at 1.3 times expected job hours. A second report of the same fault at the same house, while the first is open, joins that job and is fixed on the same visit; an Immediate fault is made safe the day it is reported, and fixing it is a second clock. The solver is single-threaded with a fixed seed, so every run gives the same numbers.
 
 **How to read our numbers.** *Cost per repair* is everything spent in the year (labour, travel, charters, overnight stays) divided by the repairs done. *9 in 10 fixed within* is the number of days by which 9 out of 10 urgent repairs were done (the 90th percentile). *Fault-days* add up every day a household lived with an unfixed fault; a dangerous fault counts more than a small one.
 
@@ -146,16 +146,16 @@ FIGURE: outputs/figures/fig4_reasons.png | 16.0 | Figure 4. Job-weeks remote job
 ## 3.6 Reading free text is the weak link
 
 TABLE: Table 3. Reader accuracy on synthetic reports. "New wording" uses phrasings kept out of training.
-| Measure | Familiar wording (330) | New wording (660) |
+| Measure | Familiar wording ({{N['reader']['seen']['n']}}) | New wording ({{N['reader']['heldout']['n']}}) |
 |---|---|---|
 | Spotting a dangerous fault, model ROC-AUC (0.5 = guessing) | {{Qr['seen']['danger']['roc_auc']:.2f}} | {{Qr['heldout']['danger']['roc_auc']:.2f}} |
 | Spotting a dangerous fault, model PR-AUC (guessing = {{Qr['heldout']['danger']['pr_auc_baseline']:.2f}}) | {{Qr['seen']['danger']['pr_auc']:.2f}} | {{Qr['heldout']['danger']['pr_auc']:.2f}} |
-| Category correct, rules only | 84% | 62% |
-| Category correct, model only | 96% | 59% |
-| Category correct, combined | 90% | 79% |
-| Under-triaged and not sent to a person | 0.6% | 3.2% |
-| Dangerous fault missed and not sent to a person | 0% | 1.3% |
-| Sent to a person | 17% | 40% |
+| Category correct, rules only | {{pct(N['reader']['seen']['rules']['category_acc'])}} | {{pct(N['reader']['heldout']['rules']['category_acc'])}} |
+| Category correct, model only | {{pct(N['reader']['seen']['model']['category_acc'])}} | {{pct(N['reader']['heldout']['model']['category_acc'])}} |
+| Category correct, combined | {{pct(N['reader']['seen']['combined']['category_acc'])}} | {{pct(N['reader']['heldout']['combined']['category_acc'])}} |
+| Under-triaged and not sent to a person | {{N['reader']['seen']['combined']['under_triaged_unflagged']*100:.1f}}% | {{N['reader']['heldout']['combined']['under_triaged_unflagged']*100:.1f}}% |
+| Dangerous fault missed and not sent to a person | {{N['reader']['seen']['combined']['danger_missed']*100:.1f}}% | {{N['reader']['heldout']['combined']['danger_missed']*100:.1f}}% |
+| Sent to a person | {{pct(N['reader']['seen']['combined']['to_person'])}} | {{pct(N['reader']['heldout']['combined']['to_person'])}} |
 
 On new wording the model alone is only moderately good at spotting danger, and its confidence is not honest. The safety net works only because it sends four in ten reports to a person. Appendix G has the full measures: calibration, cross-validation, ranking agreement, solver gaps, and the results in four more random years. Real reports will come in Aboriginal English, Kriol and other languages [20], which synthetic English cannot test.
 
@@ -195,7 +195,7 @@ The requests are synthetic, so absolute numbers are illustrations and the compar
 
 **For communities and their organisations:**
 7. Co-design the tenant answer, the intake questions and the fault vocabulary in local languages with tenants, Aboriginal Housing NT and the Aboriginal Interpreter Service, under ethics approval and land council research permits.
-8. Hold the decision ledger to account through local authorities and tenant groups.
+8. Hold the decision ledger to account through local authorities and tenant groups, and give every tenant a way to ask a person to review their ranking, answered within 10 working days.
 
 # References
 
@@ -217,7 +217,7 @@ The requests are synthetic, so absolute numbers are illustrations and the compar
 16. Residential Tenancies Act 1999 (NT) s 63. https://www.austlii.edu.au/cgi-bin/viewdoc/au/legis/nt/consol_act/rta1999207/s63.html
 17. Royal Commission into the Robodebt Scheme (2023). Report, Recommendation 17.1; Commonwealth Ombudsman (2025). Automated decision-making better practice guide. https://apo.org.au/node/306481
 18. Gilbert + Tobin (2026). Automated decision-making transparency under the Privacy Act. https://www.gtlaw.com.au/insights/automated-decision-making-transparency-under-the-privacy-act
-19. Global Indigenous Data Alliance. CARE Principles for Indigenous Data Governance. https://www.gida-global.org/care ; NIAA (2024) Framework for Governance of Indigenous Data.
+19. Global Indigenous Data Alliance. CARE Principles for Indigenous Data Governance. Carroll, S.R. et al. (2020), Data Science Journal 19(1):43, https://doi.org/10.5334/dsj-2020-043 ; NIAA (2024) Framework for Governance of Indigenous Data.
 20. ABC News (2022). More than 80pc of Aboriginal people speak Kriol or Aboriginal English. https://www.abc.net.au/news/2022-05-05/kriol-aboriginal-english-tranlsation-interpreting/101005782
 21. Brodsky, I. (2018). H3: Uber's Hexagonal Hierarchical Spatial Index. https://www.uber.com/au/en/blog/h3/ ; H3 documentation and S2 comparison. https://h3geo.org/docs/ ; https://github.com/uber/h3
 22. Neon. Postgres extensions; regions; pricing. https://neon.com/docs/extensions/pg-extensions ; https://neon.com/docs/introduction/regions ; https://neon.com/pricing ; h3-pg: https://github.com/zachasme/h3-pg
@@ -226,7 +226,7 @@ The requests are synthetic, so absolute numbers are illustrations and the compar
 
 # Appendix A: AI usage declaration
 
-We used Claude (Anthropic) as a coding and writing assistant: to search for and summarise public sources, draft and review Python and JavaScript, and draft and edit report text. The NT sources behind the figures we quote (DHLGCD FS17, the NIAA review, Nous 2017, Grealy et al. 2022, the Menzies Healthy Homes evaluation, the ANAO audit) were read in full and the figures checked against them (copies in research/sources/). Other references, mainly overseas methods and legal context, were checked through their published summaries. All numbers in this report come from run_all.py through outputs/numbers.json. The team reviewed, tested and is responsible for all content. ReachNT itself uses no large language model: the reader is phrase rules plus a logistic regression, and tenant answers are assembled from logged facts.
+We used Claude (Anthropic) as a coding and writing assistant: to search for and summarise public sources, draft and review Python and JavaScript, and draft and edit report text. The NT sources behind the figures we quote (DHLGCD FS17, the NIAA review, Nous 2017, Grealy et al. 2022, the Menzies Healthy Homes evaluation, the ANAO audit) were read in full and the figures checked against them (links in research/sources/README.md). Other references, mainly overseas methods and legal context, were checked through their published summaries. All numbers in this report come from run_all.py through outputs/numbers.json. The team reviewed, tested and is responsible for all content. ReachNT itself uses no large language model: the reader is phrase rules plus a logistic regression, and tenant answers are assembled from logged facts.
 
 # Appendix B: Code, portal and how to run
 
@@ -234,8 +234,10 @@ CODE:
 pip install -r requirements.txt
 python run_all.py                      rebuilds every number, figure and the portal data (about 15 minutes on 8 cores)
 python run_all.py --quality           quality measures only (Appendix G)
-pytest -q tests                        checks: location-free urgency, reader safety net, planner limits and optimality, H3 shared trips, readable answers
-https://reachnt.vercel.app             the ReachNT portal (or open web/index.html); works offline with bundled satellite tiles
+pytest -q tests                        70 checks: location-free urgency, reader safety net, planner limits, data and simulation integrity
+node tests/test_api.mjs                 10 checks on the server: input validation, no-access evidence, sign-in rules
+https://reachnt.vercel.app             the ReachNT portal, desktop and phone (or serve web/ locally); works offline
+https://github.com/harshrastogii/reachnt   all code, data links and documents
 notebooks/01_walkthrough.ipynb         the method step by step
 
 Code: src/reachnt/ geo.py (communities, access, H3 cells and shared trips), synth.py, intake.py (reader), urgency.py (need score), planner.py (CP-SAT trips and shared trips), simulate.py, explain.py (tenant answers), experiments.py, evaluate.py (quality measures), figures.py, export_web.py. Parameters, each tagged as sourced or assumed: config/params.yaml. Fault taxonomy: config/taxonomy.yaml. Database: docs/schema.sql and docs/DATABASE.md.
@@ -270,3 +272,11 @@ TABLE: Table F1. Data zones and access in the ReachNT database (docs/schema.sql)
 # Appendix G: How good are the algorithms?
 
 QUALITY_APPENDIX
+
+# Appendix H: Validation and accountability for a pilot
+
+We checked ReachNT against the standards similar services now have to meet. The full list, with sources, is in docs/VALIDATION.md. The live portal has a strict content security policy, serves its libraries from its own site, and checks every update it receives. It shows zero WCAG 2.2 AA issues in every view, on desktop and phone. All 70 community positions were checked against satellite imagery.
+
+ReachNT now follows the rules that would apply to a pilot. A plain-language notice of its automated decisions, with an AI transparency statement, meets the Privacy Act's transparency duty from 10 December 2026 (web/privacy.html). An AI impact assessment follows the format of the Commonwealth AI policy v2.0 (docs/AI_IMPACT_ASSESSMENT.md). Tenants can ask a person to review their ranking, and a person re-reads a weekly sample of the reader's work, as the Robodebt Royal Commission and the Commonwealth Ombudsman's guide recommend. "Made safe" and "fixed" are separate clocks, as in England's Awaab's Law. No job closes on an unevidenced "no one home", a failure the UK Housing Ombudsman found in 2025.
+
+Before real use, the reader must be tested on real reports, by language, with the Aboriginal Interpreter Service, following docs/REAL_LANGUAGE_TEST_PROTOCOL.md.

@@ -783,7 +783,7 @@
           <p>ReachNT uses Uber's free hexagon map grid, H3. Every hexagon's neighbours are the same distance away, so "within two hexagons" means the same distance in every direction. That keeps sharing fair between communities. It's also how a house is stored: as a small hexagon, not a street address.</p></div>
         <div class="card big"><h3>Keeping people's details safe</h3><p>Names, phone numbers and addresses are locked in one encrypted store that only intake staff can open, and every look is recorded. Everything else uses a house number and its hexagon. Tradespeople only see their own jobs.</p></div>
         <div class="card big"><h3>Works without signal</h3><p>Install ReachNT on a phone and the run sheet, map and job details stay on it. Updates are saved on the phone and sent when signal returns. Every run and repair can also be saved as a PDF.</p></div>
-        <div class="card big"><h3>People check the computer</h3><p>A person checks every report that might be dangerous and every report the computer can't read with confidence, re-reads 1 in 20 of the rest each week (the Checks tab), and answers any tenant who asks for a review within 10 working days. <a href="privacy.html" target="_blank" rel="noopener">How ReachNT decides, what it uses, and your rights</a>.</p></div>
+        <div class="card big"><h3>People check the computer</h3><p>A person checks every report that might be dangerous and every report the computer can't read with confidence, re-reads 1 in 20 of the rest each week (the Checks tab), and answers any tenant who asks for a review within 10 working days. <a href="privacy" target="_blank" rel="noopener">How ReachNT decides, what it uses, and your rights</a>.</p></div>
         <div class="card"><p class="note">${esc(RN.notice)} Imagery now: ${esc(imagery.name)}.</p></div>
       </div>`;
   }
@@ -974,7 +974,7 @@
                <button class="btn ghost" type="submit">Ask for a review</button></form>`}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
           <button class="btn primary" id="interp">Ask for an interpreter</button><button class="btn ghost" id="worse">It got worse</button>
-          <button class="btn ghost" id="tpdf">Save this as a PDF</button><a class="btn ghost" href="privacy.html" target="_blank" rel="noopener">How ReachNT decides</a></div>
+          <button class="btn ghost" id="tpdf">Save this as a PDF</button><a class="btn ghost" href="privacy" target="_blank" rel="noopener">How ReachNT decides</a></div>
       </div>`;
     bindGuides(el);
     $("#tplace", el).addEventListener("change", (e) => { state.place = e.target.value; state.tjob = null; renderTenant(); tenantMap(); });

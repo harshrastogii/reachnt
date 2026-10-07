@@ -68,7 +68,9 @@
     try {
       const r = await fetch("api/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ updates: pending }) });
       if (!r.ok) throw new Error(r.status);
-      box.forEach((u) => (u.sent = true)); store("rn-outbox", box);
+      const ack = await r.json().catch(() => ({})); const bad = new Set(ack.rejected || []);
+      box.forEach((u) => { if (!u.sent && !bad.has(u.id)) u.sent = true; else if (bad.has(u.id)) u.rejected = true; });   // rejected ones stay on the phone
+      store("rn-outbox", box);
     } catch (e) { /* stays queued; tried again when the signal comes back */ }
     renderNet();
   }
@@ -84,8 +86,7 @@
   // ================================================================ PDF (job sheets to keep without signal)
   async function getPDF() {
     if (!window.jspdf) {
-      await new Promise((res) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = res; s.onerror = res; document.head.appendChild(s); });
-      if (!window.jspdf) await new Promise((res) => { const s = document.createElement("script"); s.src = "vendor/jspdf.umd.min.js"; s.onload = res; s.onerror = res; document.head.appendChild(s); });
+      await new Promise((res) => { const s = document.createElement("script"); s.src = "vendor/jspdf.umd.min.js?v=4.2.1"; s.onload = res; s.onerror = res; document.head.appendChild(s); });
     }
     if (!window.jspdf) { toast("Couldn't load the PDF maker. Try again with signal."); return null; }
     return new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
@@ -552,6 +553,7 @@
         <div><b>When it should be fixed</b><p class="note">${clock}</p></div>
         <div><b>Who fixes it</b><p class="note">${TRADE[h.trade]}, about ${h.hours} hours on site.${h.rta_s63 ? " The law treats this as an emergency repair." : ""}</p></div>
         <div><b>Priority ${base + h.harm + hlp + exp + rep} points</b><p class="note">${r.mods.vulnerable ? `Extra points because “${esc(r.mods.vulnerable)}” lives there. ` : ""}${rep ? "Extra points because it was reported before. " : ""}Where the house is doesn't change this.</p></div>
+        ${r.mods.negation && h.category === "immediate" ? `<p class="note">You also wrote “${esc(r.mods.negation)}”, so it stays urgent until a person has checked.</p>` : ""}
         ${h.category === "immediate" || r.mods.danger_words ? `<span class="chip person" style="justify-self:start">A person calls today to check it's safe</span>` : ""}</div>`;
     };
     $("#rtext").addEventListener("input", go);

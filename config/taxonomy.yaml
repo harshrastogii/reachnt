@@ -259,6 +259,7 @@ modifiers:
   negation:
     patterns:
       - "(not|no longer|isn.?t|stopped) (spark|leak|smok|overflow)ing( now)?|fixed (it )?now"
+      - "\\b(no|not|never|no longer) (any )?(sparks?|sparking|smoking|gas smell|smell of gas|overflowing)\\b"   # "no sparks", not "no smoke detector"
   danger_words:   # generic safety net: if any appears and the reading is not Immediate, a person checks. ASSUMPTION
     patterns:
       - "smok|melt|burn|spark|shock|zap|smell|fume|hiss|collaps|fell|falling|caved|sewage|sewerage|flood|gush|pour|spray|live wire|fire"

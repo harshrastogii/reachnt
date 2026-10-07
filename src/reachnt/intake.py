@@ -148,6 +148,11 @@ def read(text: str, clf: Classifier | None) -> Reading:
         elif danger_word:
             needs_human = True
             reasons.append(f"You wrote '{danger_word}'. A person will call to check it is safe.")
+    if primary and H[primary]["category"] == "immediate" and "negation" in mods:
+        # "no sparks, the power point just doesn't work": never downgrade danger on our own reading of a negation;
+        # keep it Immediate and have a person confirm by phone
+        needs_human = True
+        reasons.append(f"You also wrote '{mods['negation']}'. A person will call to check whether it is still dangerous.")
     if source == "model":
         # no percentage: on unfamiliar wording the model's confidence runs ahead of its accuracy (evaluate.py, calibration)
         reasons.append(f"No listed phrase matched. The model's best guess is '{H[mh]['label']}'.")

@@ -1,6 +1,6 @@
 # Validation: what we checked, what we fixed, what is still missing
 
-Checked 7 October 2026 against the live portal (https://reachnt.vercel.app), the Python engine and the standards that similar services now have to meet. Every check that can be automated runs in `tests/`, which GitHub Actions runs on every push.
+Checked 7 October 2026 against the live portal (https://reachnt.vercel.app), the Python engine and the standards that similar services now have to meet. Every check that can be automated runs in `tests/` (70 Python checks, 10 server checks), which GitHub Actions runs on every push.
 
 ## 1. Checks we ran
 
@@ -20,45 +20,32 @@ Checked 7 October 2026 against the live portal (https://reachnt.vercel.app), the
 | Reader | ROC-AUC, PR-AUC, calibration, cross-validation | See report Appendix G. The model's confidence runs ahead of its accuracy on new wording, so no percentage is shown to tenants. |
 | Data | 70 communities, inside the NT, houses > 0, every community has a hub, unique ids, valid hazards, request days within the year | Pass |
 | Simulation | In all 14 plans: done + open = all jobs, no negative waits, nothing fixed before it was reported, same requests in every plan | Pass (66 of 66) |
-| Simulation | Results hold in other random years; solver close to optimal | Pass (Appendix G: five years; 99.5% of 26,028 weekly plans proved optimal) |
+| Simulation | Results hold in other random years; solver close to optimal | Pass (Appendix G: five years; 99.4% of 25,996 weekly plans proved optimal) |
 | Build | A fresh install can run the code | **Was broken:** `requirements.txt` did not list `h3`, `scipy` or `requests`. Fixed, and CI now installs from scratch on every push. |
 | Links | 45 links in the report and research notes | 36 load; 7 are government sites that refuse automated requests (they open in a browser); **2 were dead and are fixed in our notes** (the NIAA review needs `.pdf`; the CARE principles page moved, so we cite Carroll et al. 2020, https://doi.org/10.5334/dsj-2020-043). |
 | Page weight | Brotli on the wire | Page 2 KB, app 28 KB, data 195 KB, map library 217 KB. Bundled offline tiles load only when needed. |
 
-## 2. What comparable services and current rules expect that ReachNT does not yet do
+## 2. What comparable services and current rules expect, and what we did
 
-Ordered by what would matter first in a real pilot.
+Each gap found by the research, and where it now stands in the prototype (7 October 2026).
 
-### Rules that would apply
-
-1. **Privacy Act, automated decisions (from 10 December 2026).** An organisation covered by the Privacy Act that uses a computer program to make, or substantially help make, decisions that significantly affect people must say so in its privacy policy: what personal information is used, what decisions, and how, in plain language. This covers rule-based scoring, not only AI. A community housing provider or contractor running ReachNT would need this. NT Government agencies follow the Information Act 2002 privacy principles instead (data quality, security, access and correction). *Missing: a privacy notice and an "access or correct my information" path.*
-2. **Commonwealth AI policy v2.0 (from 15 December 2025) and the National AI Centre's Guidance for AI Adoption (October 2025).** The policy asks for an AI impact assessment, a named accountable owner, an internal register of AI uses, a public AI transparency statement updated every year, and a review of high-risk uses at least every 12 months. The Guidance's six practices are: decide who is accountable, understand impacts, measure and manage risks, share essential information, test and monitor, maintain human control. *We have the named sign-off, testing and human control. Missing: a completed impact assessment and a transparency statement.*
-3. **Robodebt Royal Commission, recommendation 17.1, and the Commonwealth Ombudsman's ADM guide (March 2025).** Automated decisions need a clear path to review, a plain-language explanation of how the process works, and business rules open to independent scrutiny. The guide adds quality assurance to keep decisions accurate after launch. *We publish the rules (the repository is public) and explain each wait. Missing: a formal "ask for a review of this decision" step with a response time, and a routine audit sample (for example, a person re-reads 5% of automatically read reports each week).*
-
-### What housing regulators found goes wrong with repairs
-
-4. **"Made safe" and "fixed" are two different clocks.** England's Awaab's Law (in force since 27 October 2025) requires emergency hazards to be investigated and made safe within 24 hours. Significant damp and mould must be investigated within 10 working days, with a written summary to the tenant within 3 working days. The NT fact sheet also separates a 4-hour response from the repair. *ReachNT's simulation assumes dangerous jobs are made safe on day one and does not record it. Missing: a separate "made safe at" time for Immediate jobs.*
-5. **Damp and mould.** It is the hazard Awaab's Law was written for, and the Top End wet season makes it common. *ReachNT has roof leaks but no damp-and-mould category.* Adding one changes the fault list and the simulated year, so it should be agreed with the department first.
-6. **"No one home" must not close a job.** The Housing Ombudsman's 2025 report *Repairing Trust* found landlords closing cases on unevidenced claims that the tenant denied access. It also found missing property records, missed health needs, and temporary fixes that came back. *Missing:*
-   - "No one home" needs a time, a note and a tenant notification, and books the next visit automatically.
-   - A repair history per house.
-   - A flag when the same fault returns within 90 days.
-   - A step where the tenant confirms the repair worked.
-7. **Duplicate reports.** The same fault reported twice for one house should merge, not queue twice. *Missing.*
-8. **Published performance in a standard form.** English social landlords publish TSM RP02: the share of emergency and non-emergency repairs completed within their own target times. *ReachNT computes the equivalent; it could publish it per hub on the public, H3-aggregated view.*
-
-### Model and data
-
-9. **Test on real reports.** Every reader measure uses synthetic English. A pilot needs real reports, including Kriol and Aboriginal English, reviewed with the Aboriginal Interpreter Service, and an external validation reported to a standard such as TRIPOD+AI.
-10. **Monitor after launch.** Track the share of reports sent to a person each week, remote against town waits, and misreads found by the audit sample. A rising "sent to a person" share is the first sign of language the reader does not know.
-11. **Confirm two fault categories with the department.** A dripping tap is currently Urgent (with "shower or taps not working") and a missing smoke detector is Urgent. Our sources do not settle either.
-
-### Running it for real
-
-12. **Sign-in and roles.** Tenant one-time codes and tradesperson accounts are designed (row-level security in `docs/schema.sql`) but not built; the prototype has no login.
-13. **Rate limits and abuse protection** on the sync endpoint (Vercel Firewall), backups, and an incident plan.
-14. **Two phones, one job.** When two people update the same job offline, the server needs a rule for which update wins (latest timestamp, with both kept in the history).
-15. **Accessibility beyond the checker.** Automated checks pass; a screen-reader walkthrough and testing with tenants, in language, are still needed.
+| # | Expectation | Source | Status |
+|---|---|---|---|
+| 1 | Say in plain language what automated decisions are made, with what information and how; let people see and correct their information | Privacy Act APP 1.7–1.9 (from 10 Dec 2026); NT Information Act IPPs | **Done.** [`web/privacy.html`](../web/privacy.html), linked from the tenant view and the About sheet: what is decided, where a person decides, what information is used and never used, how the score works (with links to the public rules), rights, who sees what. |
+| 2 | AI impact assessment, accountable owner, transparency statement, yearly review | Commonwealth AI policy v2.0; NAIC Guidance for AI Adoption | **Done as drafts for a pilot.** [`AI_IMPACT_ASSESSMENT.md`](AI_IMPACT_ASSESSMENT.md) follows the government tool's sections; the transparency statement is on the privacy page. A department must name the accountable official and sign it. |
+| 3 | A path to review an automated decision; ongoing quality assurance | Robodebt Royal Commission rec. 17.1; Ombudsman ADM guide | **Done.** "Ask for a review" in the tenant view (a reason is required; a person answers within 10 working days). The coordinator's new Checks tab lists reviews with their due date and runs the weekly audit: a person re-reads 1 in 20 reports the program read on its own and records right or wrong. Tables `ops.review_request` and `ops.reader_audit`. |
+| 4 | "Made safe" and "fixed" as two clocks | Awaab's Law; NT FS17 (4-hour response) | **Done.** The simulation records a made-safe day for every Immediate job; the tenant timeline, run sheet and job detail show it. `ops.job.made_safe_at` and `done_at` are separate. |
+| 5 | Damp and mould as a hazard | Awaab's Law | **Done, as an assumption to confirm.** New Urgent category for general maintenance, with word rules and test phrases. The simulated year now includes it, which moved the report's numbers slightly (see the run notes). |
+| 6 | Never close a job on an unevidenced "no access" | Housing Ombudsman, *Repairing Trust* (2025) | **Done.** "No one home" or "Can't get in" needs the time of the knock and at least one thing tried (card, phone, family, photo); the job stays open; the tenant sees when we came. The server rejects a no-access update without that evidence. Table `ops.visit_attempt` enforces it with a check constraint. |
+| 7 | Repair history per house; flag fixes that don't hold; tenant confirms the fix | Housing Ombudsman (2025) | **Done.** Each job shows the house's other repairs this year; a fault that comes back within 90 days of a fix is flagged on the run sheet, in the job detail and in Checks; after a booked repair the tenant answers "Did the repair work?", and "still broken" reopens it. `ops.job.repeat_of`, `ops.tenant_confirmation`. |
+| 8 | Merge duplicate reports | Field-service practice | **Done.** A second report of the same fault at the same house, while the first is open, joins the first job and is fixed on the same visit. This happens in the simulation too, so crews no longer spend time on duplicates. `ops.job.duplicate_of`. |
+| 9 | Test on real reports in the languages tenants use | TRIPOD+AI; our own limitation | **Kit ready, data needed.** [`REAL_LANGUAGE_TEST_PROTOCOL.md`](REAL_LANGUAGE_TEST_PROTOCOL.md) (who labels, how many, held-back set, pass marks) and `scripts/evaluate_real_reports.py` (results by language, every missed danger, faults with no category; refuses files containing phone numbers or addresses). It can't be finished without real reports and the Aboriginal Interpreter Service. |
+| 10 | Monitor after launch | Ombudsman ADM guide; Guidance for AI Adoption ("test and monitor") | **Partly done.** The weekly audit and the share sent to a person are the two signals; a dashboard over the live database is for the pilot. |
+| 11 | Confirm fault categories with the department | Our own review | **Open.** A dripping tap and a missing smoke detector are Urgent; damp and mould is Urgent. Our sources don't settle these. |
+| 12 | Sign-in and roles | Ombudsman ADM guide; NT IPP 4 (security) | **Server side done; sign-in service open.** [`web/api/_auth.js`](../web/api/_auth.js) checks a signed token (forged, unsigned and expired tokens are refused) and limits tenants to reviews and confirmations of their own jobs, tradespeople to visits on their own run. Switched on with `REQUIRE_SIGN_IN=1` and `AUTH_SECRET` in Vercel. The service that issues tokens (an SMS one-time code for tenants, logins for staff) needs a real identity provider and database and is not in the prototype. |
+| 13 | Rate limits, backups, incident plan | General | **Open, for the pilot** (Vercel Firewall rate limits; managed Postgres backups). |
+| 14 | Two phones updating one job offline | General | **Open.** The server will keep both updates in `ops.visit_attempt` and treat the latest as current. |
+| 15 | Accessibility beyond automated checks | WCAG 2.2 | **Open.** A screen-reader walkthrough and testing with tenants, in language. |
 
 ## Sources
 

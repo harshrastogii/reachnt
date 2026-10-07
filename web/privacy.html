@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How ReachNT decides</title>
+<meta name="description" content="How ReachNT uses your repair report to decide how soon your repair is done, what information it uses, and how to ask a person to review it.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&display=swap">
+<style>
+  :root { --bg: #f6f5f2; --card: #ffffff; --ink: #14181d; --ink-2: #4a4f57; --line: #e2e0da; --accent: #2a78d6; --note: #fff7e0; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0d1418; --card: #151c22; --ink: #eef1f4; --ink-2: #a9b0b8; --line: #263038; --accent: #64a8ff; --note: #2a2410; } }
+  :root[data-theme="dark"] { --bg: #0d1418; --card: #151c22; --ink: #eef1f4; --ink-2: #a9b0b8; --line: #263038; --accent: #64a8ff; --note: #2a2410; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 Geist, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  p, li { color: var(--ink-2); } b, strong { color: var(--ink); }
+  a { color: var(--accent); }
+  .note { background: var(--note); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin: 16px 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 6px 18px; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink); }
+  .back { display: inline-block; margin-bottom: 18px; }
+  footer { margin-top: 40px; font-size: 14px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← Back to ReachNT</a>
+  <h1>How ReachNT decides how soon your repair is done</h1>
+  <p>ReachNT is a computer program. It reads repair reports from tenants in remote Northern Territory public housing, decides how urgent each repair is, and helps plan which repairs a tradesperson does each week. This page explains what it decides, what it uses, and how to ask a person to look again.</p>
+  <div class="note"><b>This is a prototype.</b> Every repair request in ReachNT is made up for testing. This page is the notice we would publish before ReachNT was used for real. A housing department running it would add its own contact details and the name of the person responsible.</div>
+
+  <h2>What the program decides</h2>
+  <ul>
+    <li><b>What your repair is and how urgent it is.</b> It reads what you said and picks the fault (for example "toilet blocked") and one of three groups: Immediate (dangerous), Urgent or Routine.</li>
+    <li><b>Your place in the line.</b> It gives your repair a score. Higher scores are done first.</li>
+    <li><b>Which week a tradesperson comes.</b> Each week it plans trips around the tradespeople available, road closures and airstrips.</li>
+  </ul>
+  <p>These decisions affect how long you wait, so they matter. That is why people check them.</p>
+
+  <h2>Where a person decides, not the program</h2>
+  <ul>
+    <li>Any report that might be dangerous is checked by a person by phone the same day, and a maintenance officer makes it safe.</li>
+    <li>Any report the program can't read with confidence, or where its two methods disagree, goes to a person.</li>
+    <li>Each week a person re-reads 1 in 20 of the reports the program read on its own, to catch mistakes.</li>
+    <li>How much cost is allowed to count when planning trips is decided and signed by a named coordinator, not the program. If a cost decision held your repair back, you are told, with the name of the role that signed it.</li>
+    <li>You can ask a person to review how your repair was ranked (see below).</li>
+  </ul>
+
+  <h2>What information it uses</h2>
+  <div class="card"><table>
+    <tr><th>It uses</th><th>For</th></tr>
+    <tr><td>What you said about the fault</td><td>Working out the fault and how urgent it is</td></tr>
+    <tr><td>Who lives in the house, if you tell us (for example an older person, a baby, someone unwell, or many people)</td><td>Extra points, so the repair is done sooner</td></tr>
+    <tr><td>Whether the same fault was reported or fixed before</td><td>Extra points, and checking why a fix didn't hold</td></tr>
+    <tr><td>How long you have waited</td><td>Extra points the longer you wait</td></tr>
+    <tr><td>Your house, as a small map area (a hexagon about 15,000 m²), not your address</td><td>Planning the trip</td></tr>
+  </table></div>
+  <p><b>Never used for your score:</b> your name, your phone number, your address, or how far away or expensive your community is to reach. Distance and cost can change which week a trip goes; when they do, that is a signed decision and you are told.</p>
+
+  <h2>How the score works</h2>
+  <p>The score adds up: points for the group (Immediate, Urgent or Routine), for how much harm the fault can do, for which healthy-living need it affects (for example washing or safe power), for who lives there, for a repeat report, and for waiting. The same report gets the same score in town and out bush. The rules are public: <a href="https://github.com/harshrastogii/reachnt/blob/main/config/taxonomy.yaml">the list of faults and the words the program looks for</a> and <a href="https://github.com/harshrastogii/reachnt/blob/main/config/params.yaml">the points and deadlines</a>.</p>
+  <p>The program reads reports with word rules plus a small statistical model trained on example reports. It does not use a chatbot or generative AI, and it does not learn from your report by itself.</p>
+
+  <h2>Your rights and choices</h2>
+  <ul>
+    <li><b>Ask for a review.</b> Say so when you call, or use "Ask for a review" in the app. A person looks again and answers within 10 working days.</li>
+    <li><b>Ask for an interpreter</b> at any time, free.</li>
+    <li><b>See or correct your information.</b> Ask the housing office for the information held about you and your repairs, and ask for anything wrong to be fixed.</li>
+    <li><b>If an urgent repair isn't done,</b> you can ask the NT Civil and Administrative Tribunal (NTCAT) for an emergency repair order.</li>
+    <li><b>Complain</b> to the NT Ombudsman, or about privacy to the NT Information Commissioner.</li>
+  </ul>
+
+  <h2>Who sees your information</h2>
+  <ul>
+    <li>Your name, phone number and address are kept apart, encrypted, and read only by intake staff, and every read is recorded.</li>
+    <li>Tradespeople see the jobs on their own trips and nearby open jobs.</li>
+    <li>You see your own repairs.</li>
+    <li>Anyone can see waits and repair numbers for larger areas, never for a single house: an area with fewer than 5 repairs is not shown.</li>
+  </ul>
+
+  <h2>AI transparency statement</h2>
+  <div class="card">
+    <p><b>Where AI is used:</b> reading free-text repair reports to suggest the fault and urgency (word rules plus a logistic regression model).</p>
+    <p><b>Where it isn't:</b> no generative AI or chatbot. The planning of trips is an optimisation program that follows rules a person sets.</p>
+    <p><b>How it is checked:</b> tested before use (it caught 99% of dangerous reports in our tests on unfamiliar wording, because it sends doubtful ones to a person), a weekly sample re-read by people, and a review on request. Full results: <a href="https://github.com/harshrastogii/reachnt/blob/main/docs/VALIDATION.md">validation checks</a> and the <a href="https://github.com/harshrastogii/reachnt/blob/main/docs/AI_IMPACT_ASSESSMENT.md">AI impact assessment</a>.</p>
+    <p><b>Who is responsible:</b> a named accountable official in the housing department (to be named before use), and the coordinator who signs each planning setting.</p>
+    <p><b>Reviewed:</b> at least every 12 months, and whenever the rules change.</p>
+  </div>
+
+  <footer>Last updated 7 October 2026. ReachNT prototype, CDU IT Code Fair 2026, Artificial Intelligence Challenge, Team Top Enders (AIC015).</footer>
+</main>
+</body>
+</html>

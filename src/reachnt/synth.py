@@ -22,6 +22,10 @@ PHRASES: dict[str, tuple[list[str], list[str]]] = {
          "kids got zapped touching the light switch"],
         ["live wire sticking out by the back door", "black marks and melting on the power point", "light switch gave my son a big shock",
          "fuse box making crackling noise and smoke"]),
+    "damp_mould": (
+        ["black mould all over the bedroom ceiling", "walls are damp and mouldy since the rain", "mould growing in the bathroom",
+         "musty smell and black spots on the walls", "kids coughing, mould in their room", "damp walls in the lounge, smells bad"],
+        ["black stuff growing up the wall behind the bed", "mildew on the ceiling every wet season", "walls always wet, green fungus in the corner"]),
     "gas_leak": (
         ["smell gas in the kitchen", "gas bottle hissing", "gas leak near the stove", "strong gas smell"],
         ["smells like gas inside the house", "gas bottle leaking outside the kitchen"]),

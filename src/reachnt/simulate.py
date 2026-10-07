@@ -118,6 +118,10 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
     jobs["clock_official"] = [urgency.clock_days("urgent" if c == "immediate" else c, r, "official") for c, r in zip(jobs.category, jobs.remote)]
     jobs["done_day"] = np.nan
     jobs["done_mode"] = ""
+    jobs["merged_into"] = ""      # a second report of the same fault at the same house, while the first is still open
+    # Immediate faults are made safe the day they are reported, by the community's Remote Housing Maintenance Officer
+    # (DHLGCD FS17: response within 4 hours; ASSUMPTION that an officer is always available). The repair is a second clock.
+    jobs["made_safe_day"] = np.where(jobs.true_category == "immediate", jobs.available_day, np.nan)
     recs = jobs.to_dict("records")
     by_hub: dict[str, list[dict]] = {}
     for j in recs:
@@ -135,6 +139,15 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
         road = {cid: geo.road_open(com.loc[cid], month, wk, rng) for cid in com.index}
         for hub, hjobs in by_hub.items():
             open_jobs = [j for j in hjobs if np.isnan(j["done_day"]) and j["available_day"] < day_end]
+            # duplicates join the earliest open job for the same house and fault, and are fixed on the same visit
+            first: dict[tuple, dict] = {}
+            for j in sorted(open_jobs, key=lambda x: (x["day"], x["job_id"])):
+                key = (j["house"], j["hazard"])
+                if key in first and not j["merged_into"]:
+                    j["merged_into"] = first[key]["job_id"]
+                first.setdefault(key, j)
+            merged = [j for j in open_jobs if j["merged_into"]]
+            open_jobs = [j for j in open_jobs if not j["merged_into"]]
             for trade in sorted({j["trade"] for j in open_jobs}):
                 tj = [j for j in open_jobs if j["trade"] == trade]
                 cap = crews.get((hub, trade), 1) * P["crews"]["hours_per_week"]
@@ -192,6 +205,14 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                     logs.setdefault(jid, []).append([wk, code, round(tcost), o.mode if o else "town"])
                     last_reason[jid] = dict(week=wk, code=code, mode=o.mode if o else "town", trip_cost=(o.fixed_cost if o else 0),
                                             capacity=cap, used=res.hours_used, trips=len(res.trips))
+                for j in merged:
+                    if j["trade"] == trade:
+                        lead = next((x for x in tj if x["job_id"] == j["merged_into"]), None)
+                        if lead is not None and not np.isnan(lead["done_day"]):
+                            if lead["done_day"] >= j["day"]:      # fixed on the same visit
+                                j["done_day"], j["done_mode"] = lead["done_day"], lead["done_mode"]
+                            else:                                  # reported after that visit: a new job, not a duplicate
+                                j["merged_into"] = ""
                 weekly.append(dict(week=wk, hub=hub, trade=trade, month=month, crew=crews.get((hub, trade), 1), capacity=cap,
                                    hours_used=res.hours_used, jobs_done=len(done), trips=len(res.trips),
                                    air_trips=sum(o.mode.startswith("air") for o in res.trips.values()),
@@ -235,6 +256,9 @@ def summarise(res: SimResult, houses: pd.Series | None = None) -> dict:
              overdue_official_remote=float(remote.overdue_official.mean()),
              harm_days_total=float(j.harm_days.sum()), air_trips=int(wk.air_trips.sum()), trips=int(wk.trips.sum()))
     s["gap_p90"] = s["urgent_p90_remote"] / max(s["urgent_p90_town"], 0.1)
+    s["duplicates_merged"] = int((j.merged_into != "").sum()) if "merged_into" in j else 0
+    imm = j[j.true_category == "immediate"]
+    s["immediate_made_safe_within_1_day"] = float(((imm.made_safe_day - imm.day) <= 1).mean()) if "made_safe_day" in j and len(imm) else None
     by = []
     for b in BAND_ORDER:
         x = j[j.band == b]

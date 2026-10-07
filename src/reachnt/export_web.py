@@ -108,6 +108,23 @@ def build(N: dict) -> None:
         snap = pd.read_parquet(OUTPUTS / f"snap_{k}.parquet")
         snap = snap[snap.hub == DEMO_HUB]
         jj_all = jobs.set_index("job_id")
+        by_house = {h: g.sort_values("day") for h, g in jobs[jobs.hub == DEMO_HUB].groupby("house")}
+
+        def history(jr, asof):
+            """This house's other repairs up to the week shown: what, when, and whether it was fixed by then."""
+            g = by_house.get(jr.house)
+            if g is None:
+                return []
+            g = g[(g.job_id != jr.name) & (g.day <= asof)].tail(6)
+            return [[int(x.day), x.hazard, (int(x.done_day) if pd.notna(x.done_day) and x.done_day <= asof else None)] for x in g.itertuples()]
+
+        def came_back(jr):
+            """The same fault at the same house was fixed within the 90 days before this report: maybe the fix didn't hold."""
+            g = by_house.get(jr.house)
+            if g is None:
+                return None
+            prev = g[(g.hazard == jr.hazard) & (g.job_id != jr.name) & g.done_day.notna() & (g.done_day <= jr.day) & (jr.day - g.done_day <= 90)]
+            return None if prev.empty else int(jr.day - prev.done_day.max())
         weeks = {}
         for wk, s in snap.groupby("week"):
             s = s.copy()
@@ -130,7 +147,10 @@ def build(N: dict) -> None:
                                  rank=int(sr["rank"]), of=int(sr["of"]), wait=round(max(0.0, int(wk) * 7 + 3 - float(jr.day)), 1),
                                  needs_human=bool(jr.needs_human), vulnerable=bool(jr.vulnerable), reasons=log,
                                  now=("booked" if bool(sr.done) else next((x[1] for x in jr.reason_log if x[0] == int(wk)), None)),
-                                 short=ex["short"], sections=ex["sections"], score=ex["score"], score_text=ex["score_text"]))
+                                 short=ex["short"], sections=ex["sections"], score=ex["score"], score_text=ex["score_text"],
+                                 made_safe=(int(jr.made_safe_day) if "made_safe_day" in jr and pd.notna(jr.made_safe_day) else None),
+                                 merged_into=(jr.merged_into if "merged_into" in jr and jr.merged_into else ""),
+                                 came_back=came_back(jr), history=history(jr, int(wk) * 7 + 3)))
             weeks[int(wk)] = rows
             # field app: each trade's run this week, and "while you're there" suggestions
         field = {}

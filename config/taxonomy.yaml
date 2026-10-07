@@ -163,6 +163,17 @@ hazards:
     patterns:
       - "roof.*(leak|hole|lifted|blown)|leak.*(roof|ceiling)|rain (coming|comes|getting) in|water (coming )?through (the )?ceiling"
       - "storm|cyclone|flood(ed|ing)? (house|room|inside)|tree (fell|fallen|on)"
+  damp_mould:
+    label: Damp or mould
+    category: urgent       # ASSUMPTION: like England's Awaab's Law (2025), significant damp and mould is made safe within days, not weeks
+    hlp: 8                 # ASSUMPTION: Healthabitat HLP 8, controlling the temperature and air of the living environment
+    harm: 50
+    trade: general
+    hours: 3
+    rta_s63: false
+    patterns:
+      - "mou?ld|mildew|black (spots|stuff|fungus) (on|all over|up)|fungus (on|in) (the )?(wall|ceiling|corner)"
+      - "damp (wall|walls|room|ceiling|carpet|mattress)|walls? (are |is )?(always )?(damp|wet|sweating)|musty smell"
   stove_broken:
     label: Stove or oven not working
     category: urgent

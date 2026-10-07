@@ -14,9 +14,9 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 
 | Plan | Average cost per repair (incl. travel) | 9 in 10 urgent remote repairs fixed within | Days households lived with a fault |
 |---|---|---|---|
-| Cheapest jobs first | $558 | 62 days (town: 3) | 216,000 |
-| Most urgent first, one community per trip | $843 | 3 days | 75,800 |
-| **ReachNT**: most urgent first, with shared trips | **$775** | **3 days** | **61,700** |
+| Cheapest jobs first | $559 | 62 days (town: 3) | 225,800 |
+| Most urgent first, one community per trip | $876 | 3 days | 74,300 |
+| **ReachNT**: most urgent first, with shared trips | **$803** | **3 days** | **61,000** |
 
 - **Average cost per repair** is the year's labour, parts and travel divided by the number of repairs done.
 - **9 in 10 fixed within** is the wait that 90% of urgent remote repairs beat. The slowest 1 in 10 waited longer.
@@ -27,16 +27,16 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 
 | Check | Familiar wording | New wording |
 |---|---|---|
-| Spotting a dangerous fault, ROC-AUC (0.5 = guessing) | 1.00 | 0.78 (0.73–0.82) |
-| Spotting a dangerous fault, PR-AUC (guessing = 0.23) | 0.99 | 0.60 (0.53–0.68) |
-| Dangerous reports caught by the whole system (model, rules, person) | 100% | 99% |
-| Urgency category correct (macro-F1) | 0.90 | 0.79 |
-| Queue order vs true order (Kendall's τ, after a person checks) | 0.91 | 0.86 |
+| Spotting a dangerous fault, ROC-AUC (0.5 = guessing) | 1.00 | 0.84 (0.80–0.88) |
+| Spotting a dangerous fault, PR-AUC (guessing = 0.22) | 0.99 | 0.72 (0.65–0.78) |
+| Dangerous reports caught by the whole system (model, rules, person) | 100% | 99.3% |
+| Urgency category correct (macro-F1) | 0.89 | 0.80 |
+| Queue order vs true order (Kendall's τ, after a person checks) | 0.89 | 0.85 |
 
-- **Model on its own:** weak on wording it never saw. Its confidence is also too high at the top end: when it says 84% it is right 65% of the time, so tenants never see a confidence percentage.
+- **Model on its own:** moderate on wording it never saw (ROC-AUC 0.84). Its confidence doesn't match its accuracy: when it said it was 90% sure or more, it was right 56% of the time, so tenants never see a confidence percentage.
 - **Whole system:** still catches 99% of dangerous reports, because it sends 40% of those reports to a person.
-- **Trip planner:** CP-SAT proved 99.5% of 26,028 weekly plans optimal. The median plan takes 4 ms.
-- **Five random years:** ReachNT cut fault-days by 69–74% against cheapest-first, for 38–40% more per repair. Shared trips saved $68–78 per repair in every year.
+- **Trip planner:** CP-SAT proved 99.4% of 25,996 weekly plans optimal. The median plan takes 4 ms.
+- **Five random years:** ReachNT cut fault-days by 73%–75% against cheapest-first, for 42%–46% more per repair. Shared trips saved $66–73 per repair in every year.
 
 ## Deliverables
 
@@ -47,7 +47,8 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 | Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns |
 | Python solution | `src/reachnt/`, `run_all.py`, `notebooks/01_walkthrough.ipynb`, `tests/` |
 | Database design | `docs/DATABASE.md`, `docs/schema.sql` |
-| Validation checks and gaps | `docs/VALIDATION.md` (security, accessibility, map accuracy, reader stress tests, data and simulation integrity, what a pilot still needs) |
+| Validation checks and gaps | `docs/VALIDATION.md` (security, accessibility, map accuracy, reader stress tests, data and simulation integrity, each gap's status) |
+| Accountability for a pilot | `docs/AI_IMPACT_ASSESSMENT.md`, `web/privacy.html` (automated-decision notice and AI transparency statement), `docs/REAL_LANGUAGE_TEST_PROTOCOL.md` with `scripts/evaluate_real_reports.py` |
 | Background research | `research/RESEARCH.md`; links to the documents we read in full in `research/sources/README.md` |
 
 ## Run it
@@ -55,7 +56,7 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 ```bash
 pip install -r requirements.txt
 python run_all.py                     # every number, figure and the portal data (~15 min on 8 cores)
-pytest -q tests                       # 55 checks, all passing (also run by GitHub Actions on every push)
+pytest -q tests                       # 70 checks; node tests/test_api.mjs adds 10 for the server (both run by GitHub Actions on every push)
 python run_all.py --quality           # only the quality measures (ROC/PR-AUC, calibration, solver gap, 5 random years)
 python -m http.server 8731 --directory web   # then open http://localhost:8731
 python docs/report/build_pdf.py

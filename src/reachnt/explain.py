@@ -109,6 +109,10 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
         status.append(f"That is longer than our rule, by {_days(waited - clock)}.")
     if rank and not booked:
         status.append(f"You are number {rank[0]} of {rank[1]} waiting for {_a(trade)} from {job['hub']}.")
+    if job.get("merged_into"):
+        status.append("This fault was already reported for your house, so we joined the two reports: one visit fixes it.")
+    if job.get("true_category", cat) == "immediate" or cat == "immediate":
+        status.append("A maintenance officer makes it safe the day you report it. Fixing it properly is a second step, with its own date.")
     sections.append(("Where it is up to", " ".join(status)))
 
     why = _why(log, trade, place, ledger, community)
@@ -123,7 +127,9 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
     sections.append(("Your rights",
                      "You can ask for an Aboriginal interpreter at any time. "
                      "If an urgent repair is not done, you can ask the Tribunal (NTCAT) for an emergency repair order. "
-                     "You can also complain to the NT Ombudsman."))
+                     "You can also complain to the NT Ombudsman. "
+                     "You can ask for a person to review how your repair was ranked: say so when you call, or use \"Ask for a review\" in the app. "
+                     "We answer within 10 working days."))
 
     score_txt = (f"Score {u.total}: {u.base} for the {cat} category, {u.harm} for harm, {u.hlp} for the health practice it affects, "
                  f"{u.exposure} for who lives there, {u.repeat} for a repeat report, {u.ageing} for waiting. "

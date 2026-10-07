@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
-<link rel="stylesheet" href="styles.css?v=35">
+<link rel="stylesheet" href="styles.css?v=36">
 </head>
 <body>
 <div id="splash" class="glass"><svg width="34" height="34" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/></svg><b>ReachNT</b><span>Loading this week's repairs…</span></div>
@@ -51,7 +51,8 @@
       <button role="tab" data-tab="queue" aria-selected="true">This week</button>
       <button role="tab" data-tab="trips" aria-selected="false">Trips</button>
       <button role="tab" data-tab="reader" aria-selected="false">Try a report</button>
-      <button role="tab" id="tradeoff-open" aria-selected="false">Compare settings</button>
+      <button role="tab" data-tab="checks" aria-selected="false">Checks</button>
+      <button role="tab" id="tradeoff-open" aria-selected="false" aria-label="Compare settings">Compare</button>
     </nav>
   </div>
   <div class="panel-body" id="coord-body"></div>
@@ -93,7 +94,7 @@
 <!-- libraries are served from this site (vendor/), not a public CDN: no third party can change the code we run -->
 <script src="vendor/maplibre-gl.js"></script>
 <script src="vendor/h3-js.umd.js"></script>
-<script src="data/app.js?v=35"></script>
-<script src="app.js?v=35"></script>
+<script src="data/app.js?v=36"></script>
+<script src="app.js?v=36"></script>
 </body>
 </html>

@@ -15,3 +15,5 @@ jobs:
       - run: pytest -q tests
       - name: portal code parses
         run: node -e "new Function(require('fs').readFileSync('web/app.js','utf8'))"
+      - name: server function (validation, no-access evidence, sign-in rules)
+        run: node tests/test_api.mjs

@@ -105,9 +105,11 @@ CREATE TABLE ops.job (
   vulnerable    boolean NOT NULL DEFAULT false,
   crowded       boolean NOT NULL DEFAULT false,
   repeat_report boolean NOT NULL DEFAULT false,
-  made_safe_at  timestamptz,
-  done_at       timestamptz,
-  done_by       uuid REFERENCES ops.crew_member
+  made_safe_at  timestamptz,                         -- first clock: an Immediate fault made safe (4 h in FS17)
+  done_at       timestamptz,                         -- second clock: properly fixed
+  done_by       uuid REFERENCES ops.crew_member,
+  duplicate_of  bigint REFERENCES ops.job,           -- same house and fault reported while that job was open: fixed on its visit
+  repeat_of     bigint REFERENCES ops.job            -- same house and fault fixed within 90 days before: the fix may not have held
 );
 CREATE INDEX ON ops.job (category, done_at);
 
@@ -166,6 +168,52 @@ REVOKE UPDATE, DELETE ON ops.decision FROM PUBLIC;
 GRANT INSERT, SELECT ON ops.decision TO coordinator;
 
 -- ------------------------------------------------------------------ row-level security
+-- Every visit, including the ones that missed. A job is never closed because no one was home
+-- (Housing Ombudsman 2025): a no-access visit records when, and at least one thing the tradesperson tried.
+CREATE TABLE ops.visit_attempt (
+  visit_id    bigserial PRIMARY KEY,
+  job_id      bigint NOT NULL REFERENCES ops.job,
+  crew_id     uuid NOT NULL REFERENCES ops.crew_member,
+  at          timestamptz NOT NULL,
+  outcome     text NOT NULL CHECK (outcome IN ('done','no_one_home','cant_get_in','need_parts','needs_another_trade','unsafe')),
+  actions     text[] NOT NULL DEFAULT '{}',          -- left a card, phoned the tenant, spoke to family, photo of the door
+  note        text,
+  photo_ref   text,                                  -- object-store key, never in the database
+  tenant_told_at timestamptz,
+  CHECK (outcome NOT IN ('no_one_home','cant_get_in') OR cardinality(actions) > 0)
+);
+
+-- A tenant asks a person to review how their repair was ranked (Robodebt Royal Commission rec. 17.1).
+CREATE TABLE ops.review_request (
+  review_id    bigserial PRIMARY KEY,
+  job_id       bigint NOT NULL REFERENCES ops.job,
+  requested_at timestamptz NOT NULL DEFAULT now(),
+  reason       text NOT NULL,
+  due_at       timestamptz NOT NULL,                 -- 10 working days
+  answered_at  timestamptz,
+  answered_by  text,                                 -- role, as in the decision ledger
+  outcome      text CHECK (outcome IN ('unchanged','rescored','escalated')),
+  answer_text  text                                  -- what the tenant is told, in plain words
+);
+
+-- The weekly audit: a person re-reads 1 in 20 reports the program read on its own.
+CREATE TABLE ops.reader_audit (
+  job_id      bigint PRIMARY KEY REFERENCES ops.job,
+  week        date NOT NULL,
+  checked_by  text NOT NULL,
+  correct     boolean NOT NULL,
+  correct_hazard text,                               -- what it should have been, when wrong
+  checked_at  timestamptz NOT NULL DEFAULT now()
+);
+
+-- The tenant says whether the repair worked. "still broken" reopens it as a repeat.
+CREATE TABLE ops.tenant_confirmation (
+  job_id      bigint PRIMARY KEY REFERENCES ops.job,
+  at          timestamptz NOT NULL DEFAULT now(),
+  fixed       boolean NOT NULL,
+  note        text
+);
+
 ALTER TABLE ops.job ENABLE ROW LEVEL SECURITY;
 
 -- A tradesperson sees jobs on their trips, and open jobs within 3 res-5 rings of a community they visit this week.
@@ -175,7 +223,7 @@ CREATE POLICY job_tradesperson ON ops.job FOR SELECT TO tradesperson USING (
   OR (done_at IS NULL AND EXISTS (
           SELECT 1 FROM ops.trip t JOIN ops.crew_member c USING (crew_id) JOIN ops.house h ON h.house_id = ops.job.house_id
           CROSS JOIN LATERAL unnest(t.communities) AS cm(community_id)
-          JOIN ops.community k USING (community_id)
+          JOIN ops.community k ON k.community_id = cm.community_id
           WHERE c.db_user = current_user AND t.week_start = date_trunc('week', now())::date
             AND h3_grid_distance(h3_cell_to_parent(h.cell_r10, 5), h3_cell_to_parent(k.cell_r7, 5)) <= 3))
 );

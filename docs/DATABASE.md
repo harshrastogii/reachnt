@@ -59,6 +59,22 @@ Hexagons have one kind of neighbour, all the same distance from the centre, so "
 
 H3 does not know where the roads are. ReachNT pairs H3 with the NT road-restriction register and live Road Report closures for travel time; H3 decides who is near whom, and the road data decides whether you can get there this week.
 
+## Records that keep the system honest
+
+Added after checking ReachNT against UK and Australian repair and automated-decision rules (`docs/VALIDATION.md`). Each rule is enforced by the database, not left to the app.
+
+| Table or column | What it records | Rule it enforces |
+|---|---|---|
+| `ops.job.made_safe_at`, `done_at` | Two clocks for a dangerous fault: made safe, then fixed | Awaab's Law; NT FS17 (4-hour response) |
+| `ops.job.duplicate_of` | A second report of the same fault at the same house, while the first is open | Fixed on the same visit; must point at a real job |
+| `ops.job.repeat_of` | The same fault, fixed within the 90 days before | Flags fixes that didn't hold |
+| `ops.visit_attempt` | Every visit, including missed ones: when, outcome, what was tried | A "no one home" or "can't get in" row is refused unless at least one action is recorded (Housing Ombudsman 2025) |
+| `ops.review_request` | A tenant's request for a person to review their ranking, the due date and the answer | Robodebt Royal Commission rec. 17.1 |
+| `ops.reader_audit` | The weekly re-reading of 1 in 20 automatically read reports | Ongoing quality assurance (Ombudsman ADM guide) |
+| `ops.tenant_confirmation` | Whether the tenant says the repair worked | "Still broken" reopens the job |
+
+The schema was loaded into PostgreSQL 16 to check it: all tables and the three row-level security policies are created, a no-access visit without evidence is refused, and a duplicate pointing at a job that doesn't exist is refused. (PostGIS and h3-pg were replaced by simple stand-ins for that check; on Neon or NT Government servers the real extensions are used.)
+
 ## Retention and rights
 
 - Personal fields are deleted 2 years after a tenancy ends (to be confirmed against the NT Information Act and records schedules). Job history stays, keyed only by `house_id` and H3 cell.

@@ -86,3 +86,23 @@ def test_a_negated_danger_is_checked_by_a_person_not_downgraded(text, clf):
 def test_a_missing_smoke_detector_is_not_read_as_a_negation():
     pats = [re.compile(p) for p in taxonomy()["modifiers"]["negation"]["patterns"]]
     assert not any(p.search(intake.normalise("no smoke detector in the bedroom")) for p in pats)
+
+
+@pytest.mark.skipif(not glob.glob(str(OUTPUTS / "jobs_*.parquet")), reason="simulation outputs not built")
+@pytest.mark.parametrize("path", sorted(glob.glob(str(OUTPUTS / "jobs_*.parquet"))), ids=lambda p: Path(p).stem)
+def test_duplicates_are_fixed_on_the_same_visit_and_dangers_made_safe_first(path):
+    j = pd.read_parquet(path)
+    if "merged_into" not in j:
+        pytest.skip("outputs predate duplicate merging; run python run_all.py")
+    lead = j.set_index("job_id")
+    dup = j[(j.merged_into != "") & j.done_day.notna()]
+    assert (dup.done_day.values == lead.loc[dup.merged_into, "done_day"].values).all()
+    assert (lead.loc[dup.merged_into, "hazard"].values == dup.hazard.values).all()       # only the same fault is joined
+    imm = j[j.true_category == "immediate"]
+    assert imm.made_safe_day.notna().all() and (imm.made_safe_day <= imm.day + 1).all()   # made safe by the next day
+    assert j[j.true_category != "immediate"].made_safe_day.isna().all()
+
+
+def test_damp_and_mould_is_read(clf):
+    for text in ["black mould all over the bedroom ceiling", "walls always damp, musty smell"]:
+        assert intake.read(text, clf).hazard == "damp_mould"

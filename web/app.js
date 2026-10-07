@@ -57,11 +57,16 @@
   const canSW = "serviceWorker" in navigator && /^https?:$/.test(location.protocol) && !/claude\.ai|claudeusercontent/.test(location.host);
   if (canSW) navigator.serviceWorker.register("sw.js").catch(() => {});
   const outbox = () => store("rn-outbox") || [];
-  function recordUpdate(job, status) {
-    const box = outbox().filter((u) => u.id !== job.id);
-    box.push({ id: job.id, status, trade: job.trade, place: job.place, at: new Date().toISOString(), sent: false });
+  // kind: "visit" (tradesperson: done or couldn't do it), "review" (tenant asks a person to review), "confirm" (tenant: is it fixed?)
+  function recordUpdate(job, status, extra = {}, kind = "visit") {
+    const box = outbox().filter((u) => !(u.id === job.id && (u.kind || "visit") === kind));
+    box.push({ id: job.id, kind, status, trade: job.trade, place: job.place, at: new Date().toISOString(), sent: false, ...extra });
     store("rn-outbox", box); sync(); renderNet();
   }
+  const updateOf = (id, kind = "visit") => outbox().find((u) => u.id === id && (u.kind || "visit") === kind);
+  const NO_ACCESS = ["No one home", "Can't get in"];
+  const ACCESS_STEPS = ["Left a card", "Phoned the tenant", "Spoke to family or a neighbour", "Took a photo of the door"];
+  const timeOf = (iso) => new Date(iso).toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit" });
   async function sync() {
     const box = outbox(); const pending = box.filter((u) => !u.sent);
     if (!pending.length || !navigator.onLine) return renderNet();
@@ -69,7 +74,8 @@
       const r = await fetch("api/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ updates: pending }) });
       if (!r.ok) throw new Error(r.status);
       const ack = await r.json().catch(() => ({})); const bad = new Set(ack.rejected || []);
-      box.forEach((u) => { if (!u.sent && !bad.has(u.id)) u.sent = true; else if (bad.has(u.id)) u.rejected = true; });   // rejected ones stay on the phone
+      const key = (u) => `${u.id}:${u.kind || "visit"}`;
+      box.forEach((u) => { if (bad.has(key(u))) u.rejected = true; else if (!u.sent) u.sent = true; });   // rejected ones stay on the phone
       store("rn-outbox", box);
     } catch (e) { /* stays queued; tried again when the signal comes back */ }
     renderNet();
@@ -446,7 +452,7 @@
   function decisionHTML() {
     const mine = signedFor(state.policy); const d = RN.demo[state.policy].ledger;
     if (mine) return `<div class="decision"><span class="eyebrow">Signed in this browser</span><b>${esc(label(state.policy))}</b><p>${esc(mine.role)}, ${esc(mine.date)}. ${esc(mine.why)}</p></div>`;
-    if (state.policy === "cheapest_1") return `<div class="decision unsigned"><span class="eyebrow">Nobody signed this</span><b>Cheapest jobs first</b><p>Town jobs need no travel, so they always look cheaper and remote repairs wait. Nobody agreed to that. Open “Compare settings” to choose one and sign it.</p></div>`;
+    if (state.policy === "cheapest_1") return `<div class="decision unsigned"><span class="eyebrow">Nobody signed this</span><b>Cheapest jobs first</b><p>Town jobs need no travel, so they always look cheaper and remote repairs wait. Nobody agreed to that. Open “Compare” to choose a setting and sign it.</p></div>`;
     return `<div class="decision"><span class="eyebrow">How this week was planned · example sign-off</span><b>${esc(label(state.policy))}</b><p>${esc(d.role)}, ${esc(d.date)}. ${esc(d.rationale.replace(/H3 cells/g, "hexagons"))}</p></div>`;
   }
   function renderCoord() {
@@ -454,6 +460,7 @@
     const body = $("#coord-body");
     if (state.tab === "queue") body.innerHTML = queueHTML();
     if (state.tab === "trips") body.innerHTML = tripsHTML();
+    if (state.tab === "checks") { body.innerHTML = checksHTML(); bindChecks(body); }
     if (state.tab === "reader") { body.innerHTML = readerHTML(); bindReader(); return; }
     bindGuides(body);
     $$(".row[data-id]", body).forEach((b, i) => { b.style.animationDelay = reduce ? "0ms" : Math.min(i, 14) * 22 + "ms"; b.addEventListener("click", () => openJob(b.dataset.id)); });
@@ -489,6 +496,49 @@
           <span class="t">${esc(H[r.hazard].label)}</span><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>
           <span class="s">${esc(r.place)} · ${TRADE_SHORT[r.trade]} · waiting ${days(r.wait)}</span></button>`).join("")
       + (list.length > 120 ? `<p class="note" style="padding:8px">Showing 120 of ${list.length}.</p>` : "");
+  }
+  // ---------------------------------------------------------------- checks: the human side of the system
+  const audit = () => store("rn-audit") || {};
+  const hash = (t) => [...t].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  function auditSample() {   // 1 in 20 reports the computer read on its own, the same sample for everyone this week
+    const auto = rows().filter((r) => !r.needs_human);
+    const pick = auto.filter((r) => hash(r.id + state.week) % 20 === 0);
+    return pick.length >= 5 ? pick : auto.slice().sort((a, b) => hash(a.id) - hash(b.id)).slice(0, 5);
+  }
+  function checksHTML() {
+    const A = audit(); const sample = auditSample(); const checked = sample.filter((r) => A[r.id] !== undefined);
+    const wrong = checked.filter((r) => A[r.id] === false).length;
+    const box = outbox(); const all = rows();
+    const reviews = box.filter((u) => u.kind === "review"), missed = box.filter((u) => (u.kind || "visit") === "visit" && NO_ACCESS.includes(u.status));
+    const broken = box.filter((u) => u.kind === "confirm" && u.status === "still broken");
+    const back = all.filter((r) => r.came_back != null), twice = all.filter((r) => r.merged_into);
+    const due = (iso) => { const d = new Date(iso); let n = 0; while (n < 10) { d.setDate(d.getDate() + 1); if (d.getDay() % 6) n++; } return d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }); };
+    const job = (id) => all.find((r) => r.id === id);
+    const line = (r, extra) => r ? `<button class="row" data-id="${r.id}"><span class="dot ${r.category}"></span><span class="t">${esc(H[r.hazard].label)}</span>${extra}<span class="s">${esc(r.place)} · house ${r.house}</span></button>` : "";
+    return guide("checks", `<b>Checks.</b> The computer reads reports and ranks repairs; people check it. Re-read this week's sample, answer tenants who asked for a review, and follow up visits that missed.`)
+      + `<div class="section-title"><h3>Check the reader</h3><span class="note">${checked.length} of ${sample.length} checked${checked.length ? ` · ${checked.length - wrong} right` : ""}</span></div>
+        <p class="note" style="padding:0 6px 6px">One in 20 reports the computer read without a person. Is the reading right? If more than 1 in 10 are wrong, tell the team that looks after the reader: tenants are using words it doesn't know.</p>`
+      + sample.map((r) => `<div class="job audit" data-a="${r.id}"><p class="quote" style="font-size:14px">“${esc(r.text)}”</p>
+          <div class="meta"><span>Read as <b>${esc(H[r.hazard].label)}</b></span><span class="chip ${r.category}">${CAT[r.category]}</span></div>
+          ${A[r.id] === undefined ? `<div class="acts"><button class="btn good" data-ok="1">Right</button><button class="btn ghost" data-ok="0">Wrong</button></div>`
+            : `<p class="note">${A[r.id] ? "Checked: right" : "Checked: wrong, sent back to the coordinator to correct"}</p>`}</div>`).join("")
+      + `<div class="section-title"><h3>Reviews tenants asked for</h3><span class="note">${reviews.length}</span></div>`
+      + (reviews.length ? reviews.map((u) => line(job(u.id), `<span class="chip person">answer by ${due(u.at)}</span>`) + `<p class="note" style="padding:0 8px 8px">“${esc(u.note)}”</p>`).join("")
+          : `<p class="note" style="padding:0 6px 6px">None yet. Tenants ask from the Tenant view.</p>`)
+      + `<div class="section-title"><h3>Visits that missed</h3><span class="note">${missed.length}</span></div>`
+      + (missed.length ? missed.map((u) => line(job(u.id), `<span class="chip travel_cost">${esc(u.status)}</span>`)).join("") + `<p class="note" style="padding:0 6px 6px">These stay open and go on the next trip. The tenant has been told when we came and what we tried.</p>`
+          : `<p class="note" style="padding:0 6px 6px">None. Tradespeople record them from the run sheet.</p>`)
+      + `<div class="section-title"><h3>Tenant says it's still broken</h3><span class="note">${broken.length}</span></div>`
+      + (broken.length ? broken.map((u) => line(job(u.id), `<span class="chip cut">reopened</span>`)).join("") : `<p class="note" style="padding:0 6px 6px">None.</p>`)
+      + `<div class="section-title"><h3>Came back within 90 days of a fix</h3><span class="note">${back.length}</span></div>`
+      + back.slice(0, 8).map((r) => line(r, `<span class="chip cut">${days(r.came_back)} after</span>`)).join("")
+      + `<div class="section-title"><h3>Reported twice, joined into one job</h3><span class="note">${twice.length}</span></div>`
+      + (twice.length ? twice.slice(0, 8).map((r) => line(r, `<span class="chip hex">with ${esc(r.merged_into)}</span>`)).join("") : `<p class="note" style="padding:0 6px 6px">None this week.</p>`);
+  }
+  function bindChecks(body) {
+    $$(".audit [data-ok]", body).forEach((b) => b.addEventListener("click", () => {
+      const A = audit(); A[b.closest(".audit").dataset.a] = b.dataset.ok === "1"; store("rn-audit", A); renderCoord();
+    }));
   }
   function tripsHTML() {
     const all = rows(); const F2 = fieldData();
@@ -539,7 +589,10 @@
     d.innerHTML = `<button class="iconbtn closebtn" aria-label="Close">✕</button><div class="detail">
       <div><span class="eyebrow">${esc(r.place)} · ${TRADE[r.trade]}</span><h2 style="margin-top:4px">${esc(H[r.hazard].label)}</h2></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip ${r.category}">${CAT[r.category]}</span><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>
-        ${r.needs_human ? '<span class="chip person">A person checked the report</span>' : ""}${r.run ? '<span class="chip hex">On a shared trip</span>' : ""}</div>
+        ${r.needs_human ? '<span class="chip person">A person checked the report</span>' : ""}${r.run ? '<span class="chip hex">On a shared trip</span>' : ""}
+        ${r.made_safe != null ? `<span class="chip booked">Made safe ${dateOf(r.made_safe)}</span>` : ""}${r.came_back != null ? `<span class="chip cut">Came back ${days(r.came_back)} after a fix</span>` : ""}
+        ${r.merged_into ? `<span class="chip hex">Reported twice: joined to ${esc(r.merged_into)}</span>` : ""}</div>
+        ${(r.history || []).length ? `<p class="note">House ${r.house} this year: ${r.history.map(([d, hz, fx]) => `${esc(H[hz].label.toLowerCase())} (${dateOf(d)}, ${fx != null ? "fixed" : "open"})`).join("; ")}.</p>` : ""}
       <p class="quote">“${esc(r.text)}”</p>
       <div><b>Priority ${r.score.total} points</b><p class="note" style="margin:2px 0 6px">Worked out only from what was reported and how long it has waited. Distance and cost are never part of it.</p>${scoreBars(r.score)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn ghost" id="fly">Show the house</button><button class="btn ghost" id="pdf">Save as PDF</button></div>
@@ -730,6 +783,7 @@
           <p>ReachNT uses Uber's free hexagon map grid, H3. Every hexagon's neighbours are the same distance away, so "within two hexagons" means the same distance in every direction. That keeps sharing fair between communities. It's also how a house is stored: as a small hexagon, not a street address.</p></div>
         <div class="card big"><h3>Keeping people's details safe</h3><p>Names, phone numbers and addresses are locked in one encrypted store that only intake staff can open, and every look is recorded. Everything else uses a house number and its hexagon. Tradespeople only see their own jobs.</p></div>
         <div class="card big"><h3>Works without signal</h3><p>Install ReachNT on a phone and the run sheet, map and job details stay on it. Updates are saved on the phone and sent when signal returns. Every run and repair can also be saved as a PDF.</p></div>
+        <div class="card big"><h3>People check the computer</h3><p>A person checks every report that might be dangerous and every report the computer can't read with confidence, re-reads 1 in 20 of the rest each week (the Checks tab), and answers any tenant who asks for a review within 10 working days. <a href="privacy.html" target="_blank" rel="noopener">How ReachNT decides, what it uses, and your rights</a>.</p></div>
         <div class="card"><p class="note">${esc(RN.notice)} Imagery now: ${esc(imagery.name)}.</p></div>
       </div>`;
   }
@@ -774,7 +828,7 @@
     if (!trades.includes(state.ftrade)) state.ftrade = trades[0];
     const t = state.ftrade; const d = F2[t] || { nearby: [] };
     const { groups, order, stops, town } = myRun();
-    const status = Object.fromEntries(outbox().map((u) => [u.id, u]));
+    const status = Object.fromEntries(outbox().filter((u) => (u.kind || "visit") === "visit").map((u) => [u.id, u]));
     const stopNo = Object.fromEntries(stops.map((s, i) => [s.cid, i + 1]));
     const card = (r, nearby) => {
       const st = status[r.id];
@@ -782,10 +836,19 @@
         <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h4>${stopNo[r.site] ? `<span class="stopno" title="Stop ${stopNo[r.site]} on the map">${stopNo[r.site]}</span>` : ""}${esc(H[r.hazard].label)}</h4><span class="chip ${r.category}">${CAT[r.category]}</span></div>
         <p class="quote" style="font-size:14px">“${esc(r.text)}”</p>
         <div class="meta"><span>${esc(r.place)}</span><span>·</span><span>waiting ${days(r.wait)}</span><span>·</span><span>about ${H[r.hazard].hours} h</span>${r.vulnerable ? '<span class="chip person">vulnerable person lives here</span>' : ""}${nearby ? `<span class="chip hex">${nearby} hexagon${nearby > 1 ? "s" : ""} from your run</span>` : ""}</div>
-        ${r.category === "immediate" ? `<p class="note" style="color:var(--bad)">Dangerous. Check the maintenance officer made it safe before you start.</p>` : ""}
-        ${st ? `<p class="note"><b style="color:var(--ink)">${st.status === "done" ? "Marked done" : "Not done: " + esc(st.status)}</b> · ${st.sent ? "sent" : "saved on this phone, sends when there's signal"}</p>` :
+        ${r.category === "immediate" ? `<p class="note" style="color:var(--bad)">Dangerous. ${r.made_safe != null ? `Made safe on ${dateOf(r.made_safe)} by the maintenance officer; check it is still safe before you start.` : "Check the maintenance officer made it safe before you start."}</p>` : ""}
+        ${r.came_back != null ? `<p class="note"><span class="chip cut">Came back</span> The same fault was fixed here ${days(r.came_back)} before this report. Find out why the last fix didn't hold.</p>` : ""}
+        ${r.merged_into ? `<p class="note"><span class="chip hex">Reported twice</span> Joined to job ${esc(r.merged_into)}: one visit fixes both.</p>` : ""}
+        ${st ? `<p class="note"><b style="color:var(--ink)">${st.status === "done" ? "Marked done" : "Not done: " + esc(st.status)}</b>${st.knocked_at ? ` at ${timeOf(st.knocked_at)} · ${esc((st.actions || []).join(", ").toLowerCase())}. The job stays open and the tenant is told` : ""} · ${st.rejected ? "not accepted, check and send again" : st.sent ? "sent" : "saved on this phone, sends when there's signal"}</p>` :
           `<div class="acts"><button class="btn good" data-act="done">Done</button><button class="btn ghost" data-act="no">Couldn't do it</button><button class="btn ghost" data-act="map" aria-label="Show this house on the map">Map</button></div>
-           <div class="reasons" hidden>${["No one home", "Can't get in", "Need parts", "Needs another trade", "Unsafe to work"].map((x) => `<button data-why="${x}">${x}</button>`).join("")}</div>`}
+           <div class="reasons" hidden>${["No one home", "Can't get in", "Need parts", "Needs another trade", "Unsafe to work"].map((x) => `<button data-why="${x}">${x}</button>`).join("")}</div>
+           <form class="noaccess" hidden>
+             <p class="note">A job is never closed because no one was home. Say when you knocked and what you tried; the tenant gets a message and the job stays in line.</p>
+             <label class="field-label">Time you knocked <input type="time" name="t" required></label>
+             <fieldset><legend class="field-label">What you tried (at least one)</legend>${ACCESS_STEPS.map((a) => `<label class="tick"><input type="checkbox" name="a" value="${a}"> ${a}</label>`).join("")}</fieldset>
+             <label class="field-label">Note (optional) <input type="text" name="n" maxlength="300" placeholder="e.g. dogs in the yard, called twice"></label>
+             <button class="btn primary" type="submit">Save visit</button>
+           </form>`}
       </div>`;
     };
     const runCards = order.map((k) => {
@@ -820,7 +883,22 @@
         if (b.dataset.act === "no") $(".reasons", j).hidden = !$(".reasons", j).hidden;
         if (b.dataset.act === "map") flyToJob(r);
       }));
-      $$("[data-why]", j).forEach((b) => b.addEventListener("click", () => { recordUpdate(r, b.dataset.why); toast("Reason saved: " + b.dataset.why); renderField(); }));
+      $$("[data-why]", j).forEach((b) => b.addEventListener("click", () => {
+        if (NO_ACCESS.includes(b.dataset.why)) {   // evidence first, then save
+          const f = $(".noaccess", j); f.hidden = false; f.dataset.why = b.dataset.why;
+          const now = new Date(); f.t.value = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`; f.t.focus(); return;
+        }
+        recordUpdate(r, b.dataset.why); toast("Reason saved: " + b.dataset.why); renderField();
+      }));
+      const f = $(".noaccess", j);
+      if (f) f.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const actions = $$("input[name=a]:checked", f).map((x) => x.value);
+        if (!actions.length) return toast("Tick at least one thing you tried, so the tenant knows we came.");
+        const [hh, mm] = f.t.value.split(":").map(Number); const k = new Date(); k.setHours(hh, mm, 0, 0);
+        recordUpdate(r, f.dataset.why, { knocked_at: k.toISOString(), actions, note: f.n.value.trim() || undefined });
+        toast("Visit saved. The job stays open for your next trip, and the tenant gets a message."); renderField();
+      });
     });
   }
   function lon2x(lon, z) { return Math.floor(((lon + 180) / 360) * 2 ** z); }
@@ -855,11 +933,17 @@
     const say = { travel_cost: (x) => `No ${trade} was sent to ${esc(r.place)}. A trip costs about ${money(x.cost)} by ${x.mode && x.mode.startsWith("air") ? "plane" : "road"}. That was a cost decision.`,
                   crew_full: () => `Every ${trade} was busy with repairs more urgent than yours.`, cut: () => `The road was cut and there was no way to fly someone in.`,
                   lower_priority: () => `${an(trade, true)} was nearby but did more urgent repairs first.` };
+    const visit = updateOf(r.id, "visit"), review = updateOf(r.id, "review"), confirm = updateOf(r.id, "confirm");
+    const missed = !!(visit && NO_ACCESS.includes(visit.status));
     const steps = [
       { cls: "ok", t: `Reported ${dateOf(r.day)}`, p: `You said: “${esc(r.text)}”` },
       { cls: "ok", t: `We read it as ${esc(H[r.hazard].label.toLowerCase())}`, p: `${CAT[r.category]} repair.${r.needs_human ? " A person checked it." : ""}` },
+      ...(r.made_safe != null ? [{ cls: "ok", t: `Made safe ${dateOf(r.made_safe)}`, p: "The maintenance officer made it safe the day you reported it. Fixing it properly is the next step." }] : []),
+      ...(r.merged_into ? [{ cls: "ok", t: "Joined to your earlier report", p: "This fault was already reported for your house. One visit fixes both." }] : []),
       ...runs.map((x) => ({ cls: "wait", t: `${x.n} week${x.n > 1 ? "s" : ""}, ${x.n > 1 ? `${dateOf(x.from * 7)} to ${dateOf(x.to * 7 + 6)}` : `week of ${dateOf(x.from * 7)}`}`, p: say[x.code] ? say[x.code](x) : esc(x.code) })),
-      r.done ? { cls: "now", t: "Booked this week", p: `${an(trade, true)} is coming to ${esc(r.place)}.` } : { cls: "now", t: `Waiting ${days(r.wait)}`, p: `You are number ${r.rank} of ${r.of} waiting for ${an(trade)} from ${esc(RN.hub)}.` },
+      ...(visit && NO_ACCESS.includes(visit.status) ? [{ cls: "wait", t: `${an(trade, true)} came at ${timeOf(visit.knocked_at)}`, p: `${esc(visit.status)}. They ${esc(visit.actions.join(", ").toLowerCase())}. Your repair stays in line and is booked for the next trip.` }] : []),
+      missed ? { cls: "now", t: "Booked for the next trip", p: `We'll tell you the day. If it gets worse before then, call 1800 104 076.` }
+        : r.done ? { cls: "now", t: "Booked this week", p: `${an(trade, true)} is coming to ${esc(r.place)}.` } : { cls: "now", t: `Waiting ${days(r.wait)}`, p: `You are number ${r.rank} of ${r.of} waiting for ${an(trade)} from ${esc(RN.hub)}.` },
     ];
     const secs = r.sections.filter(([t]) => t !== "What we heard" && t !== "Where it is up to");
     el.innerHTML = `<div class="grabber"></div><div class="app-head">
@@ -875,10 +959,22 @@
         ${guide("tenant", `<b>What a tenant sees.</b> The green bubble is the text message. Below is every week the repair waited and the real reason. The map shows the house as a small hexagon, not an address.`)}
         <div class="sms">${esc(r.short)}</div>
         <div class="track" style="margin-top:16px">${steps.map((s, i) => `<div class="step ${s.cls}" style="animation-delay:${reduce ? 0 : i * 60}ms"><span class="node">${s.cls === "ok" ? "✓" : ""}</span><div><b>${s.t}</b><p>${s.p}</p></div></div>`).join("")}</div>
+        ${r.came_back != null ? `<div class="card" style="margin-top:6px"><b>This fault came back</b><p class="note">It was fixed ${days(r.came_back)} before you reported it again. The tradesperson is asked to find out why the last fix didn't hold.</p></div>` : ""}
         <div class="card big say" style="margin-top:6px">${sections({ ...r, sections: secs }, true)}</div>
+        ${(r.history || []).length ? `<div class="card" style="margin-top:6px"><b>Your house's other repairs this year</b>
+          <ul class="hist">${r.history.slice().reverse().map(([d, hz, fixed]) => `<li><span>${esc(H[hz].label)}</span><span class="note">reported ${dateOf(d)} · ${fixed != null ? `fixed ${dateOf(fixed)}` : "still open"}</span></li>`).join("")}</ul></div>` : ""}
+        ${r.done && !missed ? `<div class="card" style="margin-top:6px"><b>After the visit: did the repair work?</b>
+          ${confirm ? `<p class="note">You said: ${confirm.status === "fixed" ? "it's fixed. Thank you." : "it's still broken. It is back in line as a repeat, with extra points."}</p>`
+            : `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="btn good" id="fixedyes">Yes, it's fixed</button><button class="btn ghost" id="fixedno">No, still broken</button></div>`}</div>` : ""}
+        <div class="card" style="margin-top:6px"><b>Think your repair was ranked wrongly?</b>
+          ${review ? `<p class="note">You asked for a review on ${new Date(review.at).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}. A person answers within 10 working days.</p>`
+            : `<p class="note">A person, not the computer, looks again at how your repair was ranked and answers within 10 working days.</p>
+               <form id="reviewf" style="display:grid;gap:8px;margin-top:8px"><label class="field-label" for="rwhy">What should we know?</label>
+               <textarea id="rwhy" maxlength="1000" required placeholder="e.g. my grandson has asthma and the mould is in his room"></textarea>
+               <button class="btn ghost" type="submit">Ask for a review</button></form>`}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
           <button class="btn primary" id="interp">Ask for an interpreter</button><button class="btn ghost" id="worse">It got worse</button>
-          <button class="btn ghost" id="tpdf" style="grid-column:span 2">Save this as a PDF</button></div>
+          <button class="btn ghost" id="tpdf">Save this as a PDF</button><a class="btn ghost" href="privacy.html" target="_blank" rel="noopener">How ReachNT decides</a></div>
       </div>`;
     bindGuides(el);
     $("#tplace", el).addEventListener("change", (e) => { state.place = e.target.value; state.tjob = null; renderTenant(); tenantMap(); });
@@ -886,6 +982,15 @@
     $("#interp", el).addEventListener("click", () => toast("Noted. A Community Housing Officer will call back with an interpreter."));
     $("#worse", el).addEventListener("click", () => toast("Call 1800 104 076 now. If it's dangerous it is made safe today."));
     $("#tpdf", el).addEventListener("click", () => pdfJob(r, true));
+    const rf = $("#reviewf", el);
+    if (rf) rf.addEventListener("submit", (e) => {
+      e.preventDefault(); const note = $("#rwhy", el).value.trim();
+      if (!note) return toast("Tell us a little about why, so the person reviewing knows what to check.");
+      recordUpdate(r, "review", { note }, "review"); toast("Review asked for. A person answers within 10 working days."); renderTenant();
+    });
+    const fy = $("#fixedyes", el), fn = $("#fixedno", el);
+    if (fy) fy.addEventListener("click", () => { recordUpdate(r, "fixed", {}, "confirm"); toast("Thanks. Marked as fixed."); renderTenant(); });
+    if (fn) fn.addEventListener("click", () => { recordUpdate(r, "still broken", {}, "confirm"); toast("Reopened as a repeat repair. It moves up the line."); renderTenant(); });
   }
   function tenantMap() { const r = rows().find((x) => x.id === state.tjob); if (r && r.cell) { clearMarkers(); hubBadge(); flyToJob(r); } }
 

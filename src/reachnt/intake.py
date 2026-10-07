@@ -120,10 +120,6 @@ def read(text: str, clf: Classifier | None) -> Reading:
     hits = rule_hits(text)
     mods = modifier_hits(text)
     danger_word = mods.pop("danger_words", None)
-    if "negation" in mods:
-        for k in ("electrical_danger", "sewage_overflow", "burst_pipe"):
-            if k in hits and len(hits) > 1:
-                hits.pop(k)
     probs = clf.probs(text) if clf else {}
     mh, mc = (max(probs, key=probs.get), max(probs.values())) if probs else (None, 0.0)
     p_immediate = sum(p for k, p in probs.items() if H[k]["category"] == "immediate")

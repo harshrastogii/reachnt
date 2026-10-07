@@ -274,10 +274,17 @@
     map.on("zoom", () => { const z = map.getZoom(); document.body.classList.toggle("zoomed", z > 8.6); document.body.classList.toggle("z8", z > 8); });
     map.on("zoomend", () => declutter());
   }
-  const home = () => map && map.flyTo({ center: [133.0, -15.3], zoom: phone() ? 5.5 : 6.3, pitch: 35, bearing: -8, duration: reduce ? 0 : 2400, essential: true });
+  const home = () => {
+    if (!map) return;
+    if (!phone()) return map.flyTo({ center: [133.0, -15.3], zoom: 6.3, pitch: 35, bearing: -8, duration: reduce ? 0 : 2400, essential: true });
+    // on a phone the visible gap between the top bar and the sheet is small: fit the hub's communities into it
+    const pts = RN.communities.filter((c) => c.hub === RN.hub).map(ll).concat([HUBLL()]);
+    padMap();
+    map.fitBounds(pts.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(pts[0], pts[0])), { padding: 24, pitch: 0, bearing: 0, duration: reduce ? 0 : 1600, essential: true });
+  };
   function padMap() {
     if (!map) return;
-    if (phone()) map.setPadding({ top: 150, bottom: Math.round(innerHeight * 0.55), left: 0, right: 0 });
+    if (phone()) map.setPadding({ top: topH() + 50, bottom: Math.min(sheetHeight(), innerHeight - topH() - 120), left: 0, right: 0 });
     else map.setPadding({ top: 90, bottom: 60, left: state.role === "coord" ? 450 : 20, right: state.role === "coord" ? 20 : 430 });
   }
   function addLayers() {
@@ -410,13 +417,30 @@
     }
     if (state.layer === "reach" && !refreshMap.reach) {
       const lons = hubComs.map((c) => c.lon), lats = hubComs.map((c) => c.lat);
-      const poly = [[Math.min(...lats) - 0.6, Math.min(...lons) - 0.6], [Math.min(...lats) - 0.6, Math.max(...lons) + 0.6], [Math.max(...lats) + 0.6, Math.max(...lons) + 0.6], [Math.max(...lats) + 0.6, Math.min(...lons) - 0.6]];
-      refreshMap.reach = fc(h3.polygonToCells(poly, 5).map((cell) => { const [la, lo] = h3.cellToLatLng(cell); return F(hexGeom(cell), { h: (h3.greatCircleDistance([la, lo], [hub.lat, hub.lon], "km") * 1.2) / 70 }); }));
+      // a circle around the hub that reaches just past its farthest community, on land only
+      const reachKm = Math.max(...hubComs.map((c) => h3.greatCircleDistance([c.lat, c.lon], [hub.lat, hub.lon], "km"))) + 60;
+      const pad = reachKm / 100;
+      const poly = [[hub.lat - pad, hub.lon - pad], [hub.lat - pad, hub.lon + pad], [hub.lat + pad, hub.lon + pad], [hub.lat + pad, hub.lon - pad]];
+      // only hexagons on NT land: the sea has no driving time
+      refreshMap.reach = fc(h3.polygonToCells(poly, 5).map((cell) => [cell, h3.cellToLatLng(cell)]).filter(([, [la, lo]]) => onLand(lo, la) && h3.greatCircleDistance([la, lo], [hub.lat, hub.lon], "km") <= reachKm)
+        .map(([cell, [la, lo]]) => F(hexGeom(cell), { h: (h3.greatCircleDistance([la, lo], [hub.lat, hub.lon], "km") * 1.2) / 70 })));
     }
     if (refreshMap.reach) map.getSource("reach").setData(refreshMap.reach);
     hubBadge();
     legend();
     declutter();
+  }
+  // point-in-polygon against the NT coastline rings (mainland and islands) shipped in the data
+  const LAND = (RN.coast || []).map((poly) => (Array.isArray(poly[0][0]) ? poly[0] : poly));
+  function onLand(lon, lat) {
+    return LAND.some((ring) => {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const [xi, yi] = ring[i], [xj, yj] = ring[j];
+        if ((yi > lat) !== (yj > lat) && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+      }
+      return inside;
+    });
   }
   function legend() {
     const L = $("#legend");
@@ -995,7 +1019,7 @@
   function tenantMap() { const r = rows().find((x) => x.id === state.tjob); if (r && r.cell) { clearMarkers(); hubBadge(); flyToJob(r); } }
 
   // ================================================================ wiring
-  function setPolicy(k) { state.policy = k; $("#policy").value = k; renderAll(); }
+  function setPolicy(k) { state.policy = k; $("#policy").value = k; contextText(); renderAll(); }
   function setRole(role) {
     state.role = role; seg($("#role"), "role", role);
     $("#coord").classList.toggle("hide", role !== "coord");
@@ -1017,12 +1041,100 @@
     if (state.job) { const r = rows().find((x) => x.id === state.job); if (r) openJob(r.id); else $("#detail").classList.add("hide"); }
   }
   window.ReachNT = { get map() { return map; }, state };
+  // ---------------------------------------------------------------- plan menu (our own, so Windows doesn't crop it)
+  const PLAN_NOTE = { "guarantee_0.2_h3": "Urgent repairs on time everywhere; neighbours share trips", "guarantee_0.2": "Urgent repairs on time everywhere; one place per trip",
+                      floor_1: "Saves money on routine work; urgent jobs keep their deadline", cheapest_1: "Fixes the most jobs per dollar; remote tenants wait" };
+  function planMenu() {
+    const btn = $("#planbtn"), list = $("#planlist"), keys = Object.keys(RN.demo);
+    list.innerHTML = keys.map((k, i) => `<li role="option" id="plan-${i}" data-k="${k}" aria-selected="${k === state.policy}">${esc(label(k))}${PLAN_NOTE[k] ? `<small>${esc(PLAN_NOTE[k])}</small>` : ""}</li>`).join("");
+    $("#planname").textContent = label(state.policy);
+    const inSheet = () => !!list.closest("#ctx-host");
+    const close = (focusBtn) => { if (inSheet()) return; list.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); list.removeAttribute("aria-activedescendant"); if (focusBtn) btn.focus(); };
+    const open = () => {
+      list.classList.add("open"); btn.setAttribute("aria-expanded", "true");
+      const i = Math.max(0, keys.indexOf(state.policy)); move(i); list.focus();
+    };
+    let cur = 0;
+    const move = (i) => { cur = (i + keys.length) % keys.length; $$("li", list).forEach((li, j) => li.classList.toggle("active", j === cur)); list.setAttribute("aria-activedescendant", `plan-${cur}`); };
+    const pick = (k) => { setPolicy(k); $$("li", list).forEach((li) => li.setAttribute("aria-selected", String(li.dataset.k === k))); if (inSheet()) closeSheets(); else close(true); };
+    btn.onclick = () => (list.classList.contains("open") ? close(false) : open());
+    btn.onkeydown = (e) => { if (["ArrowDown", "Enter", " "].includes(e.key)) { e.preventDefault(); open(); } };
+    list.onkeydown = (e) => {
+      if (e.key === "ArrowDown") { e.preventDefault(); move(cur + 1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); move(cur - 1); }
+      else if (e.key === "Home") { e.preventDefault(); move(0); }
+      else if (e.key === "End") { e.preventDefault(); move(keys.length - 1); }
+      else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(keys[cur]); }
+      else if (e.key === "Escape" || e.key === "Tab") { e.stopPropagation(); close(e.key === "Escape"); }
+    };
+    $$("li", list).forEach((li, i) => { li.onclick = () => pick(li.dataset.k); li.onmousemove = () => move(i); });
+    document.addEventListener("click", (e) => { if (!e.target.closest("#planpick")) close(false); });
+  }
+  function contextText() {
+    const wk = state.week === "12" ? "Sept · dry" : "Feb · wet";
+    $("#ctxtext").textContent = `${wk} · ${(RN.short && RN.short[state.policy]) || label(state.policy)}`;
+    $("#planname").textContent = label(state.policy);
+  }
+
+  // ---------------------------------------------------------------- phones: controls move into a sheet; panels are bottom sheets
+  const SNAP = () => ({ peek: 150, half: Math.round(innerHeight * 0.5), full: Math.max(300, innerHeight - topH() - 12) });
+  const topH = () => { const t = $(".topbar"); return t ? Math.round(t.getBoundingClientRect().bottom) : 112; };
+  let sheet = "half", sheetPx = null;
+  function setSheet(name, px) {
+    if (!phone()) { document.documentElement.style.removeProperty("--sheet-h"); return; }
+    if (name) { sheet = name; sheetPx = SNAP()[name]; } else sheetPx = px;
+    document.documentElement.style.setProperty("--sheet-h", sheetPx + "px");
+    document.body.dataset.sheet = name || "drag";
+    padMap();
+    clearTimeout(setSheet.t);
+    if (name && map) setSheet.t = setTimeout(() => { if (state.role === "coord" && !comById[state.filter]) home(); }, 360);   // the role may have changed meanwhile
+  }
+  const sheetHeight = () => (phone() ? sheetPx || SNAP()[sheet] : 0);
+  function layoutPhone() {
+    document.documentElement.style.setProperty("--top-h", topH() + "px");
+    const host = phone() ? $("#ctx-host") : $("#ctl-home").parentNode;
+    const anchor = phone() ? null : $("#ctl-home");
+    const order = phone() ? [$("#week"), $("#planpick")] : [$("#planpick"), $("#week")];   // on a phone the week comes first
+    order.forEach((el) => host.insertBefore(el, anchor));
+    if (!phone()) $("#context").classList.remove("open");
+    setSheet(phone() ? sheet : null);
+    seg($("#week"), "week", state.week);
+  }
+  function bindSheetDrag() {
+    let y0 = 0, h0 = 0, moved = false, active = false;
+    const panels = () => $$(".panel.left:not(.hide), .panel.phone:not(.hide)");
+    document.addEventListener("pointerdown", (e) => {
+      const g = e.target.closest(".panel .grabber"); if (!g || !phone()) return;
+      active = true; moved = false; y0 = e.clientY; h0 = sheetHeight(); g.setPointerCapture && g.setPointerCapture(e.pointerId);
+      document.body.classList.add("sheet-dragging");
+    });
+    document.addEventListener("pointermove", (e) => {
+      if (!active) return; const dy = e.clientY - y0; if (Math.abs(dy) > 6) moved = true;
+      const S = SNAP(); setSheet(null, Math.min(S.full, Math.max(110, h0 - dy)));
+    });
+    document.addEventListener("pointerup", () => {
+      if (!active) return; active = false; document.body.classList.remove("sheet-dragging");
+      const S = SNAP();
+      if (!moved) return setSheet(sheet === "full" ? "half" : sheet === "half" ? "full" : "half");   // a tap opens it up or brings it back
+      const near = Object.entries(S).sort((a, b) => Math.abs(a[1] - sheetPx) - Math.abs(b[1] - sheetPx))[0][0];
+      setSheet(near);
+    });
+    document.addEventListener("keydown", (e) => {   // keyboard: Enter or Space on the grabber does what a tap does
+      if (!e.target.closest || !e.target.closest(".panel .grabber") || !["Enter", " "].includes(e.key)) return;
+      e.preventDefault(); setSheet(sheet === "full" ? "half" : "full");
+    });
+    panels();
+  }
+
   function init() {
     $("#policy").innerHTML = Object.keys(RN.demo).map((k) => `<option value="${k}">${esc(label(k))}</option>`).join("");
     $("#policy").value = state.policy;
-    $("#policy").addEventListener("change", (e) => setPolicy(e.target.value));
+    planMenu(); contextText();
+    $("#ctxbtn").addEventListener("click", () => openSheet("context"));
+    $("#keybtn").addEventListener("click", () => { const on = document.body.classList.toggle("key-open"); $("#keybtn").setAttribute("aria-expanded", String(on)); });
+    bindSheetDrag();
     $$("#role button").forEach((b) => b.addEventListener("click", () => setRole(b.dataset.role)));
-    $$("#week button").forEach((b) => b.addEventListener("click", () => { state.week = b.dataset.week; seg($("#week"), "week", state.week); renderAll(); }));
+    $$("#week button").forEach((b) => b.addEventListener("click", () => { state.week = b.dataset.week; seg($("#week"), "week", state.week); contextText(); renderAll(); }));
     $$("#coord .tabs button[data-tab]").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.tab; renderCoord(); }));
     $("#tradeoff-open").addEventListener("click", () => openSheet("tradeoff"));
     $("#about-open").addEventListener("click", () => openSheet("about"));
@@ -1037,8 +1149,8 @@
       else map.flyTo({ center: [133.0, -15.3], zoom: phone() ? 5.5 : 6.3, pitch: state.layer === "reach" ? 0 : 35, bearing: state.layer === "reach" ? 0 : -8, duration: reduce ? 0 : 1300 });
     }));
     const h = location.hash.replace("#", "");
-    requestAnimationFrame(() => { seg($("#role"), "role", state.role); seg($("#week"), "week", state.week); });
-    addEventListener("resize", () => { seg($("#role"), "role", state.role); seg($("#week"), "week", state.week); padMap(); });
+    requestAnimationFrame(() => { seg($("#role"), "role", state.role); layoutPhone(); });
+    let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { seg($("#role"), "role", state.role); layoutPhone(); padMap(); }, 80); });
     renderCoord(); renderNet(); sync();
     const sp = $("#splash"); if (sp) { sp.classList.add("gone"); setTimeout(() => sp.remove(), 700); }
     initMap();

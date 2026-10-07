@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
-<link rel="stylesheet" href="styles.css?v=37">
+<link rel="stylesheet" href="styles.css?v=43">
 </head>
 <body>
 <div id="splash" class="glass"><svg width="34" height="34" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/></svg><b>ReachNT</b><span>Loading this week's repairs…</span></div>
@@ -24,7 +24,7 @@
       <path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
       <path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/>
     </svg>
-    <b>ReachNT</b><small id="hubname">Katherine hub</small>
+    <b>ReachNT</b><small id="hubname" title="Tradespeople start their trips from Katherine and serve 16 remote communities across the Big Rivers region, up to 6 hours away by road. ReachNT plans for five hubs; the demo shows this one.">Katherine hub · 16 communities</small>
   </div>
   <div class="seg" id="role" role="group" aria-label="Who is using it">
     <span class="thumb" aria-hidden="true"></span>
@@ -33,24 +33,33 @@
     <button data-role="tenant" aria-pressed="false">Tenant</button>
   </div>
   <div class="spacer hide-sm"></div>
-  <label class="pill hide-sm" for="policy">Plan <select id="policy" aria-label="Setting in force"></select></label>
-  <div class="seg hide-sm" id="week" role="group" aria-label="Week">
+  <div class="planpick" id="planpick">
+    <button class="pill" id="planbtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="planlist"><span class="k">Plan</span> <b id="planname"></b>
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <ul class="menu glass" id="planlist" role="listbox" aria-label="Plan in force" tabindex="-1"></ul>
+    <select id="policy" class="sr-only" tabindex="-1" aria-hidden="true"></select>
+  </div>
+  <button class="pill show-sm" id="ctxbtn" type="button" aria-haspopup="dialog"><b id="ctxtext"></b>
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="seg" id="week" role="group" aria-label="Week">
     <span class="thumb" aria-hidden="true"></span>
     <button data-week="12" aria-pressed="false">Late Sept · dry</button>
     <button data-week="30" aria-pressed="true">Early Feb · wet</button>
   </div>
-  <span class="pill syn" title="Communities, houses, roads, deadlines and costs are real. The repair requests are made up for this demo.">Demo data</span>
+  <span id="ctl-home" hidden></span>
+  <span class="pill syn" title="Communities, houses, roads, deadlines and costs are real. The repair requests are made up for this demo."><span class="lg-only">Demo data</span><span class="sm-only">Demo</span></span>
   <button class="iconbtn" id="about-open" aria-label="How ReachNT works">
     <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 7v4.5M8 4.6v.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
   </button>
 </header>
 
 <section class="panel left glass" id="coord" aria-label="Coordinator">
+  <div class="grabber" role="button" tabindex="0" aria-label="Resize panel"></div>
   <div class="panel-head">
     <nav class="tabs" role="tablist" aria-label="Coordinator views">
-      <button role="tab" data-tab="queue" aria-selected="true">This week</button>
+      <button role="tab" data-tab="queue" aria-selected="true"><span class="lg">This week</span><span class="sm">Week</span></button>
       <button role="tab" data-tab="trips" aria-selected="false">Trips</button>
-      <button role="tab" data-tab="reader" aria-selected="false">Try a report</button>
+      <button role="tab" data-tab="reader" aria-selected="false"><span class="lg">Try a report</span><span class="sm">Try</span></button>
       <button role="tab" data-tab="checks" aria-selected="false">Checks</button>
       <button role="tab" id="tradeoff-open" aria-selected="false" aria-label="Compare settings">Compare</button>
     </nav>
@@ -63,6 +72,7 @@
 <section class="panel phone glass hide" id="tenant" aria-label="Tenant repair tracker"></section>
 
 <div class="maplegend glass" id="legend"></div>
+<button class="iconbtn show-sm keybtn glass" id="keybtn" type="button" aria-expanded="false" aria-controls="legend">Key</button>
 <div class="mapchips glass" id="layers" role="group" aria-label="Map layers">
   <button data-layer="week" aria-pressed="true">This week</button>
   <button data-layer="year" aria-pressed="false">Whole year</button>
@@ -89,12 +99,20 @@
   </div>
   <div class="body" id="about-body"></div>
 </section>
+<section class="sheet glass" id="context" aria-label="Week and plan" aria-hidden="true">
+  <div class="grabber"></div>
+  <div class="sheet-head">
+    <div style="flex:1"><div class="eyebrow">What you're looking at</div><h2>Week and plan</h2></div>
+    <button class="iconbtn" data-close="context" aria-label="Close">✕</button>
+  </div>
+  <div class="body" id="ctx-body"><p class="note">Pick a week to see the dry season or the wet, and the plan in force.</p><div id="ctx-host"></div></div>
+</section>
 <div class="toast glass" id="toast" role="status" aria-live="polite"></div>
 
 <!-- libraries are served from this site (vendor/), not a public CDN: no third party can change the code we run -->
 <script src="vendor/maplibre-gl.js"></script>
 <script src="vendor/h3-js.umd.js"></script>
-<script src="data/app.js?v=37"></script>
-<script src="app.js?v=37"></script>
+<script src="data/app.js?v=43"></script>
+<script src="app.js?v=43"></script>
 </body>
 </html>

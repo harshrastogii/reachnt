@@ -75,10 +75,10 @@ s.addText("ReachNT", { placeholder: "title" });
 s.addText("Urgent repairs fixed on time out bush, without letting cost quietly decide who waits", { placeholder: "body" });
 text(s, "Harsh Rastogi · Aashish", { x: 0.8, y: 5.25, w: 6.4, h: 0.4, fontSize: 16, color: "9AA3AD", objectName: "names" });
 text(s, "reachnt.vercel.app", { x: 0.8, y: 5.7, w: 6.4, h: 0.4, fontSize: 16, color: "64D2FF", bold: true, objectName: "url" });
-s.addNotes(`[AASHISH, about 30 seconds]
-Good morning. I'm Aashish, this is Harsh, and we're Team Top Enders.
+s.addNotes(`[HARSH, about 30 seconds]
+Good morning. I'm Harsh, this is Aashish, and we're Team Top Enders.
 Imagine a family in a remote community in the Northern Territory. The water to their house stops. They ring the repairs line. In town, a plumber would be there in a couple of days. For them, it can take weeks.
-Our project, ReachNT, is about why that happens, and what AI can do about it.`);
+Our project, ReachNT, is about why that happens, and what AI can do about it. Aashish will start with the problem.`);
 
 // ================================================================ 2 the problem
 pres.addSection({ title: "Problem" });

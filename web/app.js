@@ -266,6 +266,7 @@
     map.once("style.load", onReady); map.once("load", onReady);
     const poll = setInterval(() => { if (ready) return clearInterval(poll); if (map.isStyleLoaded()) { clearInterval(poll); onReady(); } }, 80);
     map.on("zoom", () => { const z = map.getZoom(); document.body.classList.toggle("zoomed", z > 8.6); document.body.classList.toggle("z8", z > 8); });
+    map.on("zoomend", () => declutter());
   }
   const home = () => map && map.flyTo({ center: [133.0, -15.3], zoom: phone() ? 5.5 : 6.3, pitch: 35, bearing: -8, duration: reduce ? 0 : 2400, essential: true });
   function padMap() {
@@ -295,7 +296,7 @@
 
   // ---- markers: hexagon badges (clean, readable at any zoom)
   let markers = [];
-  function clearMarkers() { markers.forEach((m) => m.remove()); markers = []; }
+  function clearMarkers() { markers.forEach((m) => m.remove()); markers = []; groupMarkers.forEach((m) => m.remove()); groupMarkers = []; }
   function badge(lngLat, { n, cls, name, sub, onClick, size }) {
     const el = document.createElement("button");
     el.className = `hexb ${cls || ""} ${size || ""}`; el.type = "button";
@@ -303,7 +304,39 @@
     el.innerHTML = `<span class="hx"><b>${n ?? ""}</b></span>${name ? `<span class="nm">${esc(name)}${sub ? `<small>${esc(sub)}</small>` : ""}</span>` : ""}`;
     if (onClick) el.addEventListener("click", (e) => { e.stopPropagation(); onClick(); });
     markers.push(new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat(lngLat).addTo(map));
+    el._ll = lngLat; el._n = Number(n) || 0; el._name = name || "";
     el.setAttribute("aria-label", `${name || ""}${n != null && n !== "" ? `, ${n}` : ""} ${sub || ""}`.trim());   // MapLibre replaces it with "Map marker"
+  }
+  // Badges closer than a fingertip merge into one "N places" badge; tapping it zooms in until they separate.
+  // Keeps every target at least 24 px (WCAG 2.2, 2.5.8) and stops taps landing on the wrong community.
+  let groupMarkers = [];
+  function declutter() {
+    groupMarkers.forEach((m) => m.remove()); groupMarkers = [];
+    if (!map || state.role !== "coord") return;
+    const items = markers.map((m) => m.getElement()).filter((el) => el.classList && el.classList.contains("hexb") && el._ll);
+    items.forEach((el) => (el.style.visibility = ""));
+    const placed = [];
+    items.sort((a, b) => b._n - a._n).forEach((el) => {
+      const p = map.project(el._ll);
+      const g = placed.find((q) => Math.hypot(q.p.x - p.x, q.p.y - p.y) < 34);
+      if (g) g.members.push(el); else placed.push({ p, members: [el] });
+    });
+    placed.filter((g) => g.members.length > 1).forEach((g) => {
+      g.members.forEach((el) => (el.style.visibility = "hidden"));
+      const n = g.members.reduce((t, el) => t + el._n, 0);
+      const names = g.members.map((el) => el._name).filter(Boolean);
+      const el = document.createElement("button"); el.type = "button"; el.className = "hexb s-group";
+      el.innerHTML = `<span class="hx"><b>${n}</b></span><span class="nm">${g.members.length} places<small>tap to zoom in</small></span>`;
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const b = g.members.reduce((bb, m) => bb.extend(m._ll), new maplibregl.LngLatBounds(g.members[0]._ll, g.members[0]._ll));
+        map.fitBounds(b, { padding: 140, maxZoom: Math.max(map.getZoom() + 2, 8), duration: reduce ? 0 : 900 });
+      });
+      const ll = map.unproject(g.p);
+      const mk = new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat(ll).addTo(map);
+      el.setAttribute("aria-label", `${g.members.length} places: ${names.join(", ")}. ${n} repairs. Zoom in`);
+      groupMarkers.push(mk);
+    });
   }
   function hubBadge() {
     const el = document.createElement("div"); el.className = "hubb"; el.title = "Trades start their trips here";
@@ -377,6 +410,7 @@
     if (refreshMap.reach) map.getSource("reach").setData(refreshMap.reach);
     hubBadge();
     legend();
+    declutter();
   }
   function legend() {
     const L = $("#legend");

@@ -376,3 +376,12 @@ details.costs[open] summary::before { transform: rotate(90deg); }
 details.costs p, details.costs ul { margin: 8px 0 0; line-height: 1.45; }
 details.costs ul { padding-left: 18px; }
 @media (prefers-reduced-motion: reduce) { details.costs summary::before { transition: none; } }
+
+/* several communities too close to tap apart: one badge, "N places", tap to zoom in */
+.hexb.s-group { --c: #5e5ce6; }
+.hexb.s-group .hx { box-shadow: 0 0 0 3px rgba(255,255,255,.85), 0 4px 14px rgba(0,0,0,.35); }
+.hexb.s-group .nm { opacity: 1; transform: none; }
+/* the hub name is a label, not a control: it sits under community badges and lets taps through */
+.hubb { pointer-events: none; z-index: 0; }
+.hexb { z-index: 1; }
+.hexb.s-group { z-index: 2; }

@@ -10,6 +10,8 @@
 3. Planner (planner.py). How close is each weekly plan to the best possible one? CP-SAT proves optimality or
    reports a bound; the gap is how far the plan could be from that bound.
 4. Simulation. Do the headline results hold in other random years? Five request streams for each headline plan.
+5. Inclusion. Does a household lose points because the tenant said less? The same households, described in full and
+   in a few words, scored from the words alone and then with the standard intake questions (intake.household).
 
 Honest limit: the reports are synthetic, written from our own phrase lists. "New wording" keeps phrasings out of
 training, which is the fairer test, but neither tests Aboriginal English, Kriol or other languages.
@@ -220,6 +222,57 @@ def simulation_quality(workers: int = 8) -> dict:
                    gap_p95=float(np.percentile(gap, 95)), gap_max=float(gap.max()), solve_median_s=float(np.median(t)),
                    solve_p95_s=float(np.percentile(t, 95)), time_limit_s=float(limit), hit_limit_share=float((t >= limit * 0.98).mean()))
     return dict(years=years, spread=spread, paired=paired, planner=planner)
+
+
+def inclusion(n: int = 3000, seed: int = 21) -> dict:
+    """Same household, two tellings: "full" names the baby, the crowding and the earlier call; "short" names only the
+    fault (a tenant with little English, a relayed message, or someone who just wants it fixed). The fault is the same,
+    so any gap in points comes from how the household was described. Answers to the standard questions are assumed
+    true when given; a share (1 - intake_answer_rate) is left "unknown" at random."""
+    T = params()["triage"]
+    rng = np.random.default_rng(seed)
+    w = synth.hazard_weights()
+    hz, pw = list(w), np.array(list(w.values()))
+    rate = T["intake_answer_rate"]
+    rows = []
+    for _ in range(n):
+        h = hz[rng.choice(len(hz), p=pw)]
+        v, c, r = rng.random() < 0.3, rng.random() < 0.35, rng.random() < 0.12      # as synth.request_stream, remote
+        base = synth.make_report(h, rng, "heldout" if rng.random() < 0.3 else "train")
+        extra = [synth.MODIFIER_PHRASES[k][rng.integers(len(synth.MODIFIER_PHRASES[k]))] for k, on in
+                 (("vulnerable", v), ("crowded", c), ("repeat", r)) if on]
+        full = ", ".join([base] + extra)
+        bedrooms = int(rng.integers(2, 5))
+        people = int(bedrooms * (rng.uniform(2.1, 4) if c else rng.uniform(0.5, 2)))
+        which = rng.choice(list(intake.VULNERABLE_QUESTIONS)) if v else None
+        answers = {q: ("unknown" if rng.random() > rate else ("yes" if q == which else "no")) for q in intake.VULNERABLE_QUESTIONS}
+        answers["before"] = "unknown" if rng.random() > rate else ("yes" if r else "no")
+        record, history = dict(people=people, bedrooms=bedrooms), dict(same_fault_open_or_recent=bool(r and rng.random() < rate))
+        true = urgency.score(h, {k: 1 for k, on in (("vulnerable", v), ("crowded", c), ("repeat", r)) if on}).total
+        out = dict(true=true, v=v, c=c, r=r)
+        for tell, text in (("full", full), ("short", base)):
+            words = {k: x for k, x in intake.modifier_hits(text).items() if k in ("vulnerable", "crowded", "repeat")}
+            mods, _, _ = intake.household(words, answers, record, history)
+            for m, mm in (("words", words), ("intake", mods)):
+                out[f"{tell}_{m}"] = urgency.score(h, {k: 1 for k in mm}).total
+                out[f"{tell}_{m}_vulnerable"] = "vulnerable" in mm
+        rows.append(out)
+    import pandas as pd
+    d = pd.DataFrame(rows)
+    has = (d.v | d.c | d.r).to_numpy()
+    res = {}
+    for m in ("words", "intake"):
+        gap = (d[f"full_{m}"] - d[f"short_{m}"]).to_numpy()
+        pos = pd.concat([d[f"full_{m}"], d[f"short_{m}"]]).rank(ascending=False, pct=True).to_numpy()
+        lost = pos[n:] - pos[:n]               # how much further down one shared queue the short telling sits (share of queue)
+        res[m] = dict(gap_mean=float(gap[has].mean()), gap_max=int(gap.max()), short_ranked_lower=float((gap[has] > 0).mean()),
+                      queue_places_lost_pct=float(lost[has].mean() * 100),
+                      short_points_missed=float((d.true - d[f"short_{m}"]).to_numpy()[has].mean()),
+                      vulnerable_recognised_short=float(d.loc[d.v, f"short_{m}_vulnerable"].mean()),
+                      vulnerable_recognised_full=float(d.loc[d.v, f"full_{m}_vulnerable"].mean()))
+    res.update(n=n, households_with_something_to_say=float(has.mean()), answer_rate=rate,
+               note="Synthetic households. Answers are assumed true when given; unanswered questions earn no points.")
+    return res
 
 
 def build() -> dict:

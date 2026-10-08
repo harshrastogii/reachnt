@@ -36,8 +36,9 @@ The decision ledger (`ops.decision`) is append-only: each row stores the hash of
 
 | Role | Sees |
 |---|---|
+| Intake staff (repairs line, Community Housing Officers) | log new reports and the standard questions; the vault only through the logged function |
 | Tenant (one-time code by SMS or read out by a Community Housing Officer) | their own jobs and the reasons logged against them |
-| Tradesperson / contractor | jobs on their assigned trips, plus open jobs within 3 res-5 rings of where they are this week ("while you're there") |
+| Tradesperson / contractor | jobs on their assigned trips, plus open jobs within 3 res-5 rings of where they are this week ("while you're there"), plus jobs the coordinator opened to any contractor of their trade in their hub |
 | Community Housing Officer | jobs in their communities |
 | Regional coordinator | everything in their hub; signs decisions |
 | Department analyst | the `ops` schema without the vault; `public` views |
@@ -72,8 +73,13 @@ Added after checking ReachNT against UK and Australian repair and automated-deci
 | `ops.review_request` | A tenant's request for a person to review their ranking, the due date and the answer | Robodebt Royal Commission rec. 17.1 |
 | `ops.reader_audit` | The weekly re-reading of 1 in 20 automatically read reports | Ongoing quality assurance (Ombudsman ADM guide) |
 | `ops.tenant_confirmation` | Whether the tenant says the repair worked | "Still broken" reopens the job |
+| `ops.job.channel`, `first_contact_at`, `language`, `interpreter` | How the report arrived and when the tenant first told anyone | The clock starts at first contact; channel and language are kept only to book interpreters and check fairness, never scored (`docs/INCLUSIVE_DECISION_MODEL.md`) |
+| `ops.intake_answer` | The standard questions, asked the same way on every channel, with the source (asked, tenancy record, job history) | Saying less costs no points; "unknown" never removes any |
+| `ops.urgency_check` | Every time a person checks or changes urgency: who, how (call, on site, photo, review), from what to what, and why | Append-only; a CHECK refuses lowering a dangerous repair unless the source spoke to the tenant or saw the fault |
+| `ops.job_offer` | Who goes after a missed visit: next trip, a named crew, or open to any contractor of that trade | One open offer per job; the first to accept gets it |
+| `ops.escalation` | A tenant or tradesperson says it got worse | Answered by an urgency check the same day |
 
-The schema was loaded into PostgreSQL 16 to check it: all tables and the three row-level security policies are created, a no-access visit without evidence is refused, and a duplicate pointing at a job that doesn't exist is refused. (PostGIS and h3-pg were replaced by simple stand-ins for that check; on Neon or NT Government servers the real extensions are used.)
+The schema was loaded into PostgreSQL 16 to check it: all tables and the row-level security policies are created, a no-access visit without evidence is refused, and a duplicate pointing at a job that doesn't exist is refused. (PostGIS and h3-pg were replaced by simple stand-ins for that check; on Neon or NT Government servers the real extensions are used.)
 
 ## Retention and rights
 

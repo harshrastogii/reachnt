@@ -16,6 +16,7 @@ CREATE ROLE tradesperson NOLOGIN;      -- contractor staff in the field
 CREATE ROLE housing_officer NOLOGIN;   -- Community Housing Officer
 CREATE ROLE analyst NOLOGIN;           -- ops + public, never pii
 CREATE ROLE tenant NOLOGIN;            -- a tenant through a one-time code
+CREATE ROLE intake_staff NOLOGIN;      -- repairs-line staff and Community Housing Officers who log reports
 
 -- ------------------------------------------------------------------ places
 CREATE TABLE ops.hub (
@@ -95,7 +96,12 @@ CREATE TABLE ops.job (
   job_id        bigserial PRIMARY KEY,
   house_id      uuid NOT NULL REFERENCES ops.house,
   reported_at   timestamptz NOT NULL DEFAULT now(),
-  channel       text NOT NULL,                        -- phone, housing officer, maintenance officer, app
+  -- How the report arrived. Recorded to book interpreters and to check fairness by channel; never an input to the score.
+  channel       text NOT NULL CHECK (channel IN ('line','cho','rhmo','trade','app','counter')),
+  logged_by     text NOT NULL DEFAULT current_user,
+  first_contact_at timestamptz NOT NULL,              -- when the tenant first told anyone: the clock starts here, not at reported_at
+  language      text,                                 -- for booking an interpreter next time
+  interpreter   text CHECK (interpreter IN ('none','ais','tis','nrs','family')),   -- AIS, TIS National, National Relay Service
   report_text   text NOT NULL,                        -- what the tenant said (no names: intake strips them)
   hazard        text NOT NULL,                        -- from config/taxonomy.yaml
   category      text NOT NULL CHECK (category IN ('immediate','urgent','routine')),
@@ -136,7 +142,7 @@ CREATE TABLE ops.trip_job (trip_id bigint REFERENCES ops.trip, job_id bigint REF
 CREATE TABLE ops.wait_reason (
   job_id      bigint REFERENCES ops.job,
   week_start  date,
-  reason      text NOT NULL CHECK (reason IN ('cut','travel_cost','crew_full','lower_priority','no_access','parts','needs_other_trade')),
+  reason      text NOT NULL CHECK (reason IN ('cut','travel_cost','crew_full','lower_priority','no_access','parts','needs_other_trade','unsafe')),
   trip_cost   numeric,
   decision_id bigint,                                   -- the signed setting in force that week
   PRIMARY KEY (job_id, week_start)
@@ -206,6 +212,66 @@ CREATE TABLE ops.reader_audit (
   checked_at  timestamptz NOT NULL DEFAULT now()
 );
 
+-- The standard questions, asked the same way on every channel, so a household's points do not depend on how much the
+-- tenant said, in what language, or how. 'unknown' never removes points; it asks for a call-back (config/taxonomy.yaml).
+CREATE TABLE ops.intake_answer (
+  job_id      bigint NOT NULL REFERENCES ops.job,
+  question    text NOT NULL CHECK (question IN ('danger_now','young_child','elder','health','people','before')),
+  answer      text NOT NULL CHECK (answer IN ('yes','no','unknown') OR answer ~ '^[0-9]{1,2}$'),
+  source      text NOT NULL CHECK (source IN ('asked','tenancy_record','job_history')),
+  at          timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (job_id, question, at)
+);
+
+-- A person checked how urgent a repair is: on a call, on site, from a photo or a review. Append-only, like the ledger.
+-- Raising urgency takes effect at once. Lowering a dangerous repair needs someone who spoke to the tenant or saw the
+-- fault, and a reason the tenant can read. The reader (rules + model) is never a source: it cannot lower danger.
+CREATE TABLE ops.urgency_check (
+  check_id      bigserial PRIMARY KEY,
+  job_id        bigint NOT NULL REFERENCES ops.job,
+  at            timestamptz NOT NULL DEFAULT now(),
+  checked_by    text NOT NULL DEFAULT current_user,
+  source        text NOT NULL CHECK (source IN ('called_in','phoned','cho','rhmo','trade','photo','review')),
+  from_hazard   text NOT NULL,
+  to_hazard     text NOT NULL,
+  from_category text NOT NULL CHECK (from_category IN ('immediate','urgent','routine')),
+  to_category   text NOT NULL CHECK (to_category IN ('immediate','urgent','routine')),
+  reason        text NOT NULL CHECK (length(trim(reason)) > 0),   -- shown to the tenant
+  review_id     bigint REFERENCES ops.review_request,             -- when it answers a tenant's review
+  CHECK (NOT (from_category = 'immediate' AND to_category <> 'immediate')
+         OR source IN ('called_in','phoned','cho','rhmo','trade'))
+);
+REVOKE UPDATE, DELETE ON ops.urgency_check FROM PUBLIC;
+
+-- Who goes after a visit misses (or any time): the next trip, a named crew, or open to any contractor of that trade
+-- on the panel, first to accept. The job keeps its first-contact clock whatever happens here.
+CREATE TABLE ops.job_offer (
+  offer_id     bigserial PRIMARY KEY,
+  job_id       bigint NOT NULL REFERENCES ops.job,
+  at           timestamptz NOT NULL DEFAULT now(),
+  decided_by   text NOT NULL DEFAULT current_user,
+  mode         text NOT NULL CHECK (mode IN ('next','crew','open')),
+  trade        text NOT NULL,                                     -- may differ from the job's trade ("needs another trade")
+  crew_id      uuid REFERENCES ops.crew_member,                   -- for mode 'crew'
+  accepted_by  uuid REFERENCES ops.crew_member,                   -- for mode 'open': the first to accept
+  accepted_at  timestamptz,
+  CHECK ((mode = 'crew') = (crew_id IS NOT NULL)),
+  CHECK (accepted_by IS NULL OR mode = 'open')
+);
+-- One open offer per job at a time. Accepting is UPDATE ... SET accepted_by = me WHERE offer_id = $1 AND accepted_by IS NULL,
+-- so the first tradesperson to accept gets it and the second sees 0 rows updated.
+CREATE UNIQUE INDEX one_open_offer ON ops.job_offer (job_id) WHERE mode = 'open' AND accepted_by IS NULL;
+
+-- A tenant or tradesperson says it got worse. A person calls back the same day and records an urgency_check.
+CREATE TABLE ops.escalation (
+  job_id      bigint NOT NULL REFERENCES ops.job,
+  at          timestamptz NOT NULL DEFAULT now(),
+  raised_by   text NOT NULL CHECK (raised_by IN ('tenant','tradesperson','cho')),
+  note        text,
+  answered_by bigint REFERENCES ops.urgency_check,
+  PRIMARY KEY (job_id, at)
+);
+
 -- The tenant says whether the repair worked. "still broken" reopens it as a repeat.
 CREATE TABLE ops.tenant_confirmation (
   job_id      bigint PRIMARY KEY REFERENCES ops.job,
@@ -228,6 +294,15 @@ CREATE POLICY job_tradesperson ON ops.job FOR SELECT TO tradesperson USING (
             AND h3_grid_distance(h3_cell_to_parent(h.cell_r10, 5), h3_cell_to_parent(k.cell_r7, 5)) <= 3))
 );
 CREATE POLICY job_coordinator ON ops.job FOR ALL TO coordinator USING (true);
+CREATE POLICY job_intake ON ops.job FOR INSERT TO intake_staff WITH CHECK (true);
+
+-- A tradesperson also sees jobs opened to any contractor of their trade in their hub, so they can accept one.
+ALTER TABLE ops.job_offer ENABLE ROW LEVEL SECURITY;
+CREATE POLICY offer_open_to_trade ON ops.job_offer FOR SELECT TO tradesperson USING (
+  mode = 'open' AND accepted_by IS NULL AND EXISTS (
+    SELECT 1 FROM ops.crew_member c JOIN ops.job j ON j.job_id = ops.job_offer.job_id JOIN ops.house h USING (house_id)
+    WHERE c.db_user = current_user AND c.trade = ops.job_offer.trade AND c.hub_id = h.hub_id));
+CREATE POLICY offer_coordinator ON ops.job_offer FOR ALL TO coordinator USING (true);
 CREATE POLICY job_analyst ON ops.job FOR SELECT TO analyst USING (true);
 
 -- ------------------------------------------------------------------ public views (res 6, suppressed below 5)

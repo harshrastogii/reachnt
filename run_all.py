@@ -4,6 +4,7 @@ numbers.json, report figures and the web prototype's data.
     python run_all.py            # full run (about 10 minutes)
     python run_all.py --quick    # skip the sensitivity sweep
     python run_all.py --quality  # only the quality measures (evaluate.py, about 4 minutes), merged into numbers.json
+    python run_all.py --extras   # only the inclusion measure and the missed-visits experiment, merged into numbers.json
 """
 from __future__ import annotations
 
@@ -57,6 +58,8 @@ def main(quick: bool = False) -> None:
     )
     print("6b. Quality measures: ROC/PR-AUC, calibration, ranking, solver gap, five random years")
     numbers["quality"] = evaluate.build()
+    print("6c. Inclusion (saying less costs no points) and missed visits")
+    numbers.update(extras())
     (OUTPUTS / "numbers.json").write_text(json.dumps(numbers, indent=1, default=float))
     print("7. Figures")
     figures.build_all(numbers)
@@ -67,6 +70,26 @@ def main(quick: bool = False) -> None:
           f"Need + guarantee: ${f['cost_per_job']:.0f}/job, harm-days {f['harm_days_total']:.0f}. ReachNT (+ H3 run zones): ${n['cost_per_job']:.0f}/job, harm-days {n['harm_days_total']:.0f}.")
 
 
+def extras() -> dict:
+    inc = evaluate.inclusion()
+    mv = experiments.missed_visits()
+    pd.DataFrame(mv).to_csv(OUTPUTS / "missed_visits.csv", index=False)
+    (OUTPUTS / "inclusion.json").write_text(json.dumps(inc, indent=1))
+    w, i = inc["words"], inc["intake"]
+    print(f"  Short reports, words only: {w['gap_mean']:.0f} points lower, {w['short_ranked_lower']:.0%} ranked lower. "
+          f"With the standard questions: {i['gap_mean']:.1f} points, {i['short_ranked_lower']:.0%}.")
+    for r in mv:
+        print(f"  {r['key']:18s} {r['share']:.0%} of visits missed: ${r['cost_per_job']:.0f}/job, urgent P90 remote {r['urgent_p90_remote']:.0f} d, "
+              f"harm-days {r['harm_days_total']:.0f}" + (f", missed urgent remote jobs P90 {r['urgent_remote_missed_p90']:.0f} d" if r["share"] else ""))
+    return dict(inclusion=inc, missed_visits=mv)
+
+
+def extras_only() -> None:
+    numbers = json.loads((OUTPUTS / "numbers.json").read_text())
+    numbers.update(extras())
+    (OUTPUTS / "numbers.json").write_text(json.dumps(numbers, indent=1, default=float))
+
+
 def quality_only() -> None:
     numbers = json.loads((OUTPUTS / "numbers.json").read_text())
     numbers["quality"] = evaluate.build()
@@ -75,4 +98,9 @@ def quality_only() -> None:
 
 
 if __name__ == "__main__":
-    quality_only() if "--quality" in sys.argv else main(quick="--quick" in sys.argv)
+    if "--quality" in sys.argv:
+        quality_only()
+    elif "--extras" in sys.argv:
+        extras_only()
+    else:
+        main(quick="--quick" in sys.argv)

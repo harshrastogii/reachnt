@@ -121,14 +121,14 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
     sections.append(("Why it is not fixed yet" if (is_open and not booked) else "What held it up", " ".join(why)))
 
     sections.append(("What would change it",
-                     f"If it gets worse (sparks, smoke, water everywhere, sewage), call {HOTLINE} and say so. "
+                     f"If it gets worse (sparks, smoke, water everywhere, sewage), call {HOTLINE} or tell your housing officer. "
                      "It becomes Immediate and is made safe the same day. "
                      "Every day you wait adds points, so your repair moves up the line."))
     sections.append(("Your rights",
-                     "You can ask for an Aboriginal interpreter at any time. "
+                     "You can ask for a free interpreter at any time. "
                      "If an urgent repair is not done, you can ask the Tribunal (NTCAT) for an emergency repair order. "
                      "You can also complain to the NT Ombudsman. "
-                     "You can ask for a person to review how your repair was ranked: say so when you call, or use \"Ask for a review\" in the app. "
+                     "You can ask for a person to review how your repair was ranked: say so when you call, tell your housing officer, or use the app. "
                      "We answer within 10 working days."))
 
     score_txt = (f"Score {u.total}: {u.base} for the {cat} category, {u.harm} for harm, {u.hlp} for the health practice it affects, "

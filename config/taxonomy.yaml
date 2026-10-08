@@ -274,3 +274,27 @@ modifiers:
   danger_words:   # generic safety net: if any appears and the reading is not Immediate, a person checks. ASSUMPTION
     patterns:
       - "smok|melt|burn|spark|shock|zap|smell|fume|hiss|collaps|fell|falling|caved|sewage|sewerage|flood|gush|pour|spray|live wire|fire"
+
+# The standard intake questions. Asked the same way on every channel (repairs line, Community Housing Officer,
+# maintenance officer, tradesperson on site, app), read out by staff or an interpreter, so a household's points do
+# not depend on how much the tenant says, in what language, or how. "unknown" never removes points; it asks for a
+# call-back. Shared by the Python engine (intake.household) and the portal's "New report" form.
+intake_questions:
+  - id: danger_now
+    ask: Is anyone in danger right now? (sparks, smoke, gas, water near power, sewage inside, something falling)
+    means: danger              # yes: a person calls today and checks whether it is Immediate; never lowers a reading
+  - id: young_child
+    ask: Does a baby or young child live there?
+    means: vulnerable
+  - id: elder
+    ask: Does an elder or older person live there?
+    means: vulnerable
+  - id: health
+    ask: Is anyone there sick, pregnant, or living with a disability?
+    means: vulnerable
+  - id: people
+    ask: How many people are living there now? (the tenancy record fills this in; ask if it may have changed)
+    means: crowded             # more than crowded_people_per_bedroom people per bedroom (params.yaml)
+  - id: before
+    ask: Have you told anyone about this fault before? (the house's job history fills this in)
+    means: repeat

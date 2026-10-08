@@ -46,6 +46,8 @@ Each gap found by the research, and where it now stands in the prototype (7 Octo
 | 13 | Rate limits, backups, incident plan | General | **Open, for the pilot** (Vercel Firewall rate limits; managed Postgres backups). |
 | 14 | Two phones updating one job offline | General | **Open.** The server will keep both updates in `ops.visit_attempt` and treat the latest as current. |
 | 15 | Accessibility beyond automated checks | WCAG 2.2 | **Open.** A screen-reader walkthrough and testing with tenants, in language. |
+| 16 | Decisions that don't depend on how or when someone reported, how much they said, their English or digital skills | Our own review (report §4.1 named it as a limit); Closing the Gap Priority Reform 3 | **Done (8 October 2026).** Standard intake questions on every channel, tenancy record and job history feed the household points; the clock starts at first contact; channel, language and timing are banned from the score by a unit test. Measured by `evaluate.inclusion()`. [`INCLUSIVE_DECISION_MODEL.md`](INCLUSIVE_DECISION_MODEL.md). |
+| 17 | A person can verify and change urgency at any time; a missed job is reassigned without losing its place | Ombudsman ADM guide; Housing Ombudsman (2025) | **Done.** Job detail → "Check the urgency" and "Who goes"; Checks → "Needs a decision today"; tradesperson "Open jobs you can take" and "Worse than reported"; tenant "It got worse". Server rules in `web/api/sync.js` (17 checks in `tests/test_api.mjs`); database rules in `ops.urgency_check`, `ops.job_offer`, `ops.escalation`, loaded and probed in PostgreSQL 16. |
 
 ## Sources
 

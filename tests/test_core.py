@@ -11,7 +11,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from reachnt import evaluate, explain, intake, planner, synth, urgency  # noqa: E402
+from reachnt import evaluate, explain, intake, planner, simulate, synth, urgency  # noqa: E402
 from reachnt.config import params, taxonomy  # noqa: E402
 
 
@@ -19,7 +19,9 @@ from reachnt.config import params, taxonomy  # noqa: E402
 def test_urgency_signature_has_no_place_or_cost_inputs():
     args = set(inspect.signature(urgency.score).parameters)
     assert args <= {"hazard", "modifiers", "days_waited", "clock"}
-    banned = ["distance", "km", "cost", "hub", "community", "remote", "band", "lat", "lon", "indigenous", "travel"]
+    banned = ["distance", "km", "cost", "hub", "community", "remote", "band", "lat", "lon", "indigenous", "travel",
+              # the inclusive model: how, when and in what language a report arrived never sets its place in line
+              "channel", "language", "english", "interpreter", "submitted", "form", "app", "phone", "logged"]
     src = inspect.getsource(urgency.score)
     for word in banned:
         assert word not in src.lower(), f"urgency.score mentions '{word}'"
@@ -50,6 +52,54 @@ def test_equal_clock_has_no_remote_allowance_official_does():
     # FS17: 2 vs 5 and 10 vs 25 business days
     assert urgency.clock_days("urgent", True, "official") == pytest.approx(5 * 7 / 5)
     assert urgency.clock_days("routine", True, "official") == pytest.approx(25 * 7 / 5)
+
+
+# ---------------------------------------------------------------- inclusive intake: saying less costs no points
+def test_short_and_full_tellings_score_the_same_once_the_questions_are_asked():
+    full = intake.modifier_hits("toilet blocked, my nana lives here, 9 of us living here, this is the third time")
+    short = intake.modifier_hits("toilet blocked pls come")
+    answers = dict(young_child="no", elder="yes", health="no", before="yes", danger_now="no")
+    record, history = dict(people=9, bedrooms=3), dict(same_fault_open_or_recent=True)
+    a, _, _ = intake.household(full, answers, record, history)
+    b, src, unanswered = intake.household(short, answers, record, history)
+    assert urgency.score("toilet_blocked", a).total == urgency.score("toilet_blocked", b).total
+    assert urgency.score("toilet_blocked", b).total > urgency.score("toilet_blocked", short).total
+    assert src["crowded"] == ["record"] and "history" in src["repeat"] and unanswered == []
+
+
+def test_an_unknown_answer_never_lowers_a_score():
+    words = intake.modifier_hits("no hot water for the baby")
+    known, _, _ = intake.household(words, dict(young_child="no"))
+    unknown, _, unanswered = intake.household(words, dict(young_child="unknown"))
+    assert known == unknown == {"vulnerable": 1}               # the words still count; "no" or "unknown" takes nothing away
+    assert "young_child" in unanswered                          # and an unanswered question asks for a call-back
+
+
+def test_inclusion_measure_shows_the_gap_closing():
+    r = evaluate.inclusion(n=400)
+    assert r["words"]["gap_mean"] > 10 > r["intake"]["gap_mean"]
+    assert r["intake"]["vulnerable_recognised_short"] > 0.8 > r["words"]["vulnerable_recognised_short"]
+
+
+# ---------------------------------------------------------------- time left raises priority; a missed visit keeps its clock
+def test_priority_rises_as_the_clock_runs_out():
+    job = dict(hazard="hot_water", category="urgent", vulnerable=False, crowded=False, repeat=False, day=0,
+               clock_equal=2.8, clock_official=7.0)
+    pol = simulate.Policy("guarantee", 0.2)
+    early = simulate.job_value(dict(job, day=0, clock_equal=30, clock_official=30), pol, 1)   # plenty of time left
+    late = simulate.job_value(job, pol, 2)                                                    # clock ends within the week
+    assert late - early >= params()["planning"]["deadline_bonus"] + params()["planning"]["floor_bonus"]
+
+
+def test_a_missed_visit_keeps_its_clock_and_goes_back_in_the_plan():
+    req = simulate.prepare_requests()
+    small = req[(req.hub == "Tennant Creek") & (req.week < 10)].copy()
+    res = simulate.run(simulate.Policy("guarantee", 0.2), small, extra_weeks=0, miss_share=0.3).jobs
+    hit = res[res.reason_counts.map(lambda c: c.get("no_access", 0) > 0)]
+    assert len(hit) > 0
+    later = hit[~hit.open_at_end]
+    assert (later.wait_days == later.done_day - later.day).all()           # waiting counts from the first report
+    assert later.reason_log.map(lambda log: any(x[1] == "no_access" for x in log)).all()
 
 
 # ---------------------------------------------------------------- reader

@@ -1,0 +1,24 @@
+{
+ "words": {
+  "gap_mean": 19.227961819202694,
+  "gap_max": 45,
+  "short_ranked_lower": 0.9657495788882651,
+  "queue_places_lost_pct": 13.803350177802734,
+  "short_points_missed": 19.05670971364402,
+  "vulnerable_recognised_short": 0.04077010192525481,
+  "vulnerable_recognised_full": 1.0
+ },
+ "intake": {
+  "gap_mean": 1.760247052217855,
+  "gap_max": 35,
+  "short_ranked_lower": 0.10836608646827625,
+  "queue_places_lost_pct": 1.227877596855699,
+  "short_points_missed": 1.128579449747333,
+  "vulnerable_recognised_short": 0.9150622876557192,
+  "vulnerable_recognised_full": 1.0
+ },
+ "n": 3000,
+ "households_with_something_to_say": 0.5936666666666667,
+ "answer_rate": 0.9,
+ "note": "Synthetic households. Answers are assumed true when given; unanswered questions earn no points."
+}

@@ -104,7 +104,11 @@ def main() -> None:
                 weather_saved=max((w.get("time") or "" for w in weather), default=""),
                 stations=stations, roads=roads(road_payload), weather=weather)
     out_path.write_text(json.dumps(snap, indent=1))
-    print(f"wrote {out_path.relative_to(ROOT)}: {len(snap['roads'])} closures, {len(weather)} stations")
+    # the same snapshot as a module beside the server function, so Vercel bundles it with /api/warnings
+    (ROOT / "web" / "api" / "_warnings_snapshot.js").write_text(
+        "// Written by scripts/warnings_snapshot.py. The saved copy /api/warnings falls back on.\nexport default "
+        + json.dumps(snap, indent=1) + ";\n")
+    print(f"wrote {out_path.relative_to(ROOT)} and web/api/_warnings_snapshot.js: {len(snap['roads'])} closures, {len(weather)} stations")
 
 
 if __name__ == "__main__":

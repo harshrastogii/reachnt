@@ -4,10 +4,7 @@
 // (web/data/warnings_snapshot.json, built by scripts/warnings_snapshot.py) and says so. Nothing is decided here: the
 // portal turns these into prompts, and the coordinator decides. Cached at the edge for 10 minutes, so the feeds see
 // at most a handful of requests an hour however many people open the portal.
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const SNAPSHOT = require("../data/warnings_snapshot.json");
+import SNAPSHOT from "./_warnings_snapshot.js";   // bundled with the function (a JSON file outside api/ is not)
 
 const ROADS = "https://roadreport.nt.gov.au/api/Obstruction/GetAll";
 const BOM = (wmo) => `http://www.bom.gov.au/fwo/IDD60801/IDD60801.${wmo}.json`;
@@ -43,12 +40,11 @@ export function weatherFrom(station, payload) {
 
 export async function build(fetcher = fetch) {
   const out = { fetched_at: new Date().toISOString(), stations: SNAPSHOT.stations, roads_note: SNAPSHOT.roads_note, weather_note: SNAPSHOT.weather_note };
-  try {
-    out.roads = roadsFrom(await getJSON(ROADS, fetcher)); out.roads_source = "live";
-  } catch (e) {
-    out.roads = SNAPSHOT.roads; out.roads_source = "snapshot"; out.roads_saved = SNAPSHOT.roads_saved;
-  }
-  const obs = await Promise.allSettled(SNAPSHOT.stations.map((s) => getJSON(BOM(s.wmo), fetcher).then((p) => weatherFrom(s, p))));
+  // roads and every station at once, so the slowest feed sets the time (at most TIMEOUT_MS)
+  const [rd, ...obs] = await Promise.allSettled([getJSON(ROADS, fetcher).then(roadsFrom),
+    ...SNAPSHOT.stations.map((s) => getJSON(BOM(s.wmo), fetcher).then((p) => weatherFrom(s, p)))]);
+  if (rd.status === "fulfilled") { out.roads = rd.value; out.roads_source = "live"; }
+  else { out.roads = SNAPSHOT.roads; out.roads_source = "snapshot"; out.roads_saved = SNAPSHOT.roads_saved; }
   const live = obs.filter((o) => o.status === "fulfilled").map((o) => o.value);
   if (live.length) {
     const have = new Set(live.map((w) => w.wmo));   // a station that failed keeps its saved reading, marked as such

@@ -4,11 +4,11 @@
 
 Slides: `DataChallenge_Team AIC015_Slides.pptx` (or `.pdf`). The same script is in each slide's speaker notes. Every number comes from `outputs/numbers.json`; if the pipeline is re-run, rebuild the deck (`node docs/deck/build_deck.js`) and re-read the numbers below.
 
-**Who speaks:** Harsh opens (slide 1). Aashish presents the problem, presents H3 (his idea) and trust, and gives the recommendations. Harsh presents the solution, the AI, planning, results, the demo and the close. Swap freely; the notes don't depend on who says them.
+**Who speaks:** Harsh opens (slide 1). Aashish presents the problem, the inclusive model (slide 6), H3 (his idea) and trust, and gives the recommendations. Harsh presents the solution, the AI, planning, results, the demo and the close. Swap freely; the notes don't depend on who says them.
 
-**Timing:** about 9 minutes 40 seconds spoken, which leaves 20 seconds of slack. If you're running late, cut the live demo on slide 9 and talk over the screenshots.
+**Timing:** about 9 minutes 40 seconds spoken, which leaves 20 seconds of slack. If you're running late, cut the live demo on slide 10 and talk over the screenshots.
 
-**If you only have 5 minutes:** use slides 1, 3, 4, 6, 8, 9 and 13, and shorten each one to its first two sentences.
+**If you only have 5 minutes:** use slides 1, 3, 4, 6, 9, 10 and 14, and shorten each one to its first two sentences.
 
 **Before you start:**
 - Open https://reachnt.vercel.app in a browser tab and wait for the map to load.
@@ -27,9 +27,7 @@ Slides: `DataChallenge_Team AIC015_Slides.pptx` (or `.pdf`). The same script is 
 
 Good morning. I'm Harsh, this is Aashish, and we're Team Top Enders.
 Imagine a family in a remote community in the Northern Territory. The water to their house stops. They ring the repairs line. In town, a plumber would be there in a couple of days. For them, it can take weeks.
-Our project, ReachNT, is about why that happens, and what AI can do about it. Aashish will start with the problem.*
-
-
+Our project, ReachNT, is about why that happens, and what AI can do about it. Aashish will start with the problem.
 
 ### 2. The problem in four numbers  
 *AASHISH, about 50 seconds*
@@ -38,9 +36,7 @@ Here's the problem in four numbers.
 There are 70 remote communities in our model, with about 4,500 public houses.
 Repairs there cost far more. Government research found emergency repairs in very remote communities cost eight and a half times as much, and travel can be almost the whole bill.
 Katherine's tradespeople, for example, drive up to six hours to reach some communities.
-So here is the kind of message a tenant gets from our simulation: no water to the house, waited 57 days, held up by travel cost. Notice the last line: nobody signed off on that. It just happened.*
-
-
+So here is the kind of message a tenant gets from our simulation: no water to the house, waited 57 days, held up by travel cost. Notice the last line: nobody signed off on that. It just happened.
 
 ### 3. Why it happens  
 *AASHISH, about 50 seconds*
@@ -48,9 +44,7 @@ So here is the kind of message a tenant gets from our simulation: no water to th
 Why does this happen? Because the obvious way to plan repairs is to fix the most jobs for your money.
 We simulated a whole year of repairs across the Territory. When you plan for the cheapest jobs, town tenants get urgent repairs in 3 days. Remote tenants wait up to 62. That's the orange bars.
 The important part is on the right. No one decided this. Nobody wrote a rule saying remote families wait. It's a side effect of chasing efficiency, and nobody is accountable for it.
-That's the gap we set out to close.*
-
-
+That's the gap we set out to close.
 
 ### 4. What ReachNT does  
 *HARSH, about 50 seconds*
@@ -59,9 +53,7 @@ Thanks Aashish. ReachNT does four things.
 One: it reads the repair report the way the tenant said it, and works out the fault and how urgent it is. If it isn't sure, a person calls back.
 Two: it ranks repairs by need alone. Danger, health, who lives in the house, how long they've waited. Where you live is never part of your score.
 Three: every week it plans the trips. And when two communities are close, one tradesperson visits both on one trip. That's where H3 comes in, which I'll come back to.
-Four: cost still matters, but a named person has to sign how much it counts. And every tenant can see why their repair is where it is.*
-
-
+Four: cost still matters, but a named person has to sign how much it counts. And every tenant can see why their repair is where it is.
 
 ### 5. AI that knows when to ask  
 *HARSH, about 60 seconds*
@@ -70,95 +62,97 @@ Now the AI. Tenants don't fill in forms. They say things like "no sparks now but
 ReachNT reads that with two methods: word rules for phrases we know, and a learning model for wording the rules miss.
 The key design choice is that it knows when to ask. If it's unsure, or anything sounds dangerous, a person checks the same day. And it never downgrades danger on its own. In that example, "no sparks" doesn't make it safe.
 We tested it on wording it had never seen. The model alone is decent, a ROC-AUC of 0.84. With the person in the loop, the system caught 99.3 percent of dangerous reports.
-And we're honest about its limits: its confidence isn't reliable, so we never show tenants a percentage.*
+And we're honest about its limits: its confidence isn't reliable, so we never show tenants a percentage.
 
+### 6. Fair to people who say less  
+*AASHISH, about 35 seconds*
 
+Thanks Harsh. There's a quieter unfairness too.
+If points come only from what tenants say, "my nana lives here, nine of us, third time I rang" beats "toilet blocked, please come". Same house, same need.
+So whoever the tenant tells asks the same six questions, with a free interpreter, and the tenancy record fills in the rest.
+On three thousand made-up households, saying less cost 19 points from words alone. With the questions, about 2.
+And the clock starts when the tenant first told anyone.
 
-### 6. Why H3 hexagons  
-*AASHISH, about 60 seconds*
+### 7. Why H3 hexagons  
+*AASHISH, about 50 seconds*
 
 This was my favourite decision. Early on I suggested Uber's H3, an open-source map grid made of hexagons, and Harsh built the whole system around it.
-Why hexagons? Look at the squares on the left: the middle square has neighbours at two different distances, the sides and the corners. A hexagon's six neighbours are all exactly the same distance away.
-That matters for fairness. When we say two communities are "within two hexagons" of each other, that means the same distance in every direction, so the rule for sharing a trip treats every community the same.
-And one grid does four jobs: it finds shared trips, it stores a house as a hexagon instead of an address for privacy, it lets us publish waiting times for areas without exposing any household, and it powers the maps and the "nearby jobs" list for tradespeople.*
+Why hexagons? The middle square has neighbours at two different distances, the sides and the corners. A hexagon's six neighbours are all the same distance away.
+So "within two hexagons" means the same distance in every direction, and the rule for sharing a trip treats every community the same.
+And one grid does four jobs: shared trips, a house stored as a hexagon instead of an address, waiting times published by area without exposing any household, and the maps and "nearby jobs" list for tradespeople.
 
+### 8. Planning the trips  
+*HARSH, about 35 seconds*
 
+Every week Google's OR-Tools plans the trips around crew hours, road closures and airstrips. A job running out of time gets a boost onto the next trip.
+Instead of two trips out and back, one tradesperson does one loop, and H3 tells us which pairs are close enough.
+That saves about $73 on every repair, and because the savings buy more visits, households spend 18% fewer days living with faults.
+And it's fast: the solver proved 99.4 percent of over 25 thousand weekly plans to be the best possible plan.
 
-### 7. Planning the trips  
+### 9. Results  
 *HARSH, about 50 seconds*
 
-Every week an optimiser, Google's OR-Tools, plans the trips: which communities get a visit, which jobs get done, within each tradesperson's hours, road closures in the wet, and airstrips.
-Here's the shared trip. Instead of driving out to community A and back, then out to community B and back, one tradesperson does one loop. The H3 grid tells us which pairs are close enough.
-That saves about $73 on every repair, and because the savings buy more visits, households spend 18% fewer days living with faults.
-And it's fast: the solver proved 99.4 percent of over 25 thousand weekly plans to be the best possible plan.*
-
-
-
-### 8. Results  
-*HARSH, about 60 seconds*
-
-So what does it buy? We ran one year of synthetic repair requests over the real Territory: real communities, roads, wet-season closures and costs, and 37,508 made-up requests.
+So what does it buy? We ran a year of 37,508 made-up requests over the real Territory: real communities, roads, closures and costs.
 Planning for the cheapest jobs costs $559 a repair. ReachNT costs $803. About 44% more.
 For that, nine in ten urgent remote repairs are fixed within 3 days instead of 62, and households live with faults for 73% fewer days. That's the chart.
 We didn't trust one lucky year, so we ran five. The result held every time.
-We're not saying cost doesn't matter. We're saying the trade-off should be visible, priced, and signed by a person.*
+We're not saying cost doesn't matter. We're saying the trade-off should be visible, priced, and signed by a person.
 
-
-
-### 9. The product (live demo)  
-*HARSH, about 90 seconds, including a short live demo if there's time*
+### 10. The product (live demo)  
+*HARSH, about 75 seconds, including a short live demo if there's time*
 
 This is the working prototype, live at reachnt dot vercel dot app.
 On the left is the coordinator's week: each hexagon is a community, the number is repairs waiting, green means a tradesperson goes this week, and the blue lines are shared trips.
-[Live demo, keep it short: tap a community; open Compare and show the four plans; switch to Tenant and show the timeline.]
-On the right, the same app on a phone. The tradesperson gets a numbered run sheet that works out bush with no signal, and the tenant sees their repair, every week it waited, and the real reason.*
+[Live demo, keep it short: New report, log "toilet blocked pls come" from the housing officer and answer the questions; on the job, show the time left and Check the urgency; switch to Tenant and show the timeline.]
+On the phone, the tradesperson gets a run sheet that works with no signal and can take open jobs, and the tenant sees every week their repair waited, and why.
 
+### 11. People stay in charge  
+*AASHISH, about 45 seconds*
 
+Because this affects people's homes, people stay in charge.
+A named coordinator signs how much cost counts.
+Urgency can change any time, so a person can change it: on a call, on site, from a photo. The computer never makes danger less urgent.
+If a tradesperson couldn't do a job, it's never closed. The coordinator sends it to the next trip, another crew, or anyone who can go sooner, and it keeps its waiting time.
+Tenants can ask for a review or say it got worse, and personal details stay in an encrypted vault.
 
-### 10. People stay in charge  
-*AASHISH, about 50 seconds*
-
-Because this affects people's homes, we built it so people stay in charge.
-A named coordinator signs how much cost is allowed to count, and that signature is kept.
-Tenants can ask for a review, and a person answers within ten working days.
-Every week a person re-reads a sample of what the AI read on its own, to catch mistakes early.
-A tradesperson can't close a job just by saying no one was home. They record when they came and what they tried, and the tenant is told.
-And personal details sit in an encrypted vault. Everywhere else, a house is just a hexagon on the map.*
-
-
-
-### 11. What we tested, and what we can't claim yet  
+### 12. What we tested, and what we can't claim yet  
 *HARSH, about 50 seconds*
 
 We want to be straight about what we've proven and what we haven't.
-On the left: we have eighty automated checks that run on every change, we tested five random years, we checked every community's location against satellite photos, and the site passes accessibility checks.
+On the left: we have ninety-two automated checks that run on every change, we tested five random years, we checked every community's location against satellite photos, and the site passes accessibility checks.
 On the right: the repair requests are synthetic, because no public repair data exists. The reader is tested in English only, and many tenants speak Kriol or Aboriginal English. And no community has reviewed this yet.
-That's why our first recommendation is about people, not code.*
+That's why our first recommendation is about people, not code.
 
-
-
-### 12. What we recommend  
+### 13. What we recommend  
 *AASHISH, about 40 seconds*
 
 Three recommendations.
-One: make the trade-off a signed decision. Publish the rules, and record who decides how much cost counts.
+One: make the trade-off a signed decision. Publish the rules, ask every tenant the same questions, and record who decides how much cost counts.
 Two: pilot it in one region, the Katherine hub's sixteen communities, and design it with tenants, Aboriginal Housing NT, land councils and interpreters.
-Three: test the AI on real words before it reads anything on its own.*
+Three: test the AI on real words before it reads anything on its own.
 
-
-
-### 13. Close  
+### 14. Close  
 *HARSH, about 20 seconds*
 
 To finish: where someone lives shouldn't decide how long they wait for water, power or a safe home.
 ReachNT fixes urgent remote repairs in days instead of months, for a cost we can see and name, and it makes someone own that choice.
-Thank you. We're happy to take questions.*
-
-
+Thank you. We're happy to take questions.
 
 ---
 
 ## Likely questions, and short answers
+
+**How do repair requests get into ReachNT? Does the coordinator type them in?**
+No. The tenant tells someone: the repairs line, their Community Housing Officer, the maintenance officer, a tradesperson, the front counter, or the app. That person logs the tenant's words in "New report" and asks the same six questions. The coordinator looks after the line, the trips and the checks. In our demo, the year of requests is synthetic; reports logged in the portal are validated by the server, and in production they go into the database.
+
+**What if a tradesperson can't do the job?**
+They record why: no one home, can't get in, need parts, needs another trade, or unsafe. "No one home" needs the time and what they tried. The job is never closed. The coordinator sends it to the next trip, a named crew, or offers it to any tradesperson of that trade on the panel; the first to accept gets it. It keeps its waiting time, and as its deadline nears it gets a boost onto the next trip. With 1 in 10 visits missing, ReachNT still fixed 9 in 10 missed urgent remote repairs within 20 days; cheapest-first took 126.
+
+**An urgency can change. Who updates it?**
+Any person, any time: when the tenant rings, when the housing officer or a tradesperson sees it, from a photo, or after a review. Raising it takes effect at once, and "dangerous" sends the maintenance officer that day. Lowering a dangerous repair needs someone who spoke to the tenant or saw it, and a reason the tenant can read. The computer can never lower it. Tenants and tradespeople can also press "it got worse", and a person calls back the same day.
+
+**Doesn't ranking by need still favour people who explain well?**
+That's what we fixed. Points for a baby, an elder or a crowded house used to come only from the tenant's words. Now everyone is asked the same questions, the tenancy record fills in household size, and the repair history fills in repeats. Saying less used to cost 19 points on average; now it costs about 2. When or how you report, your language and whether you use the app are never in the score, and a test fails if they ever are.
 
 **Is this real data?**
 The communities, house counts, roads, wet-season closures, airstrips, deadlines and costs are real or come from published sources. The repair requests are made up, because no public NT repair data exists. That's why we compare plans against each other rather than claim exact dollar figures.

@@ -140,7 +140,11 @@ def _ctx(N) -> dict:
     R, RT, CH = P["guarantee_0.2_h3"], P["guarantee_0.5_h3"], P["cheapest_1_h3"]
     band = lambda pol, b, k="urgent_p90": next(x for x in pol["bands"] if x["band"] == b)[k]
     Qr = (N.get("quality") or {}).get("reader", {})
-    return dict(N=N, Qr=Qr, P=P, C0=C0, G=G, F=F, N0=N0, L4=L4, R=R, RT=RT, CH=CH, band=band,
+    IN = N.get("inclusion", {})
+    MV = {}
+    for r in N.get("missed_visits", []):
+        MV.setdefault(r["key"], {})[0 if not r["share"] else 1] = r
+    return dict(N=N, Qr=Qr, IN=IN, MV=MV, P=P, C0=C0, G=G, F=F, N0=N0, L4=L4, R=R, RT=RT, CH=CH, band=band,
                 money=lambda x: f"${x:,.0f}", pct=lambda x: f"{x * 100:.0f}%",
                 d=lambda x: f"{x:.0f}", m=lambda x: f"${x / 1e6:.1f} million")
 

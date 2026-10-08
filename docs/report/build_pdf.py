@@ -8,6 +8,7 @@ and the footer, continuous page numbering. Arial is embedded.
 """
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -35,12 +36,16 @@ def _team() -> str:
 TEAM = _team()
 OUT = HERE / f"DataChallenge_{TEAM}_Report.pdf"   # organiser rule: DataChallenge_Team xx(number)_Report.pdf
 
-FD = "/System/Library/Fonts/Supplemental/"
-pdfmetrics.registerFont(TTFont("Arial", FD + "Arial.ttf"))
-pdfmetrics.registerFont(TTFont("Arial-Bold", FD + "Arial Bold.ttf"))
-pdfmetrics.registerFont(TTFont("Arial-Italic", FD + "Arial Italic.ttf"))
-pdfmetrics.registerFont(TTFont("Arial-BoldItalic", FD + "Arial Bold Italic.ttf"))
-pdfmetrics.registerFont(TTFont("CourierNew", FD + "Courier New.ttf"))
+# Arial is required by the organisers. macOS ships it; on Linux, point ARIAL_DIR at the Microsoft core fonts
+# (Arial.TTF, Arialbd.TTF, Ariali.TTF, Arialbi.TTF), e.g. /usr/share/fonts/truetype/msttcorefonts.
+FONT_SETS = [("/System/Library/Fonts/Supplemental/", ("Arial.ttf", "Arial Bold.ttf", "Arial Italic.ttf", "Arial Bold Italic.ttf")),
+             (os.environ.get("ARIAL_DIR", "/usr/share/fonts/truetype/msttcorefonts") + "/", ("Arial.ttf", "Arial_Bold.ttf", "Arial_Italic.ttf", "Arial_Bold_Italic.ttf")),
+             (os.environ.get("ARIAL_DIR", "/usr/share/fonts/truetype/arial") + "/", ("Arial.TTF", "Arialbd.TTF", "Ariali.TTF", "Arialbi.TTF"))]
+FD, FILES = next(((d, f) for d, f in FONT_SETS if all(Path(d, x).exists() for x in f)), (None, None))
+if FD is None:
+    raise SystemExit("Arial not found. Set ARIAL_DIR to a folder with the Arial TTF files.")
+for name, f in zip(("Arial", "Arial-Bold", "Arial-Italic", "Arial-BoldItalic"), FILES):
+    pdfmetrics.registerFont(TTFont(name, FD + f))
 pdfmetrics.registerFontFamily("Arial", normal="Arial", bold="Arial-Bold", italic="Arial-Italic", boldItalic="Arial-BoldItalic")
 
 INK = colors.HexColor("#1a1a1a"); MUTED = colors.HexColor("#555555"); ACCENT = colors.HexColor("#2a5b9a")
@@ -55,8 +60,8 @@ S = {
     "h2": ParagraphStyle("h2", fontName="Arial-Bold", fontSize=11, leading=14, textColor=INK, spaceBefore=6, spaceAfter=3, keepWithNext=1),
     "cap": ParagraphStyle("cap", fontName="Arial", fontSize=10, leading=12.5, textColor=MUTED, spaceAfter=10),
     "tcap": ParagraphStyle("tcap", fontName="Arial", fontSize=10, leading=12.5, textColor=MUTED, spaceAfter=3, keepWithNext=1),
-    "cell": ParagraphStyle("cell", fontName="Arial", fontSize=9, leading=10.8, textColor=INK),
-    "cellh": ParagraphStyle("cellh", fontName="Arial-Bold", fontSize=9, leading=10.8, textColor=INK),
+    "cell": ParagraphStyle("cell", fontName="Arial", fontSize=10, leading=12, textColor=INK),
+    "cellh": ParagraphStyle("cellh", fontName="Arial-Bold", fontSize=10, leading=12, textColor=INK),
     "ref": ParagraphStyle("ref", fontName="Arial", fontSize=10, leading=12.5, textColor=INK, leftIndent=0.8 * cm, firstLineIndent=-0.8 * cm, spaceAfter=3),
     "num": ParagraphStyle("num", fontName="Arial", fontSize=11, leading=13.8, textColor=INK, leftIndent=0.7 * cm, firstLineIndent=-0.7 * cm, spaceAfter=4),
     "code": ParagraphStyle("code", fontName="Arial", fontSize=10, leading=12.5, textColor=INK),

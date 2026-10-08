@@ -159,6 +159,10 @@ SENSITIVITY_SENTENCE
 
 We described 3,000 synthetic households in full and in a few words. From the words alone, the short telling lost {{IN['words']['gap_mean']:.0f}} points on average, ranked lower {{pct(IN['words']['short_ranked_lower'])}} of the time, and only {{pct(IN['words']['vulnerable_recognised_short'])}} of vulnerable households were recognised. With the standard questions it lost {{IN['intake']['gap_mean']:.1f}} and ranked lower {{pct(IN['intake']['short_ranked_lower'])}} of the time (unanswered questions, assumed 1 in 10); {{pct(IN['intake']['vulnerable_recognised_short'])}} were recognised. When 1 in 10 booked visits missed, ReachNT still fixed 9 in 10 of the missed urgent remote repairs within {{d(MV['guarantee_0.2_h3'][1]['urgent_remote_missed_p90'])}} days, against {{d(MV['cheapest_1'][1]['urgent_remote_missed_p90'])}} under cheapest-first, because a missed job keeps its clock and gets the deadline boost. Misses cost ReachNT {{money(MV['guarantee_0.2_h3'][1]['cost_per_job'] - MV['guarantee_0.2_h3'][0]['cost_per_job'])}} per repair and moved its remote urgent 90th percentile from {{d(MV['guarantee_0.2_h3'][0]['urgent_p90_remote'])}} to {{d(MV['guarantee_0.2_h3'][1]['urgent_p90_remote'])}} days.
 
+## 3.9 Fixes that didn't hold, trades together, and floods
+
+A repair the tenant says is still broken reopens with {{RW}} rework points and keeps its first day, so the deadline boost puts it on the next trip. Different trades booked to the same community in the same week can share one ute or charter: counted after planning, that saved ReachNT a further {{money(JT['guarantee_0.2_h3']['cost_per_job'] - JT['guarantee_0.2_h3']['cost_per_job_joint'])}} per repair. In a modelled flood of Kalkarindji, Daguragu and Pigeon Hole ({{DZ['Flood, usual crews']['event_jobs']}} repairs, roads cut for four weeks), the usual crews fixed 9 in 10 urgent flood repairs within {{d(DZ['Flood, usual crews']['event_urgent_p90'])}} days, and the rest of the hub slipped from {{d(DZ['No flood']['other_urgent_p90'])}} to {{d(DZ['Flood, usual crews']['other_urgent_p90'])}}; with surge crews from the panel both stayed at {{d(DZ['Flood, surge crews']['event_urgent_p90'])}}.
+
 # 4 Discussion
 
 ## 4.1 Ethical impacts
@@ -187,7 +191,7 @@ The requests are synthetic, so absolute numbers are illustrations and the compar
 
 **For contractors and industry:**
 5. Log a reason for every week a job waits and evidence for every missed visit, so cost decisions can be told apart from capacity shortfalls and a missed job is reassigned without losing its place.
-6. Price charters, batching and shared trips into contracts, and train local tradespeople in the communities that wait longest.
+6. Price charters, shared trips, trades travelling together and a disaster surge panel into contracts, and train local tradespeople in the communities that wait longest.
 
 **For communities and their organisations:**
 7. Co-design the tenant answer, the intake questions and the fault vocabulary in local languages with tenants, Aboriginal Housing NT and the Aboriginal Interpreter Service, under ethics approval and land council research permits.
@@ -304,5 +308,9 @@ TABLE: Table I1. What used to disadvantage a tenant, and what ReachNT does inste
 | Unchecked machine decisions | A person can raise or confirm urgency at any time, from a call, a visit, a photo or a review. Lowering a dangerous repair needs someone who spoke to the tenant or saw the fault, and a reason the tenant reads. The reader can never lower danger. Enforced in the portal, the server and a database constraint. |
 
 **When time runs short.** The planner values a job by its need points, adds 400 when its clock ends within 7 days and, under ReachNT, 6,000 more for an urgent or dangerous job, which puts it on the next trip. The coordinator sees the time left and this arithmetic on every waiting repair.
+
+**Tenants without the app.** The Community Housing Officer has their own view: they log reports with the same questions and record what a tenant tells them (fixed, still broken, it got worse, a review), only for their own communities, each marked as recorded for the tenant. "Still broken" reopens the job with rework points and its first day.
+
+**Floods, cyclones and fires.** The coordinator declares an event over the communities hit. The portal plans the response (make every house safe within 48 hours, one team trip with the trades needed, surge crews from the contractor panel, a message to every household) and tags every job from the area, while need still sets the order and other communities keep their trips.
 
 **When a visit misses.** The tradesperson records why ("No one home" and "Can't get in" need the time and what was tried). The job never closes. The coordinator sends it to the next trip, a named crew, or opens it to any contractor of that trade on the panel, including local Aboriginal Business Enterprises, where the first to accept gets it; "Needs another trade" changes the trade. A tenant or tradesperson can say it got worse, by phone, through the housing officer or in the app; a person calls back that day and records an urgency check. The tenant's timeline shows each check and each reassignment.

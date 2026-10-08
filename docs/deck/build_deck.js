@@ -12,6 +12,8 @@ const N = JSON.parse(fs.readFileSync(path.join(ROOT, "outputs", "numbers.json"),
 const EX = JSON.parse(fs.readFileSync(path.join(ROOT, "outputs", "deck_example.json"), "utf8"));
 const SHOT = (n) => path.join(ROOT, "docs", "deck", "shots", n + ".png");
 const P = N.policies, Q = N.quality, IN = N.inclusion;
+const JT = Object.fromEntries((N.joint_trips || []).map((r) => [r.key, r])), DZ = Object.fromEntries((N.disaster || []).map((r) => [r.label, r]));
+const togetherSaving = JT["guarantee_0.2_h3"] ? JT["guarantee_0.2_h3"].cost_per_job - JT["guarantee_0.2_h3"].cost_per_job_joint : 0;
 const C0 = P["cheapest_1"], G = P["guarantee_0.2"], R = P["guarantee_0.2_h3"];
 const money = (x) => "$" + Math.round(x).toLocaleString("en-AU");
 const pct = (x) => Math.round(x * 100) + "%";
@@ -94,11 +96,10 @@ hexIcon(s, 0.95, 4.95, 0.9, HEX.cost, "!", "story-hex", 26);
 text(s, "A real kind of message, from our simulated year", { x: 2.15, y: 4.8, w: 10.2, h: 0.35, fontSize: 13, color: HEX.muted, bold: true, objectName: "story-label" });
 text(s, `“${EX.short.split("\n")[0]}”`, { x: 2.15, y: 5.15, w: 10.2, h: 0.5, fontSize: 18, bold: true, color: HEX.ink, objectName: "story-sms" });
 text(s, EX.why, { x: 2.15, y: 5.65, w: 10.2, h: 0.85, fontSize: 15, color: HEX.ink2, objectName: "story-why" });
-s.addNotes(`[AASHISH, about 50 seconds]
+s.addNotes(`[AASHISH, about 40 seconds]
 Here's the problem in four numbers.
 There are ${N.communities} remote communities in our model, with about ${(Math.round(N.remote_houses / 100) * 100).toLocaleString()} public houses.
-Repairs there cost far more. Government research found emergency repairs in very remote communities cost eight and a half times as much, and travel can be almost the whole bill.
-Katherine's tradespeople, for example, drive up to six hours to reach some communities.
+Emergency repairs in very remote communities cost eight and a half times as much, and travel can be almost the whole bill. Katherine's tradespeople drive up to six hours.
 So here is the kind of message a tenant gets from our simulation: no water to the house, waited ${EX.short.match(/Waiting (\\d+) days/) ? EX.short.match(/Waiting (\\d+) days/)[1] : "57"} days, held up by travel cost. Notice the last line: nobody signed off on that. It just happened.`);
 
 // ================================================================ 3 why it happens
@@ -142,12 +143,12 @@ steps.forEach(([n, h, b, col], i) => {
 });
 text(s, "One tool, three views: the coordinator plans, the tradesperson gets a run sheet that works without signal, and the tenant gets a straight answer.",
   { x: 0.6, y: 6.3, w: 12.1, h: 0.5, fontSize: 16, italic: true, color: HEX.ink2, objectName: "views" });
-s.addNotes(`[HARSH, about 50 seconds]
+s.addNotes(`[HARSH, about 40 seconds]
 Thanks Aashish. ReachNT does four things.
-One: it reads the repair report the way the tenant said it, and works out the fault and how urgent it is. If it isn't sure, a person calls back.
-Two: it ranks repairs by need alone. Danger, health, who lives in the house, how long they've waited. Where you live is never part of your score.
-Three: every week it plans the trips. And when two communities are close, one tradesperson visits both on one trip. That's where H3 comes in, which I'll come back to.
-Four: cost still matters, but a named person has to sign how much it counts. And every tenant can see why their repair is where it is.`);
+One: it reads the report the way the tenant said it. If it isn't sure, a person calls back.
+Two: it ranks repairs by need alone. Where you live is never part of your score.
+Three: every week it plans the trips, and close communities share one trip.
+Four: a named person signs how much cost counts, and every tenant can see why their repair is where it is.`);
 
 // ================================================================ 5 the AI that knows when to ask
 pres.addSection({ title: "Technology" });
@@ -170,10 +171,10 @@ stat(s, 7.5, 3.65, 2.5, H.danger.roc_auc.toFixed(2), "ROC-AUC for the model alon
 stat(s, 10.2, 3.65, 2.5, pct(N.reader.heldout.combined.to_person), "of unfamiliar reports sent to a person", HEX.cost, "s-person", 40);
 text(s, "We never show tenants a confidence percentage: when the model said it was 90% sure, it was right about half the time. Being honest about that is part of the design.",
   { x: 7.5, y: 5.6, w: 5.2, h: 1.1, fontSize: 14, italic: true, color: HEX.ink2, objectName: "honest" });
-s.addNotes(`[HARSH, about 60 seconds]
+s.addNotes(`[HARSH, about 50 seconds]
 Now the AI. Tenants don't fill in forms. They say things like "no sparks now but the switch is black and the kids touch it".
-ReachNT reads that with two methods: word rules for phrases we know, and a learning model for wording the rules miss.
-The key design choice is that it knows when to ask. If it's unsure, or anything sounds dangerous, a person checks the same day. And it never downgrades danger on its own. In that example, "no sparks" doesn't make it safe.
+ReachNT reads that with word rules and a learning model for wording the rules miss.
+The key design choice: if it's unsure, or anything sounds dangerous, a person checks the same day, and it never downgrades danger on its own.
 We tested it on wording it had never seen. The model alone is decent, a ROC-AUC of ${H.danger.roc_auc.toFixed(2)}. With the person in the loop, the system caught ${(H.danger.net_recall * 100).toFixed(1)} percent of dangerous reports.
 And we're honest about its limits: its confidence isn't reliable, so we never show tenants a percentage.`);
 
@@ -242,11 +243,11 @@ uses.forEach(([h, b, col], i) => {
   text(s, h, { x: 7.85, y, w: 4.85, h: 0.4, fontSize: 17, bold: true, color: HEX.ink, objectName: `use-h-${i}` });
   text(s, b, { x: 7.85, y: y + 0.42, w: 4.85, h: 0.8, fontSize: 14, color: HEX.ink2, objectName: `use-b-${i}` });
 });
-s.addNotes(`[AASHISH, about 50 seconds]
+s.addNotes(`[AASHISH, about 40 seconds]
 This was my favourite decision. Early on I suggested Uber's H3, an open-source map grid made of hexagons, and Harsh built the whole system around it.
 Why hexagons? The middle square has neighbours at two different distances, the sides and the corners. A hexagon's six neighbours are all the same distance away.
 So "within two hexagons" means the same distance in every direction, and the rule for sharing a trip treats every community the same.
-And one grid does four jobs: shared trips, a house stored as a hexagon instead of an address, waiting times published by area without exposing any household, and the maps and "nearby jobs" list for tradespeople.`);
+And one grid does four jobs: shared trips, privacy, public numbers by area, and the maps.`);
 
 // ================================================================ 8 planning + shared trips
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Technology" });
@@ -264,14 +265,15 @@ s.addShape(pres.shapes.LINE, { x: 5.35, y: 2.6, w: 1.05, h: 1.25, flipV: true, l
 s.addShape(pres.shapes.LINE, { x: 6.9, y: 2.95, w: 0.45, h: 1.45, line: { color: HEX.hex, width: 2.5 }, objectName: "run-l2" });
 s.addShape(pres.shapes.LINE, { x: 5.35, y: 4.1, w: 1.65, h: 0.6, line: { color: HEX.hex, width: 2.5 }, objectName: "run-l3" });
 text(s, "One loop: hub → A → B → hub", { x: 4.4, y: 5.3, w: 3.6, h: 0.35, fontSize: 13, color: HEX.hex, bold: true, objectName: "run-note" });
-text(s, "Google OR-Tools (CP-SAT) chooses which communities get a visit and which jobs are done, within each tradesperson's 40 hours, road closures and airstrips.",
-  { x: 0.6, y: 5.85, w: 7.4, h: 0.85, fontSize: 14, color: HEX.ink2, objectName: "ortools" });
+text(s, [{ text: "Google OR-Tools (CP-SAT) chooses which communities get a visit and which jobs are done, within each tradesperson's 40 hours, road closures and airstrips. ", options: { color: HEX.ink2 } },
+         { text: `Trades going to the same place travel together: a further ${money(togetherSaving)} off every repair.`, options: { color: HEX.ink, bold: true } }],
+  { x: 0.6, y: 5.75, w: 7.4, h: 0.95, fontSize: 14, objectName: "ortools" });
 stat(s, 8.7, 1.65, 4.0, money(G.cost_per_job - R.cost_per_job), "saved per repair by shared trips, against the same plan without them", HEX.hex, "s-saved");
 stat(s, 8.7, 3.4, 4.0, pct(1 - R.harm_days_total / G.harm_days_total), "fewer days households live with a fault, because the saving buys more visits", HEX.good, "s-share-harm");
 stat(s, 8.7, 5.15, 4.0, (PL.optimal_share * 100).toFixed(1) + "%", `of ${PL.plans.toLocaleString()} weekly plans proved the best possible, in milliseconds`, HEX.violet, "s-optimal", 40);
 s.addNotes(`[HARSH, about 35 seconds]
 Every week Google's OR-Tools plans the trips around crew hours, road closures and airstrips. A job running out of time gets a boost onto the next trip.
-Instead of two trips out and back, one tradesperson does one loop, and H3 tells us which pairs are close enough.
+Instead of two trips out and back, one tradesperson does one loop, and H3 tells us which pairs are close enough. And a plumber and an electrician going to the same place share the ute or the plane.
 That saves about ${money(G.cost_per_job - R.cost_per_job)} on every repair, and because the savings buy more visits, households spend ${pct(1 - R.harm_days_total / G.harm_days_total)} fewer days living with faults.
 And it's fast: the solver proved ${(PL.optimal_share * 100).toFixed(1)} percent of over ${Math.floor(PL.plans / 1000)} thousand weekly plans to be the best possible plan.`);
 
@@ -297,13 +299,47 @@ text(s, `It held in all five random years we tested: ${pct(PR.fault_days_cut_vs_
   { x: 7.55, y: 5.0, w: 5.0, h: 0.95, fontSize: 15, color: HEX.ink2, objectName: "years" });
 text(s, `One simulated year on real NT geography: ${N.requests.toLocaleString()} synthetic repair requests, ${N.communities} communities, 5 trade hubs.`, { x: 0.6, y: 6.3, w: 12.1, h: 0.4, fontSize: 13, color: HEX.muted, objectName: "basis" });
 s.addNotes(`[HARSH, about 50 seconds]
-So what does it buy? We ran a year of ${N.requests.toLocaleString()} made-up requests over the real Territory: real communities, roads, closures and costs.
+So what does it buy? A year of ${N.requests.toLocaleString()} made-up requests over the real Territory.
 Planning for the cheapest jobs costs ${money(C0.cost_per_job)} a repair. ReachNT costs ${money(R.cost_per_job)}. About ${pct(R.cost_per_job / C0.cost_per_job - 1)} more.
 For that, nine in ten urgent remote repairs are fixed within ${Math.round(R.urgent_p90_remote)} days instead of ${Math.round(C0.urgent_p90_remote)}, and households live with faults for ${pct(1 - R.harm_days_total / C0.harm_days_total)} fewer days. That's the chart.
 We didn't trust one lucky year, so we ran five. The result held every time.
 We're not saying cost doesn't matter. We're saying the trade-off should be visible, priced, and signed by a person.`);
 
-// ================================================================ 10 product
+// ================================================================ 10 floods and cyclones
+s = pres.addSlide({ masterName: "Content", sectionTitle: "Results" });
+s.addText("Floods: surge crews, not other communities' trades", { placeholder: "title" });
+const fl = DZ["Flood, usual crews"] || {}, fsu = DZ["Flood, surge crews"] || {}, f0 = DZ["No flood"] || {};
+const resp = [["Make every house safe within 48 hours", "Maintenance and housing officers check each one; danger is made safe that day", HEX.bad],
+              ["One team, one trip", "Plumber, electrician, carpenter and maintenance share the vehicle or the plane", HEX.hex],
+              ["Surge crews from the contractor panel", "Local Aboriginal Business Enterprises first; a named person signs the request", HEX.violet],
+              ["Tell every household", "Hotline, housing officer, free interpreters; every report tagged to the event", HEX.good]];
+resp.forEach(([h, b, col], i) => {
+  const y = 1.55 + i * 1.08;
+  hexIcon(s, 0.6, y + 0.06, 0.56, col, undefined, `resp-hex-${i}`);
+  text(s, h, { x: 1.4, y, w: 6.2, h: 0.38, fontSize: 17, bold: true, color: HEX.ink, objectName: `resp-h-${i}` });
+  text(s, b, { x: 1.4, y: y + 0.4, w: 6.2, h: 0.5, fontSize: 14, color: HEX.ink2, objectName: `resp-b-${i}` });
+});
+card(s, 7.9, 1.55, 4.8, 4.75, HEX.soft, "flood-card");
+text(s, "Modelled flood: Kalkarindji, Daguragu, Pigeon Hole", { x: 8.15, y: 1.7, w: 4.3, h: 0.4, fontSize: 14, bold: true, color: HEX.ink, objectName: "flood-h" });
+text(s, `${fl.event_jobs || 94} repairs, roads cut for 4 weeks (like January 2023). 9 in 10 urgent repairs fixed within:`, { x: 8.15, y: 2.1, w: 4.3, h: 0.7, fontSize: 13, color: HEX.ink2, objectName: "flood-sub" });
+const frow = (y, label, a, b, name) => {
+  text(s, label, { x: 8.15, y, w: 4.3, h: 0.35, fontSize: 14, bold: true, color: HEX.ink, objectName: name + "-l" });
+  [[a, "usual crews", HEX.cost, 8.15], [b, "surge crews", HEX.good, 10.35]].forEach(([v, l, col, x], k) => {
+    text(s, `${Math.round(v)} days`, { x, y: y + 0.36, w: 2.1, h: 0.5, fontSize: 26, bold: true, fontFace: "Arial", color: col, objectName: `${name}-n${k}` });
+    text(s, l, { x, y: y + 0.84, w: 2.1, h: 0.3, fontSize: 12, color: HEX.muted, objectName: `${name}-u${k}` });
+  });
+};
+frow(2.85, "In the flooded communities", fl.event_urgent_p90 || 15, fsu.event_urgent_p90 || 3, "fl-event");
+frow(4.1, `Everywhere else in the hub (${Math.round(f0.other_urgent_p90 || 3)} with no flood)`, fl.other_urgent_p90 || 10, fsu.other_urgent_p90 || 3, "fl-other");
+text(s, "Every dangerous fault was made safe the day it was reported.", { x: 8.15, y: 5.5, w: 4.3, h: 0.7, fontSize: 13, italic: true, color: HEX.ink2, objectName: "fl-safe" });
+text(s, "Need still sets the order inside the flooded area. The question for fairness is everyone else: without surge crews, the flood quietly takes their trades.",
+  { x: 0.6, y: 6.05, w: 7.0, h: 0.75, fontSize: 13.5, italic: true, color: HEX.ink2, objectName: "fl-foot" });
+s.addNotes(`[AASHISH, about 35 seconds]
+Floods and cyclones hit whole communities at once. The coordinator declares an event: every house made safe within 48 hours, one team trip with all the trades, and surge crews from the contractor panel.
+We modelled a flood like January 2023 at Kalkarindji. With the usual crews, flood repairs took ${Math.round(fl.event_urgent_p90 || 15)} days, and everyone else in the region slipped from ${Math.round(f0.other_urgent_p90 || 3)} to ${Math.round(fl.other_urgent_p90 || 10)}.
+With surge crews, both stayed at ${Math.round(fsu.event_urgent_p90 || 3)} days. A disaster shouldn't quietly take other communities' trades.`);
+
+// ================================================================ 11 product
 pres.addSection({ title: "Product" });
 s = pres.addSlide({ masterName: "Shot", sectionTitle: "Product" });
 s.addText("Live now, on a real satellite map, and on any phone", { placeholder: "title" });
@@ -319,13 +355,13 @@ const feats = ["Anyone the tenant tells can log a report, with the same question
                "Plain words, WCAG 2.2 AA checked, PDFs, no confidence percentages"];
 feats.forEach((f, i) => text(s, f, { x: 8.55, y: 4.85 + i * 0.62, w: 4.2, h: 0.6, fontSize: 13, color: "E3E7EB", bullet: true, objectName: `feat-${i}` }));
 text(s, "reachnt.vercel.app", { x: 0.6, y: 6.3, w: 7.6, h: 0.4, fontSize: 16, bold: true, color: "64D2FF", objectName: "shot-url" });
-s.addNotes(`[HARSH, about 75 seconds, including a short live demo if there's time]
+s.addNotes(`[HARSH, about 65 seconds, including a short live demo if there's time]
 This is the working prototype, live at reachnt dot vercel dot app.
 On the left is the coordinator's week: each hexagon is a community, the number is repairs waiting, green means a tradesperson goes this week, and the blue lines are shared trips.
-[Live demo, keep it short: New report, log "toilet blocked pls come" from the housing officer and answer the questions; on the job, show the time left and Check the urgency; switch to Tenant and show the timeline.]
-On the phone, the tradesperson gets a run sheet that works with no signal and can take open jobs, and the tenant sees every week their repair waited, and why.`);
+[Live demo, keep it short: Housing officer view, record "still broken" for a tenant; Coordinator, Checks, send it to another crew; Tenant timeline.]
+On the phone, tradespeople get a run sheet that works with no signal, and tenants see every week their repair waited, and why.`);
 
-// ================================================================ 11 trust
+// ================================================================ 12 trust
 pres.addSection({ title: "Trust" });
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Trust" });
 s.addText("People stay in charge, and tenants can push back", { placeholder: "title" });
@@ -333,7 +369,7 @@ shot(s, "tenant_phone", 0.6, 1.45, 2.4, 5.2, "trust-phone");
 const trust = [["A named person signs the trade-off", "How much cost may count is a signed decision, kept in a tamper-evident record", HEX.cost],
                ["A person can change urgency at any time", "From a call, a visit, a photo or a review. Lowering danger needs someone who spoke to the tenant or saw it", HEX.bad],
                ["A missed visit is never closed, and keeps its place", "Time and what was tried are recorded; then the next trip, another crew, or anyone who can go sooner", HEX.good],
-               ["Tenants can ask for a review, or say it got worse", "A person answers a review within 10 working days, and calls back the same day if it got worse", HEX.violet],
+               ["No app needed: the housing officer acts for the tenant", "Fixed, still broken, got worse or a review. A fix that didn't hold moves up the line", HEX.violet],
                ["People check the AI every week", "1 in 20 reports the computer read alone is re-read by a person", HEX.hex],
                ["Personal details locked away", "Names, phones and addresses in an encrypted vault; the house is just a hexagon", HEX.ink]];
 trust.forEach(([h, b, col], i) => {
@@ -347,14 +383,14 @@ Because this affects people's homes, people stay in charge.
 A named coordinator signs how much cost counts.
 Urgency can change any time, so a person can change it: on a call, on site, from a photo. The computer never makes danger less urgent.
 If a tradesperson couldn't do a job, it's never closed. The coordinator sends it to the next trip, another crew, or anyone who can go sooner, and it keeps its waiting time.
-Tenants can ask for a review or say it got worse, and personal details stay in an encrypted vault.`);
+No app is needed: the housing officer can record anything for a tenant, and a fix that didn't hold moves up the line.`);
 
-// ================================================================ 12 honest limits
+// ================================================================ 13 honest limits
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Trust" });
 s.addText("What we tested, and what we can't claim yet", { placeholder: "title" });
 card(s, 0.6, 1.55, 5.85, 5.1, HEX.goodSoft, "tested-card");
 text(s, "Tested", { x: 0.9, y: 1.8, w: 5.3, h: 0.5, fontSize: 22, bold: true, fontFace: "Arial", color: HEX.good, objectName: "tested-h" });
-const tested = ["92 automated checks on every code change: data, the reader, fair intake, the planner, the server",
+const tested = ["98 automated checks on every code change: data, the reader, fair intake, the planner, the server",
                 "Five random years of requests; the result held in all five",
                 "Every community's position checked against satellite photos",
                 "Accessibility: 0 WCAG 2.2 AA issues in every view",
@@ -369,11 +405,11 @@ const limits = ["The repair requests and households are synthetic: no public NT 
 limits.forEach((t, i) => text(s, t, { x: 7.15, y: 2.45 + i * 1.0, w: 5.3, h: 0.95, fontSize: 15, color: HEX.ink, bullet: true, objectName: `limit-${i}` }));
 s.addNotes(`[HARSH, about 50 seconds]
 We want to be straight about what we've proven and what we haven't.
-On the left: we have ninety-two automated checks that run on every change, we tested five random years, we checked every community's location against satellite photos, and the site passes accessibility checks.
+On the left: we have ninety-eight automated checks that run on every change, we tested five random years, we checked every community's location against satellite photos, and the site passes accessibility checks.
 On the right: the repair requests are synthetic, because no public repair data exists. The reader is tested in English only, and many tenants speak Kriol or Aboriginal English. And no community has reviewed this yet.
 That's why our first recommendation is about people, not code.`);
 
-// ================================================================ 13 recommendations
+// ================================================================ 14 recommendations
 pres.addSection({ title: "Close" });
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Close" });
 s.addText("What we recommend", { placeholder: "title" });
@@ -393,7 +429,7 @@ One: make the trade-off a signed decision. Publish the rules, ask every tenant t
 Two: pilot it in one region, the Katherine hub's sixteen communities, and design it with tenants, Aboriginal Housing NT, land councils and interpreters.
 Three: test the AI on real words before it reads anything on its own.`);
 
-// ================================================================ 14 close
+// ================================================================ 15 close
 s = pres.addSlide({ masterName: "Dark", sectionTitle: "Close" });
 shot(s, "tenant_desk", 6.6, 0, 6.73, 7.5, "close-backdrop", { transparency: 30, sizing: { type: "cover", w: 6.73, h: 7.5 } });
 s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 7.2, h: 7.5, fill: { color: HEX.night }, line: { color: HEX.night }, objectName: "close-veil" });

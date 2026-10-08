@@ -144,7 +144,11 @@ def _ctx(N) -> dict:
     MV = {}
     for r in N.get("missed_visits", []):
         MV.setdefault(r["key"], {})[0 if not r["share"] else 1] = r
-    return dict(N=N, Qr=Qr, IN=IN, MV=MV, P=P, C0=C0, G=G, F=F, N0=N0, L4=L4, R=R, RT=RT, CH=CH, band=band,
+    JT = {r["key"]: r for r in N.get("joint_trips", [])}
+    DZ = {r["label"]: r for r in N.get("disaster", [])}
+    from reachnt.config import params
+    RW = params()["triage"]["rework_points"]
+    return dict(N=N, Qr=Qr, IN=IN, MV=MV, JT=JT, DZ=DZ, RW=RW, P=P, C0=C0, G=G, F=F, N0=N0, L4=L4, R=R, RT=RT, CH=CH, band=band,
                 money=lambda x: f"${x:,.0f}", pct=lambda x: f"{x * 100:.0f}%",
                 d=lambda x: f"{x:.0f}", m=lambda x: f"${x / 1e6:.1f} million")
 

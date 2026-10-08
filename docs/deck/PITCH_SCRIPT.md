@@ -41,7 +41,7 @@ And this is the kind of message a tenant gets in our simulation. Notice the last
 *AASHISH, about 35 seconds*
 
 Why? Because the obvious way to plan repairs is to fix the most jobs for your money.
-We simulated a whole year across the Territory. Planning for the cheapest jobs, town tenants get urgent repairs in 3 days. Remote tenants wait up to 62.
+We simulated a whole year across the Territory. Planning for the cheapest jobs, town tenants get urgent repairs in 3 days. Remote tenants wait up to 62, and longer in the hardest places.
 Nobody wrote a rule saying remote families wait. It's a side effect of chasing efficiency, and nobody is accountable for it. That's the gap we set out to close.
 
 ### 4. What ReachNT does  
@@ -100,7 +100,7 @@ The portal reads the NT Road Report and the Bureau of Meteorology, so heavy rain
 *HARSH, about 60 seconds, including a 40-second live demo*
 
 This is the working prototype, live at reachnt dot vercel dot app. Each hexagon is a community, the number is repairs waiting, and the blue lines are shared trips.
-[Live demo, 40 seconds, practised beforehand: Tradesperson, tap Done on the first card. Housing officer, Ngukurr, the same house: "Still broken", Record. Coordinator, Checks, "Choose a crew", Send. Tenant: it opens on that repair, showing the reopened timeline.]
+[Live demo, 40 seconds, practised beforehand (Early Feb, ReachNT plan): Tradesperson (plumber), tap Done on the first card, Binjari house 29. Housing officer, switch community to Binjari, house 29: "Still broken", Record. Coordinator, Checks, scroll to "Tenant says it's still broken", "Choose a crew", pick crew B, Send. Tenant: it opens on that repair, showing the reopened timeline.]
 Tradespeople get a run sheet that works with no signal, and tenants see every week their repair waited, and why.
 
 ### 12. People stay in charge  
@@ -165,7 +165,7 @@ The NT Road Report's public feed for closures and flooding, and Bureau of Meteor
 That's what we fixed. Points for who lives there (Tier 1 or Tier 2) or a crowded house used to come only from the tenant's words. Now everyone is asked the same questions, the tenancy record fills in household size, and the repair history fills in repeats. Saying less used to cost 50 points on average; now it costs about 5, and an unanswered question gets a call-back. When or how you report, your language and whether you use the app are never in the score, and a test fails if they ever are.
 
 **Is this real data?**
-The communities, house counts, roads, wet-season closures, airstrips, deadlines and costs are real or come from published sources. The repair requests are made up, because no public NT repair data exists. That's why we compare plans against each other rather than claim exact dollar figures.
+The communities, house counts, roads, wet-season closures, airstrips and deadlines are real or published. The costs are our assumptions, calibrated to the Nous 2017 cost study. The repair requests are made up, because no public NT repair data exists. That's why we compare plans against each other rather than claim exact dollar figures.
 
 **Where is the AI?**
 Two places. A learning model, working with word rules, reads free-text reports and decides the fault and how urgent it is. An optimiser, Google OR-Tools, plans each week's trips. The portal's New report tab uses the published word rules; the learning model runs in the engine. We kept the AI where it helps and put people where judgement matters.

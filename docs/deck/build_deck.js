@@ -46,7 +46,7 @@ pres.title = "ReachNT"; pres.author = TEAM;
 pres.subject = "CDU IT Code Fair 2026, Artificial Intelligence Challenge: housing maintenance triage";
 pres.theme = { headFontFace: THEME.headFontFace, bodyFontFace: THEME.bodyFontFace };
 const C = pres.SchemeColor;
-const foot = `ReachNT · ${TEAM} · repair requests are synthetic; communities, roads and costs are real`;
+const foot = `ReachNT · ${TEAM} · requests synthetic; communities, roads and clocks real; costs assumed, calibrated to Nous 2017`;
 const darkFoot = `CDU IT Code Fair 2026 · Artificial Intelligence Challenge · ${TEAM}`;
 
 // ---------------------------------------------------------------- layouts
@@ -122,7 +122,7 @@ s.addChart(pres.charts.BAR, [{ name: "Days until 9 in 10 urgent repairs are fixe
   showTitle: true, title: "Cheapest jobs first: days until 9 in 10 urgent repairs are fixed", titleFontSize: 14, titleColor: HEX.ink, titleFontFace: "+mn-lt", objectName: "wait-chart" });
 card(s, 8.4, 1.6, 4.3, 2.35, HEX.costSoft, "trap-card");
 text(s, `${Math.round(C0.urgent_p90_remote)} days`, { x: 8.7, y: 1.8, w: 3.8, h: 0.8, fontSize: 44, bold: true, fontFace: "Arial", color: HEX.cost, objectName: "trap-n" });
-text(s, `for 9 in 10 urgent remote repairs, against ${Math.round(C0.urgent_p90_town)} days in town`, { x: 8.7, y: 2.65, w: 3.8, h: 1.0, fontSize: 16, color: HEX.ink, objectName: "trap-l" });
+text(s, `for 9 in 10 urgent remote repairs overall (longer in the hardest-to-reach places), against ${Math.round(C0.urgent_p90_town)} days in town`, { x: 8.7, y: 2.65, w: 3.8, h: 1.0, fontSize: 16, color: HEX.ink, objectName: "trap-l" });
 card(s, 8.4, 4.2, 4.3, 2.45, HEX.soft, "why-card");
 text(s, [{ text: "Why: ", options: { bold: true, color: HEX.ink } },
          { text: "a schedule built to fix the most jobs for the money always picks town first. It's efficient on paper, and no one ever decides that remote families should wait.", options: { color: HEX.ink2 } }],
@@ -192,7 +192,7 @@ s = pres.addSlide({ masterName: "Content", sectionTitle: "Technology" });
 s.addText("Fair to people who say less, or say it differently", { placeholder: "title" });
 shot(s, "intake", 0.6, 1.5, 2.65, 5.05, "shot-intake");
 const tell = [["Told in full", "“toilet blocked, my nana lives here, 9 of us, third time I rang”", HEX.soft],
-              ["Told in a few words, in Kriol, to the housing officer", "“toilet blocked pls come”. Same house, same need. From the words alone: up to 45 points less", HEX.costSoft]];
+              ["Told in a few words to the housing officer", "“toilet blocked pls come”. Same house, same need. From the words alone, this example loses 45 points", HEX.costSoft]];
 tell.forEach(([h, b, fill], i) => {
   const y = 1.5 + i * 1.55;
   card(s, 3.55, y, 4.75, 1.4, fill, `tell-${i}`);
@@ -291,7 +291,7 @@ And it's fast: the solver proved ${(PL.optimal_share * 100).toFixed(1)} percent 
 pres.addSection({ title: "Results" });
 s = pres.addSlide({ masterName: "Content", sectionTitle: "Results" });
 s.addText("Fairness costs a little more, and saves months of waiting", { placeholder: "title" });
-const plans = [["Cheapest first", C0, HEX.cost], ["Urgent first, no sharing", G, HEX.blue], ["ReachNT", R, HEX.hex]];
+const plans = [["Cheapest first", C0, HEX.cost], ["Cheapest first + urgent guarantee", P["floor_1"], HEX.blue], ["ReachNT", R, HEX.hex]];
 s.addChart(pres.charts.BAR, [{ name: "Days households lived with a fault (thousands)", labels: plans.map((p) => p[0]), values: plans.map((p) => Math.round(p[1].harm_days_total / 1000)) }], {
   x: 0.6, y: 1.5, w: 6.3, h: 4.6, barDir: "col", chartColors: plans.map((p) => p[2]), showValue: true, dataLabelPosition: "outEnd", dataLabelColor: HEX.ink,
   dataLabelFontSize: 16, dataLabelFontFace: "+mn-lt", dataLabelFormatCode: '0"k"', catAxisLabelColor: HEX.ink2, catAxisLabelFontSize: 14, catAxisLabelFontFace: "+mn-lt",

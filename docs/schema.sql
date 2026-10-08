@@ -576,7 +576,7 @@ GRANT INSERT ON ops.review_request TO tenant, housing_officer, intake_staff;
 GRANT UPDATE (answered_at, answered_by, outcome, answer_text) ON ops.review_request TO coordinator;
 GRANT SELECT ON ops.reader_audit TO coordinator, analyst, intake_staff;
 GRANT INSERT ON ops.reader_audit TO coordinator, intake_staff;
-GRANT SELECT ON ops.intake_answer TO coordinator, housing_officer, analyst, tenant, intake_staff, planner;
+GRANT SELECT ON ops.intake_answer TO coordinator, housing_officer, tenant, intake_staff;   -- health-related answers: analysts and the planner see only the derived ops.job.tier
 GRANT INSERT ON ops.intake_answer TO coordinator, housing_officer, intake_staff;
 GRANT SELECT ON ops.urgency_check TO coordinator, tradesperson, housing_officer, analyst, tenant, intake_staff;
 GRANT INSERT ON ops.urgency_check TO coordinator, housing_officer, intake_staff;

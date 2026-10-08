@@ -1,85 +1,85 @@
 key,label,band,jobs,urgent_median,urgent_p90,routine_median,overdue_equal,harm_days,open_at_end
-cheapest_1,Cheapest jobs first,Town,17431,2.0,3.0,1.0,0.20343285386196058,14748.075,0
-cheapest_1,Cheapest jobs first,Near town (road),3352,2.0,6.0,2.0,0.2781954887218045,4823.15,6
-cheapest_1,Cheapest jobs first,Remote (road),2925,10.0,69.0,8.0,0.7178729689807977,37109.95,152
-cheapest_1,Cheapest jobs first,Very remote (road),673,23.0,75.30000000000001,23.0,0.8805031446540881,11651.175000000001,56
-cheapest_1,Cheapest jobs first,"Remote, cut in the wet",7891,7.0,69.0,7.0,0.6348657985649747,97692.375,285
-cheapest_1,Cheapest jobs first,Island (fly-in),5236,8.0,71.0,9.0,0.6870607689127739,65852.325,337
-floor_1,Cheapest first + urgent guarantee,Town,17431,2.0,3.0,2.0,0.20186147709416172,19126.725,0
-floor_1,Cheapest first + urgent guarantee,Near town (road),3352,2.0,3.0,2.0,0.19486215538847118,4011.875,7
-floor_1,Cheapest first + urgent guarantee,Remote (road),2925,2.0,14.0,21.0,0.38774002954209746,18433.35,85
-floor_1,Cheapest first + urgent guarantee,Very remote (road),673,3.0,16.0,31.0,0.5534591194968553,4908.5,18
-floor_1,Cheapest first + urgent guarantee,"Remote, cut in the wet",7891,2.0,9.0,6.0,0.32022322614934895,29382.35,132
-floor_1,Cheapest first + urgent guarantee,Island (fly-in),5236,2.0,3.0,6.0,0.25051674245556016,11584.425,80
-official_0.2,"Need first, official remote allowance",Town,17431,2.0,3.0,2.0,0.20355372899794513,15738.274999999998,0
-official_0.2,"Need first, official remote allowance",Near town (road),3352,2.0,3.0,3.0,0.21428571428571427,5276.95,0
-official_0.2,"Need first, official remote allowance",Remote (road),2925,2.0,21.0,28.0,0.48522895125553916,15454.65,0
-official_0.2,"Need first, official remote allowance",Very remote (road),673,7.0,29.0,28.0,0.6729559748427673,4589.925,2
-official_0.2,"Need first, official remote allowance","Remote, cut in the wet",7891,2.0,14.0,9.0,0.36088227478076,26518.100000000002,0
-official_0.2,"Need first, official remote allowance",Island (fly-in),5236,2.0,6.0,7.0,0.2930963207937164,10996.675,12
-guarantee_0.2,Need first + urgent guarantee (ReachNT default),Town,17431,2.0,3.0,2.0,0.2022241025021153,22857.6,0
-guarantee_0.2,Need first + urgent guarantee (ReachNT default),Near town (road),3352,2.0,3.0,6.0,0.19611528822055138,6578.8,0
-guarantee_0.2,Need first + urgent guarantee (ReachNT default),Remote (road),2925,2.0,13.0,15.0,0.3744460856720827,14819.575,7
-guarantee_0.2,Need first + urgent guarantee (ReachNT default),Very remote (road),673,3.0,16.0,21.0,0.5157232704402516,3802.95,0
-guarantee_0.2,Need first + urgent guarantee (ReachNT default),"Remote, cut in the wet",7891,2.0,7.0,6.0,0.2960403933032155,21185.15,16
-guarantee_0.2,Need first + urgent guarantee (ReachNT default),Island (fly-in),5236,2.0,3.0,3.0,0.2170318313352625,7133.424999999999,8
-guarantee_0.5,"Need first + urgent guarantee, tighter budget",Town,17431,2.0,3.0,6.0,0.20319110358999154,26517.149999999998,0
-guarantee_0.5,"Need first + urgent guarantee, tighter budget",Near town (road),3352,2.0,3.0,7.0,0.19736842105263158,7019.549999999999,0
-guarantee_0.5,"Need first + urgent guarantee, tighter budget",Remote (road),2925,2.0,13.700000000000045,28.0,0.37370753323485967,16763.25,37
-guarantee_0.5,"Need first + urgent guarantee, tighter budget",Very remote (road),673,3.0,16.30000000000001,31.0,0.5188679245283019,4413.125,14
-guarantee_0.5,"Need first + urgent guarantee, tighter budget","Remote, cut in the wet",7891,2.0,7.0,10.0,0.29816635663034813,26124.899999999998,48
-guarantee_0.5,"Need first + urgent guarantee, tighter budget",Island (fly-in),5236,2.0,3.0,9.0,0.21951219512195122,10781.900000000001,52
-guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Town,17431,2.0,3.0,2.0,0.20234497763809983,21236.25,0
-guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Near town (road),3352,2.0,3.0,3.0,0.18984962406015038,5218.299999999999,0
-guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Remote (road),2925,2.0,8.700000000000045,10.0,0.3227474150664697,11610.4,4
-guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Very remote (road),673,2.0,14.0,16.0,0.46540880503144655,3098.7999999999997,2
-guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,"Remote, cut in the wet",7891,2.0,3.0,3.0,0.2697315971299495,16197.824999999999,7
-guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Island (fly-in),5236,2.0,3.0,3.0,0.21620504340636626,5749.475,7
-guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Town,17431,2.0,3.0,6.0,0.20343285386196058,24828.975,0
-guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Near town (road),3352,2.0,3.0,7.0,0.19047619047619047,5711.599999999999,0
-guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Remote (road),2925,2.0,8.0,20.0,0.31314623338257014,12421.599999999999,23
-guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Very remote (road),673,2.0,14.300000000000011,31.0,0.49056603773584906,3822.875,11
-guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)","Remote, cut in the wet",7891,2.0,3.0,9.0,0.27478076003188945,21193.449999999997,31
-guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Island (fly-in),5236,2.0,3.0,8.0,0.2170318313352625,8521.25,39
-cheapest_1_h3,Cheapest jobs first + H3 run zones,Town,17431,2.0,3.0,1.0,0.20367460413392965,14768.849999999999,0
-cheapest_1_h3,Cheapest jobs first + H3 run zones,Near town (road),3352,2.0,3.0,2.0,0.24686716791979949,4024.8999999999996,3
-cheapest_1_h3,Cheapest jobs first + H3 run zones,Remote (road),2925,6.0,41.0,3.0,0.6181683899556869,25507.7,87
-cheapest_1_h3,Cheapest jobs first + H3 run zones,Very remote (road),673,23.5,79.0,24.0,0.8647798742138365,12095.625,50
-cheapest_1_h3,Cheapest jobs first + H3 run zones,"Remote, cut in the wet",7891,3.0,59.0,3.0,0.5793250066436354,85282.375,208
-cheapest_1_h3,Cheapest jobs first + H3 run zones,Island (fly-in),5236,6.0,38.0,6.0,0.6056221579164944,41766.325,167
-need_0.8,"Need first, cost-aware (lam 0.8)",Town,17431,2.0,3.0,7.0,0.2039163544058987,21006.4,0
-need_0.8,"Need first, cost-aware (lam 0.8)",Near town (road),3352,2.0,3.0,8.0,0.224937343358396,5404.950000000001,12
-need_0.8,"Need first, cost-aware (lam 0.8)",Remote (road),2925,6.0,36.0,22.0,0.6100443131462334,22434.575,77
-need_0.8,"Need first, cost-aware (lam 0.8)",Very remote (road),673,15.0,56.0,34.0,0.7547169811320755,7697.025,17
-need_0.8,"Need first, cost-aware (lam 0.8)","Remote, cut in the wet",7891,3.0,36.0,16.0,0.5546106829657188,59846.87499999999,114
-need_0.8,"Need first, cost-aware (lam 0.8)",Island (fly-in),5236,6.0,38.0,17.0,0.6143034311699049,39863.125,148
-need_0.4,Need first (lam 0.4),Town,17431,2.0,3.0,3.0,0.20319110358999154,17892.800000000003,0
-need_0.4,Need first (lam 0.4),Near town (road),3352,2.0,3.0,6.0,0.2224310776942356,4206.15,0
-need_0.4,Need first (lam 0.4),Remote (road),2925,3.0,21.700000000000045,13.0,0.5110782865583456,13808.599999999999,14
-need_0.4,Need first (lam 0.4),Very remote (road),673,8.0,35.0,17.0,0.7169811320754716,4883.475,11
-need_0.4,Need first (lam 0.4),"Remote, cut in the wet",7891,2.0,19.400000000000546,8.0,0.418549030029232,31829.5,29
-need_0.4,Need first (lam 0.4),Island (fly-in),5236,2.0,14.0,8.0,0.4038859032658123,16696.55,47
-need_0.2,Need first (lam 0.2),Town,17431,2.0,3.0,2.0,0.2039163544058987,15919.4,0
-need_0.2,Need first (lam 0.2),Near town (road),3352,2.0,3.0,3.0,0.21804511278195488,4106.975,0
-need_0.2,Need first (lam 0.2),Remote (road),2925,2.0,22.0,9.0,0.49556868537666177,12626.25,0
-need_0.2,Need first (lam 0.2),Very remote (road),673,7.0,31.0,13.0,0.6666666666666666,4090.6250000000005,2
-need_0.2,Need first (lam 0.2),"Remote, cut in the wet",7891,2.0,14.0,6.0,0.36646292851448314,23010.325,0
-need_0.2,Need first (lam 0.2),Island (fly-in),5236,2.0,3.0,3.0,0.28317486564696154,8857.925,13
-need_0.1,Need first (lam 0.1),Town,17431,2.0,3.0,2.0,0.2039163544058987,15915.5,0
-need_0.1,Need first (lam 0.1),Near town (road),3352,2.0,3.0,3.0,0.22556390977443608,4219.924999999999,0
-need_0.1,Need first (lam 0.1),Remote (road),2925,2.0,21.0,9.0,0.4918759231905465,12286.175,0
-need_0.1,Need first (lam 0.1),Very remote (road),673,7.0,31.900000000000034,9.0,0.6761006289308176,4025.85,0
-need_0.1,Need first (lam 0.1),"Remote, cut in the wet",7891,2.0,10.0,3.0,0.34148285942067497,19822.125,0
-need_0.1,Need first (lam 0.1),Island (fly-in),5236,2.0,3.0,3.0,0.22902025630425796,6077.4,3
-need_0.05,Need first (lam 0.05),Town,17431,2.0,3.0,2.0,0.20452073008582133,16013.875,0
-need_0.05,Need first (lam 0.05),Near town (road),3352,2.0,3.0,3.0,0.22556390977443608,4226.75,0
-need_0.05,Need first (lam 0.05),Remote (road),2925,2.0,22.0,8.0,0.49926144756277696,12608.349999999999,0
-need_0.05,Need first (lam 0.05),Very remote (road),673,7.0,30.30000000000001,9.0,0.6729559748427673,4083.0,0
-need_0.05,Need first (lam 0.05),"Remote, cut in the wet",7891,2.0,10.0,3.0,0.33935689609354236,19047.0,0
-need_0.05,Need first (lam 0.05),Island (fly-in),5236,2.0,3.0,2.0,0.2277800744109136,5456.224999999999,0
-need_0,"Need first, cost ignored",Town,17431,2.0,3.0,2.0,0.2047624803577904,16143.624999999998,0
-need_0,"Need first, cost ignored",Near town (road),3352,2.0,3.0,3.0,0.2299498746867168,4359.9,0
-need_0,"Need first, cost ignored",Remote (road),2925,2.0,22.700000000000045,8.0,0.4963072378138848,12703.4,0
-need_0,"Need first, cost ignored",Very remote (road),673,7.0,30.30000000000001,9.0,0.6698113207547169,4071.4249999999993,0
-need_0,"Need first, cost ignored","Remote, cut in the wet",7891,2.0,10.0,3.0,0.3337762423598193,18236.225,0
-need_0,"Need first, cost ignored",Island (fly-in),5236,2.0,3.0,2.0,0.22033898305084745,4938.225,0
+cheapest_1,Cheapest jobs first,Town,17431,2.0,3.0,1.0,0.20348415194773772,14582.55,0
+cheapest_1,Cheapest jobs first,Near town (road),3352,2.0,6.0,2.0,0.2823086574654956,4949.3,7
+cheapest_1,Cheapest jobs first,Remote (road),2925,10.0,73.60000000000014,8.0,0.7158671586715867,38488.0,145
+cheapest_1,Cheapest jobs first,Very remote (road),673,22.0,74.19999999999999,23.0,0.8746081504702194,11393.825,50
+cheapest_1,Cheapest jobs first,"Remote, cut in the wet",7891,7.0,69.0,7.0,0.6355661881977671,97563.075,266
+cheapest_1,Cheapest jobs first,Island (fly-in),5236,8.0,70.0,10.0,0.6864931846344485,66166.5,307
+floor_1,Cheapest first + urgent guarantee,Town,17431,2.0,3.0,2.0,0.202153399467699,19304.325,0
+floor_1,Cheapest first + urgent guarantee,Near town (road),3352,2.0,3.0,2.0,0.19385194479297366,4028.4,6
+floor_1,Cheapest first + urgent guarantee,Remote (road),2925,2.0,14.0,17.0,0.388929889298893,17452.475,70
+floor_1,Cheapest first + urgent guarantee,Very remote (road),673,3.0,16.0,30.0,0.5517241379310345,4749.65,19
+floor_1,Cheapest first + urgent guarantee,"Remote, cut in the wet",7891,2.0,9.0,7.0,0.3229665071770335,28593.550000000003,101
+floor_1,Cheapest first + urgent guarantee,Island (fly-in),5236,2.0,3.0,6.0,0.24989673688558448,12671.95,79
+official_0.2,"Need first, official remote allowance",Town,17431,2.0,3.0,2.0,0.20300024195499636,15427.6,0
+official_0.2,"Need first, official remote allowance",Near town (road),3352,2.0,3.0,3.0,0.21455457967377667,5191.65,0
+official_0.2,"Need first, official remote allowance",Remote (road),2925,2.0,21.0,27.0,0.45977859778597785,14562.375,0
+official_0.2,"Need first, official remote allowance",Very remote (road),673,6.0,29.0,27.0,0.6520376175548589,4315.3,3
+official_0.2,"Need first, official remote allowance","Remote, cut in the wet",7891,2.0,13.0,9.0,0.35513024986709196,25696.525,0
+official_0.2,"Need first, official remote allowance",Island (fly-in),5236,2.0,6.0,8.0,0.2940933498554316,11433.95,9
+guarantee_0.2,Need first + urgent guarantee (ReachNT default),Town,17431,2.0,3.0,2.0,0.20251633196225502,22260.8,0
+guarantee_0.2,Need first + urgent guarantee (ReachNT default),Near town (road),3352,2.0,3.0,3.0,0.19573400250941028,6416.025,0
+guarantee_0.2,Need first + urgent guarantee (ReachNT default),Remote (road),2925,2.0,13.0,13.0,0.3726937269372694,13874.725,3
+guarantee_0.2,Need first + urgent guarantee (ReachNT default),Very remote (road),673,3.0,15.199999999999989,16.0,0.5360501567398119,3647.95,1
+guarantee_0.2,Need first + urgent guarantee (ReachNT default),"Remote, cut in the wet",7891,2.0,7.0,6.0,0.2934609250398724,20839.075,5
+guarantee_0.2,Need first + urgent guarantee (ReachNT default),Island (fly-in),5236,2.0,3.0,3.0,0.21685254027261464,7535.025,7
+guarantee_0.5,"Need first + urgent guarantee, tighter budget",Town,17431,2.0,3.0,6.0,0.20348415194773772,26153.424999999996,0
+guarantee_0.5,"Need first + urgent guarantee, tighter budget",Near town (road),3352,2.0,3.0,7.0,0.19636135508155583,7003.924999999999,0
+guarantee_0.5,"Need first + urgent guarantee, tighter budget",Remote (road),2925,2.0,13.0,23.0,0.3763837638376384,16011.075,31
+guarantee_0.5,"Need first + urgent guarantee, tighter budget",Very remote (road),673,3.0,15.0,28.0,0.5172413793103449,4060.05,11
+guarantee_0.5,"Need first + urgent guarantee, tighter budget","Remote, cut in the wet",7891,2.0,7.0,10.0,0.29797979797979796,25762.025,49
+guarantee_0.5,"Need first + urgent guarantee, tighter budget",Island (fly-in),5236,2.0,3.0,9.0,0.21933085501858737,10960.325,48
+guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Town,17431,2.0,3.0,2.0,0.2027582869586257,20780.375,0
+guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Near town (road),3352,2.0,3.0,3.0,0.18946047678795483,5195.125,0
+guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Remote (road),2925,2.0,8.0,9.0,0.3195571955719557,10845.724999999999,0
+guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Very remote (road),673,2.0,14.0,16.0,0.4890282131661442,3039.775,3
+guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,"Remote, cut in the wet",7891,2.0,3.0,3.0,0.27006911217437535,15904.55,3
+guarantee_0.2_h3,ReachNT: need first + urgent guarantee + H3 run zones,Island (fly-in),5236,2.0,3.0,3.0,0.21602643535729038,5924.7,8
+guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Town,17431,2.0,3.0,6.0,0.2037261069441084,24338.875,0
+guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Near town (road),3352,2.0,3.0,7.0,0.18883312421580928,5651.849999999999,0
+guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Remote (road),2925,2.0,8.0,16.0,0.3121771217712177,11620.849999999999,19
+guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Very remote (road),673,3.0,14.0,27.5,0.5078369905956113,3597.8499999999995,12
+guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)","Remote, cut in the wet",7891,2.0,3.0,9.0,0.27485380116959063,20840.549999999996,32
+guarantee_0.5_h3,"ReachNT, tighter budget (H3 run zones)",Island (fly-in),5236,2.0,3.0,8.0,0.21685254027261464,8777.95,35
+cheapest_1_h3,Cheapest jobs first + H3 run zones,Town,17431,2.0,3.0,1.0,0.20336317444955238,14622.15,0
+cheapest_1_h3,Cheapest jobs first + H3 run zones,Near town (road),3352,2.0,3.0,2.0,0.2547051442910916,4105.674999999999,3
+cheapest_1_h3,Cheapest jobs first + H3 run zones,Remote (road),2925,6.0,42.0,3.0,0.6177121771217712,25903.0,78
+cheapest_1_h3,Cheapest jobs first + H3 run zones,Very remote (road),673,22.0,75.19999999999999,24.0,0.8620689655172413,11407.075,53
+cheapest_1_h3,Cheapest jobs first + H3 run zones,"Remote, cut in the wet",7891,3.0,59.0,6.0,0.58160552897395,85629.175,206
+cheapest_1_h3,Cheapest jobs first + H3 run zones,Island (fly-in),5236,6.0,38.0,7.0,0.6047087980173482,41460.25,154
+need_0.8,"Need first, cost-aware (lam 0.8)",Town,17431,2.0,3.0,7.0,0.20433099443503508,20894.625,0
+need_0.8,"Need first, cost-aware (lam 0.8)",Near town (road),3352,2.0,3.0,8.0,0.2258469259723965,5383.125,12
+need_0.8,"Need first, cost-aware (lam 0.8)",Remote (road),2925,6.0,35.600000000000136,22.0,0.614760147601476,22356.75,68
+need_0.8,"Need first, cost-aware (lam 0.8)",Very remote (road),673,15.0,55.19999999999999,32.5,0.774294670846395,7400.5,14
+need_0.8,"Need first, cost-aware (lam 0.8)","Remote, cut in the wet",7891,3.0,36.0,17.0,0.5574162679425837,59664.7,91
+need_0.8,"Need first, cost-aware (lam 0.8)",Island (fly-in),5236,6.0,38.0,20.0,0.6171003717472119,40199.2,135
+need_0.4,Need first (lam 0.4),Town,17431,2.0,3.0,3.0,0.20348415194773772,17717.925,0
+need_0.4,Need first (lam 0.4),Near town (road),3352,2.0,3.0,6.0,0.2189460476787955,4246.775,0
+need_0.4,Need first (lam 0.4),Remote (road),2925,2.0,21.0,13.0,0.4797047970479705,12889.925,13
+need_0.4,Need first (lam 0.4),Very remote (road),673,8.0,35.19999999999999,17.0,0.7178683385579937,4793.475,11
+need_0.4,Need first (lam 0.4),"Remote, cut in the wet",7891,2.0,19.700000000000273,8.0,0.417331206804891,31105.625,31
+need_0.4,Need first (lam 0.4),Island (fly-in),5236,2.0,14.0,8.0,0.4072697232548534,16952.025,46
+need_0.2,Need first (lam 0.2),Town,17431,2.0,3.0,2.0,0.20421001693684976,15796.725,0
+need_0.2,Need first (lam 0.2),Near town (road),3352,2.0,3.0,3.0,0.2164366373902133,4135.85,0
+need_0.2,Need first (lam 0.2),Remote (road),2925,2.0,21.0,9.0,0.47306273062730625,11632.175,0
+need_0.2,Need first (lam 0.2),Very remote (road),673,6.0,29.0,13.0,0.64576802507837,3905.725,2
+need_0.2,Need first (lam 0.2),"Remote, cut in the wet",7891,2.0,13.0,6.0,0.361244019138756,22689.6,0
+need_0.2,Need first (lam 0.2),Island (fly-in),5236,2.0,3.0,3.0,0.28211482858323006,9252.075,10
+need_0.1,Need first (lam 0.1),Town,17431,2.0,3.0,2.0,0.20421001693684976,15853.875,0
+need_0.1,Need first (lam 0.1),Near town (road),3352,2.0,3.0,3.0,0.2233375156838143,4192.225,0
+need_0.1,Need first (lam 0.1),Remote (road),2925,2.0,20.0,8.0,0.46789667896678966,11484.599999999999,0
+need_0.1,Need first (lam 0.1),Very remote (road),673,6.0,30.0,9.0,0.658307210031348,3811.125,0
+need_0.1,Need first (lam 0.1),"Remote, cut in the wet",7891,2.0,10.0,3.0,0.3322700691121744,19429.375,0
+need_0.1,Need first (lam 0.1),Island (fly-in),5236,2.0,3.0,3.0,0.2288310615448162,6315.45,3
+need_0.05,Need first (lam 0.05),Town,17431,2.0,3.0,2.0,0.2040890394386644,16007.324999999999,0
+need_0.05,Need first (lam 0.05),Near town (road),3352,2.0,3.0,3.0,0.22396486825595985,4325.325,0
+need_0.05,Need first (lam 0.05),Remote (road),2925,2.0,21.0,8.0,0.4693726937269373,11623.45,0
+need_0.05,Need first (lam 0.05),Very remote (road),673,6.0,29.19999999999999,9.0,0.6489028213166145,3788.575,0
+need_0.05,Need first (lam 0.05),"Remote, cut in the wet",7891,2.0,10.0,3.0,0.3317384370015949,18721.525,0
+need_0.05,Need first (lam 0.05),Island (fly-in),5236,2.0,3.0,2.0,0.2275919041718298,5721.724999999999,0
+need_0,"Need first, cost ignored",Town,17431,2.0,3.0,2.0,0.20457294943140575,16243.625,0
+need_0,"Need first, cost ignored",Near town (road),3352,2.0,3.0,3.0,0.22521957340025095,4287.9,0
+need_0,"Need first, cost ignored",Remote (road),2925,2.0,21.0,8.0,0.4797047970479705,11969.599999999999,0
+need_0,"Need first, cost ignored",Very remote (road),673,6.0,31.0,9.0,0.64576802507837,3819.975,0
+need_0,"Need first, cost ignored","Remote, cut in the wet",7891,2.0,9.0,3.0,0.3258904837852206,17913.6,0
+need_0,"Need first, cost ignored",Island (fly-in),5236,2.0,3.0,2.0,0.2201569599339116,5227.475,0

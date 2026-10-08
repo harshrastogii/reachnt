@@ -14,11 +14,11 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 
 | Plan | Average cost per repair (incl. travel) | 9 in 10 urgent remote repairs fixed within | Days households lived with a fault |
 |---|---|---|---|
-| Cheapest jobs first | $559 | 62 days (town: 3) | 231,900 |
-| Most urgent first, one community per trip | $893 | 3 days | 76,400 |
-| **ReachNT**: most urgent first, with shared trips | **$816** | **3 days** | **63,100** |
+| Cheapest jobs first | $561 | 62 days (town: 3) | 233,100 |
+| Most urgent first, one community per trip | $897 | 3 days | 74,600 |
+| **ReachNT**: most urgent first, with shared trips | **$821** | **3 days** | **61,700** |
 
-- **Average cost per repair** is the year's labour, parts and travel divided by the number of repairs done.
+- **Average cost per repair** is the year's labour and travel (vehicle, charters, overnight stays) divided by the number of repairs done.
 - **9 in 10 fixed within** is the wait that 90% of urgent remote repairs beat. The slowest 1 in 10 waited longer.
 - **Days households lived with a fault** adds one for every day a household waited. Dangerous faults count more.
 - **A shared trip** is one crew visiting two neighbouring communities on the same run, so the drive or flight is paid once. H3 hexagons decide which communities are close enough to pair.
@@ -31,27 +31,27 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 | Spotting a dangerous fault, PR-AUC (guessing = 0.22) | 0.99 | 0.72 (0.65–0.78) |
 | Dangerous reports caught by the whole system (model, rules, person) | 100% | 99.3% |
 | Urgency category correct (macro-F1) | 0.89 | 0.80 |
-| Queue order vs true order (Kendall's τ, after a person checks) | 0.89 | 0.85 |
+| Queue order vs true order (Kendall's τ, after a person checks) | 0.89 | 0.87 |
 
 - **Model on its own:** moderate on wording it never saw (ROC-AUC 0.84). Its confidence doesn't match its accuracy: when it said it was 90% sure or more, it was right 56% of the time, so tenants never see a confidence percentage.
-- **Whole system:** still catches 99% of dangerous reports, because it sends 40% of those reports to a person.
-- **Trip planner:** CP-SAT proved 99.2% of 25,972 weekly plans optimal. The median plan takes 9 ms.
-- **Five random years:** ReachNT cut fault-days by 73%–75% against cheapest-first, for 45%–48% more per repair. Shared trips saved $70–77 per repair in every year.
+- **Whole system:** still catches 99% of dangerous reports, because it sends 42% of those reports to a person.
+- **Trip planner:** CP-SAT proved 99.5% of 26,018 weekly plans optimal; a fixed work limit makes every run repeat exactly. The median plan takes 8 ms.
+- **Five random years:** ReachNT cut fault-days by 74%–77% against cheapest-first, for 45%–49% more per repair. Shared trips saved $67–76 per repair in every year.
 
 ## Saying less costs no points; a missed visit keeps its clock (`docs/INCLUSIVE_DECISION_MODEL.md`)
 
 | Check (synthetic) | Before | Now |
 |---|---|---|
-| Same household told in a few words instead of in full: points lost | 43 on average (words only) | 5 (standard questions + tenancy record + job history) |
-| ...and ranked lower in the line | 97% | 12% |
-| Tier 1 or Tier 2 households recognised from a few words | 4% | 91% |
+| Same household told in a few words instead of in full: points lost | 50 on average (words only) | 5 (standard questions + tenancy record + job history) |
+| ...and ranked lower in the line | 95% | 6% |
+| Tier 1 or Tier 2 households recognised from a few words | 13% | 89% |
 
 With 1 in 10 booked visits missing, ReachNT still fixed 9 in 10 of the *missed* urgent remote repairs within 17 days (cheapest-first: 126), because a missed job keeps its waiting time and gets the deadline boost.
 
 ## Fixes that didn't hold, trades travelling together, floods and cyclones
 
 - **Rework.** If the tenant (or their housing officer) says a repair is still broken, the job reopens with 50 extra points and keeps the day it was first reported, so its clock has run out and the deadline boost puts it on the next trip. The coordinator can send a different crew.
-- **Trades travelling together.** Different trades booked to the same community (or the same shared trip) in the same week share one ute (3 seats) or one charter (5 seats). Counted after planning, so it is a floor: it saves ReachNT a further $139 per repair (1,489 of 8,280 trips shared) and cheapest-first $45. Different trades going to neighbouring communities are suggested to share one loop.
+- **Trades travelling together.** Different trades booked to the same community (or the same shared trip) in the same week share one ute (3 seats) or one charter (5 seats). Counted after planning, less the time one trade waits for another, it saves ReachNT an estimated $105 per repair (1,014 of 8,339 trips shared) and cheapest-first $21. Different trades going to neighbouring communities are suggested to share one loop.
 - **Floods, cyclones and fires.** The coordinator declares an event over the communities hit. The portal plans the response (make safe within 48 hours, one team trip, surge crews from the contractor panel, a message to every household) and tags every job from the area. In a modelled flood of Kalkarindji, Daguragu and Pigeon Hole (94 repairs, roads cut for 4 weeks), the usual crews fixed 9 in 10 urgent flood repairs within 14 days and the rest of the Katherine hub slipped from 3 to 10 days; with surge crews (double for 8 weeks) both stayed at 3 days.
 
 ## Who lives there, in tiers; roads and weather now
@@ -100,7 +100,7 @@ In this prototype, the year of requests behind the demo is synthetic (`synth.py`
 ```bash
 pip install -r requirements.txt
 python run_all.py                     # every number, figure and the portal data (~15 min on 8 cores)
-pytest -q tests                       # 81 checks; node tests/test_api.mjs adds 22 for the server (both run by GitHub Actions on every push)
+pytest -q tests                       # 104 checks; node tests/test_api.mjs adds 44 for the server (both run by GitHub Actions on every push)
 python run_all.py --quality           # only the quality measures (ROC/PR-AUC, calibration, solver gap, 5 random years)
 python run_all.py --extras            # only the inclusion, missed-visit, trades-together and flood experiments
 python -m http.server 8731 --directory web   # then open http://localhost:8731
@@ -113,7 +113,7 @@ Imagery is chosen in this order:
 3. Esri World Imagery;
 4. the bundled Digital Earth Australia tiles (`web/tiles/`, built by `scripts/build_tiles.py`).
 
-The bundled tiles stop at zoom 11.5 so they never turn to blur. Add `?offline` to the URL to force them. MapLibre, h3-js and jsPDF load from a CDN, with copies in `web/vendor/`.
+The bundled tiles stop at zoom 11.5 so they never turn to blur. Add `?offline` to the URL to force them. MapLibre, h3-js and jsPDF are served from this site (`web/vendor/`), not a public CDN.
 
 **Deploy:** the Vercel project `reachnt` builds from this repository's `web/` folder on every push to `main`. No keys are needed. Optional keys are listed in `web/DEPLOY.md`.
 

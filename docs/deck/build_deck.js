@@ -32,6 +32,15 @@ const HEX = { ink: "14181D", ink2: "4A525C", muted: "6B7480", line: "DDE1E6", so
               violet: "6E56CF", violetSoft: "ECE8FA", bad: "E5352B", white: "FFFFFF", night: "0D1418", nightCard: "1A242B" };
 
 const pres = new pptxgen();
+// Speaker notes come from docs/deck/PITCH_SCRIPT.md (one "### N. Title" section per slide), so the notes and the script never differ.
+const SCRIPT = {};
+fs.readFileSync(require("path").join(__dirname, "PITCH_SCRIPT.md"), "utf8").split("\n### ").slice(1).forEach((sec) => {
+  const m = sec.match(/^(\d+)\./); if (!m) return;
+  const lines = sec.split("\n"); const who = (lines[1] || "").replace(/^\*|\*$/g, "");
+  SCRIPT[+m[1]] = `[${who}]\n` + lines.slice(2).join("\n").split("\n## ")[0].trim();
+});
+let slideNo = 0; const addSlide0 = pres.addSlide.bind(pres);
+pres.addSlide = (o) => { const sl = addSlide0(o); const n = ++slideNo; const add = sl.addNotes.bind(sl); sl.addNotes = () => add(SCRIPT[n] || ""); return sl; };
 pres.layout = "LAYOUT_WIDE";   // 13.33 x 7.5 in
 pres.title = "ReachNT"; pres.author = TEAM;
 pres.subject = "CDU IT Code Fair 2026, Artificial Intelligence Challenge: housing maintenance triage";
@@ -141,8 +150,8 @@ steps.forEach(([n, h, b, col], i) => {
   text(s, h, { x: x + 0.3, y: 3.1, w: 2.4, h: 0.5, fontSize: 21, bold: true, fontFace: "Arial", color: HEX.ink, objectName: `step-h-${n}` });
   text(s, b, { x: x + 0.3, y: 3.65, w: 2.35, h: 2.3, fontSize: 15, color: HEX.ink2, objectName: `step-b-${n}` });
 });
-text(s, "One tool, three views: the coordinator plans, the tradesperson gets a run sheet that works without signal, and the tenant gets a straight answer.",
-  { x: 0.6, y: 6.3, w: 12.1, h: 0.5, fontSize: 16, italic: true, color: HEX.ink2, objectName: "views" });
+text(s, "One tool, four views: the coordinator plans, the tradesperson gets a run sheet that works without signal, the tenant gets a straight answer, and the housing officer records for tenants without the app.",
+  { x: 0.6, y: 6.2, w: 12.1, h: 0.65, fontSize: 14, italic: true, color: HEX.ink2, fit: "shrink", objectName: "views" });
 s.addNotes(`[HARSH, about 40 seconds]
 Thanks Aashish. ReachNT does four things.
 One: it reads the report the way the tenant said it. If it isn't sure, a person calls back.
@@ -332,7 +341,7 @@ const frow = (y, label, a, b, name) => {
 };
 frow(2.85, "In the flooded communities", fl.event_urgent_p90 || 15, fsu.event_urgent_p90 || 3, "fl-event");
 frow(4.1, `Everywhere else in the hub (${Math.round(f0.other_urgent_p90 || 3)} with no flood)`, fl.other_urgent_p90 || 10, fsu.other_urgent_p90 || 3, "fl-other");
-text(s, "Every dangerous fault was made safe the day it was reported.", { x: 8.15, y: 5.5, w: 4.3, h: 0.7, fontSize: 13, italic: true, color: HEX.ink2, objectName: "fl-safe" });
+text(s, "Dangerous faults the reader recognised were made safe within a day (we assume a maintenance officer on hand).", { x: 8.15, y: 5.5, w: 4.3, h: 0.7, fontSize: 13, italic: true, color: HEX.ink2, objectName: "fl-safe" });
 text(s, "Live NT Road Report and Bureau of Meteorology readings prompt the coordinator: a road closure, heavy rain (\u201cDeclare a flood?\u201d) or heat for Tier 1 homes. A person decides.",
   { x: 0.6, y: 6.05, w: 7.0, h: 0.75, fontSize: 13.5, italic: true, color: HEX.ink2, objectName: "fl-foot" });
 s.addNotes(`[AASHISH, about 35 seconds]
@@ -392,7 +401,7 @@ s = pres.addSlide({ masterName: "Content", sectionTitle: "Trust" });
 s.addText("What we tested, and what we can't claim yet", { placeholder: "title" });
 card(s, 0.6, 1.55, 5.85, 5.1, HEX.goodSoft, "tested-card");
 text(s, "Tested", { x: 0.9, y: 1.8, w: 5.3, h: 0.5, fontSize: 22, bold: true, fontFace: "Arial", color: HEX.good, objectName: "tested-h" });
-const tested = ["98 automated checks on every code change: data, the reader, fair intake, the planner, the server",
+const tested = ["148 automated checks on every code change: data, the reader, fair intake, the planner, the server",
                 "Five random years of requests; the result held in all five",
                 "Every community's position checked against satellite photos",
                 "Accessibility: 0 WCAG 2.2 AA issues in every view",

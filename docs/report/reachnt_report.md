@@ -24,7 +24,7 @@ On real NT geography with synthetic requests ({{N['communities']}} communities, 
 
 ## 1.1 The problem
 
-The NT Government manages 5,058 remote public housing dwellings in 73 communities [1]. In December 2022, 55% of remote houses were overcrowded [2]. In 2022–23, 54% of First Nations households in very remote areas had major structural problems, against 25% in major cities [4]. Tenants report faults by phone (1800 104 076) or to a local Community Housing Officer, and the Department sorts each job into one of three categories with a response time [5]:
+The NT Government manages 5,058 remote public housing dwellings in 73 communities [1]. In December 2022, 55% of remote houses were overcrowded [2], far from the Closing the Gap housing target [3]. In 2022–23, 54% of First Nations households in very remote areas had major structural problems, against 25% in major cities [4]. Tenants report faults by phone (1800 104 076) or to a local Community Housing Officer, and the Department sorts each job into one of three categories with a response time [5]:
 
 TABLE: Table 1. NT response times for public housing repairs (DHLGCD Fact sheet FS17, version 10/25).
 | Category | Town | Remote |
@@ -35,17 +35,17 @@ TABLE: Table 1. NT response times for public housing repairs (DHLGCD Fact sheet 
 
 The published standard already gives remote houses two and a half times as long. Costs explain why: emergency repairs cost 8.5 times more in very remote communities than in remote ones, and travel can be 96% of an emergency job's cost, against 11–37% for planned work [6]. On the APY Lands, Housing SA batched about ten work orders per travel order [7].
 
-In 2015, tenants at Santa Teresa listed more than 600 repairs. The Tribunal (2018) and the Court of Appeal (2022) held that public housing must be at least safe, and in 2023 the High Court allowed compensation for the distress of living in unrepaired homes [11]. The ANAO found that community housing organisations could not tell tenants where their repairs were up to, because they had no access to the IT systems [10].
+In 2023 the High Court allowed Santa Teresa tenants compensation for the distress of living in unrepaired homes [11]. The ANAO found that community housing organisations could not tell tenants where their repairs were up to, because they had no access to the IT systems [10].
 
 ## 1.2 Purpose and scope
 
-The brief asks for a tool that reads free-text fault reports, ranks jobs by urgency, safety and logistics, explains each job's place, makes the equity trade-off visible and leaves the decision with a person. We add one rule: urgency and logistics are separate steps. Urgency is about the tenant's need; logistics is about getting a tradesperson there. A single priority score that mixes them is how distance gets into "priority" without anyone choosing it.
+The brief asks for a tool that reads fault reports, ranks jobs by urgency, safety and logistics, explains each job's place, makes the equity trade-off visible and leaves the decision with a person. We add one rule: urgency (the tenant's need) and logistics (getting a tradesperson there) are separate steps, because a single score that mixes them lets distance into "priority" without anyone choosing it.
 
 The scope is responsive repairs in the 70 remote communities listed in the 2023 review of the NT remote housing partnership [2] and in the five towns their trades work from. Planned maintenance, homelands and town camps are out of scope.
 
 ## 1.3 Who it is for
 
-The ReachNT portal has three views of the same record: the regional coordinator (queue, trips, checks, the trade-off and sign-off), the tradesperson (a run sheet that works without signal), and the tenant (a repair tracker and a text message a Community Housing Officer or interpreter can read out). Reports come in through whoever the tenant tells: repairs-line staff, the Community Housing Officer, the maintenance officer, a tradesperson, or the tenant in the app. The coordinator does not enter them; they check urgency and decide who goes when a visit misses.
+The ReachNT portal has four views of the same record: the regional coordinator (queue, trips, checks, the trade-off and sign-off), the tradesperson (a run sheet that works without signal), the tenant (a repair tracker and a text message that can be read out), and the Community Housing Officer (who records for tenants without the app). Reports come in through whoever the tenant tells: repairs-line staff, the Community Housing Officer, the maintenance officer, a tradesperson, or the tenant in the app. The coordinator does not enter them; they check urgency and decide who goes when a visit misses.
 
 # 2 Methodology
 
@@ -57,7 +57,7 @@ Each community belongs to the nearest of five crew bases (Darwin, Katherine, Ten
 
 ## 2.2 Reading a fault report
 
-Phrase rules, written from the FS17 examples and the s 63 emergency list, match 23 fault types (including damp and mould, which England's 2025 Awaab's Law singles out) and five modifiers (a Tier 1 or Tier 2 occupant, crowded house, repeat report, negation). A TF-IDF and logistic regression model (scikit-learn) catches wording the rules miss. A person reads the report when no rule matches and the model is under 55% sure, when the two disagree on category, when the model gives 25% or more to a dangerous fault, or when a danger word (smoke, melting, sparks, sewage) appears in a reading that is not Immediate. A negated danger ("no sparks now") stays Immediate and goes to a person: the reader never downgrades danger on its own. Both the Python engine and the portal use the same rules file.
+Phrase rules, written from the FS17 examples and the s 63 emergency list, match 23 fault types (including damp and mould, which England's 2025 Awaab's Law singles out [13]) and five modifiers (a Tier 1 or Tier 2 occupant, crowded house, repeat report, negation). A TF-IDF and logistic regression model (scikit-learn [24]) catches wording the rules miss. A person reads the report when no rule matches and the model is under 55% sure, when the two disagree on category, when the model gives 25% or more to a dangerous fault, or when a danger word (smoke, melting, sparks, sewage) appears in a reading that is not Immediate. A negated danger ("no sparks now") stays Immediate and goes to a person: the reader never downgrades danger on its own. The portal's New report tab uses the same published rules; the model runs in the engine.
 
 ## 2.3 Need-only urgency
 
@@ -65,79 +65,74 @@ Category sets the clock. Inside a category, points order the line:
 
 **points = category (1000/500/100) + harm (0–100) + Healthy Living Practice (Safety 40 down to HLP 9 at 4) + who lives there (Tier 1 +40 or Tier 2 +25, crowded +10) + repeat report (+10) + waiting (+3 a day past half the clock)**
 
-Tier 1 (life-preservation) is someone who needs power, cooling or medical supplies, a baby under 12 months or a frail elder; for them, losing power, water or cooling is Immediate. Tier 2 is young children, pregnancy, illness or limited mobility. Aboriginality, income and who heads the household are never asked. Harm values adapt the HHSRS severity weighting [14]. The waiting term means no job waits forever. The only inputs are the fault, what the report says and days waited; a unit test fails if distance, cost, region or community appear in the function.
+Tier 1 (life-preservation) is someone who needs power, cooling or medical supplies, a baby under 12 months or a frail elder; for them, losing power, water or cooling is Immediate. Tier 2 is young children, pregnancy, illness or limited mobility. Aboriginality, income and who heads the household are never asked. Harm values adapt the HHSRS severity weighting [14]; like elective surgery categories [12], the category sets the clock. The waiting term means no job waits forever. The only inputs are the fault, what the report says and days waited; a unit test fails if distance, cost, region or community appear in the function.
 
 FIGURE: outputs/figures/fig1_map.png | 10.0 | Figure 1. The 70 communities by access band, each community's H3 resolution-4 hexagon, and the 68 possible shared trips (pairs of communities within two hexagon rings that can share a trip).
 
 ## 2.4 H3 hexagons
 
-H3 is Uber's open-source hierarchical grid of hexagons [21]. Every point sits in one cell at each of 16 resolutions, and each finer level is about a seventh of the area. A hexagon's six neighbours are all the same distance from its centre, so "within k rings" is fair in every direction; square grids have neighbours at two distances [21]. ReachNT uses H3 four ways:
+H3 is Uber's open-source hierarchical grid of hexagons, with 16 resolutions [21]. A hexagon's six neighbours are all the same distance from its centre, so "within k rings" is fair in every direction; square grids have neighbours at two distances [21]. ReachNT uses H3 three ways:
 1. **Shared trips.** Two communities served from the same hub share one trip when their resolution-4 cells (about 1,770 km²) are within two rings, about 90 km. That gives 68 pairs, such as Ngukurr and Rittarangu, and the three Tiwi communities.
-2. **While you're out there.** A tradesperson's phone lists open jobs in their trade within three resolution-5 rings of the communities on their run.
-3. **A house is a hexagon.** Operational records hold a house ID and its resolution-10 cell (a 76 m hexagon), never an address.
-4. **Publishing.** Anything shown outside the Department is grouped into resolution-6 cells (36 km²) and hidden below five jobs.
+2. **While you're out there.** The run sheet lists open jobs within three resolution-5 rings of the run.
+3. **Privacy.** Work records hold a house's resolution-10 cell (76 m), never an address; public figures use resolution-6 cells (36 km²), hidden below five jobs.
 
 H3 does not know where roads are, so ReachNT pairs it with the road-restriction register and live closures for travel.
 
 ## 2.5 Planning trips
 
-Each week, for each hub and trade, a constraint solver (Google OR-Tools CP-SAT) chooses which communities get a visit, alone or on a shared trip, and which jobs are done. It maximises job value minus λ × cost, where λ is the weight on money, within each tradesperson's 40 hours, travel included. A road trip costs vehicle running plus driving time, a fly-in costs a charter for both legs, and a run zone costs hub → A → B → hub. A community with a cut road and no airstrip cannot be reached. With these costs, one job sent alone to Kintore is 92% travel, inside Nous's "up to 96%"; ten jobs on the trip bring it to 57% (Appendix D).
+Each week, for each hub and trade, a constraint solver (Google OR-Tools CP-SAT [24]) chooses which communities get a visit, alone or on a shared trip, and which jobs are done. It maximises job value minus λ × cost, where λ is the weight on money [15], within the crews' pooled hours (40 a week each). A road trip costs vehicle running plus driving time, a fly-in costs a charter for both legs, and a run zone costs hub → A → B → hub. A community with a cut road and no airstrip cannot be reached. With these costs, one job sent alone to Kintore is 92% travel, inside Nous's "up to 96%"; ten jobs on the trip bring it to 57% (Appendix D).
 
 Settings differ in how each job is valued, in λ, and in whether shared trips are allowed:
-1. **Cheapest jobs first**: every job is worth the same; λ = 1.
+1. **Cheapest jobs first**: every job is worth the same; λ = 1. A 6-hour job needing an overnight stay costs more than it is worth, so this setting never does one.
 2. **Cheapest first + urgent guarantee**: as 1, plus a large bonus for an urgent job about to pass the equal clock (2 business days everywhere).
-3. **Need first, official allowance**: need points, deadline bonus against FS17's remote clocks; λ = 0.2.
+3. **Need first, official allowance**: need points, deadline bonus against FS17's longer remote clocks (so remote jobs also gain waiting points more slowly); λ = 0.2.
 4. **Need first + urgent guarantee**: need points and the guarantee against the equal clock; λ = 0.2 or 0.5.
 5. **ReachNT**: setting 4 with H3 shared trips. Setting 1 is also run with shared trips.
 6. **Need first without a guarantee**: λ from 0 to 0.8, to trace the whole curve.
 
 ## 2.6 Simulation, explanation and the ledger
 
-Requests arrive at 4 per house per year, 25% more in the wet season, with faults drawn from the APY job mix; 30% use wording the reader was not trained on. One year (52 weeks plus 8 to clear the backlog) runs under each setting, with {{N['crews_total']}} tradespeople sized at 1.3 times expected job hours. A second report of the same fault at the same house, while the first is open, joins that job and is fixed on the same visit; an Immediate fault is made safe the day it is reported, and fixing it is a second clock. The solver is single-threaded with a fixed seed, so every run gives the same numbers.
+Requests arrive at 4 per house per year, 25% more in the wet season, with faults drawn from the APY job mix; 30% use wording the reader was not trained on. One year (52 weeks plus 8 to clear the backlog) runs under each setting, with {{N['crews_total']}} tradespeople sized at 1.3 times expected job hours. A second report of the same fault at the same house, while the first is open, joins that job. An Immediate fault the reader recognises is made safe within a day (we assume a maintenance officer is available); one it misses waits for the full fix. Each week is planned with all of that week's reports, as if the coordinator re-plans as reports arrive, which flatters every setting's waits by a few days. The solver is single-threaded with a fixed seed and a deterministic work limit, so a run gives the same numbers.
 
-**How to read our numbers.** *Cost per repair* is everything spent in the year (labour, travel, charters, overnight stays) divided by the repairs done. *9 in 10 fixed within* is the number of days by which 9 out of 10 urgent repairs were done (the 90th percentile). *Fault-days* add up every day a household lived with an unfixed fault; a dangerous fault counts more than a small one.
+**How to read our numbers.** *Cost per repair* is everything spent in the year (labour, travel, charters, overnight stays) divided by the repairs done. *9 in 10 fixed within* is the number of days by which 9 out of 10 urgent repairs were done (the 90th percentile). *Fault-days* add up every day a household lived with an unfixed fault, weighted by harm (weights in Appendix D).
 
 Each week a job is not done, the planner logs why: road cut, no trip because of cost, crew fully booked, or higher-scoring jobs first. The tenant's answer is built from that log, the score parts and the signed decision, so it can only state reasons that happened (Flesch 50 or above, tested).
 
-## 2.7 Personal information and the database
+## 2.7 Inclusive intake and decisions
 
-Names, phone numbers and addresses sit in one `pii` schema, encrypted with pgcrypto and readable only by intake staff through a function that logs every read (Appendix F). Work is keyed by house ID and H3 cell; row-level security limits a tradesperson to their trips and nearby jobs, a tenant to their own jobs, and the public to resolution-6 summaries. The decision ledger is append-only, each row hashing the one before. PostgreSQL, PostGIS and h3-pg are free and open source; a pilot fits Neon's Sydney free tier [22], as a year of data is under 1 GB.
-
-## 2.8 Inclusive intake and decisions
-
-Household points (the tier, a crowded house, a repeat) used to come only from the tenant's words, so a household could lose up to 45 points by saying less. Now whoever the tenant tells asks the same six questions, with a free interpreter where needed (Aboriginal Interpreter Service, TIS National, National Relay Service); the tenancy record gives household size and the job history gives repeats. Any "yes" counts; an unanswered question never removes points. The clock starts when the tenant first told anyone. Channel, language and timing are never scored (a unit test checks). A person can raise urgency at any time; lowering a dangerous repair needs someone who spoke to the tenant or saw it. A missed visit goes to the next trip, a named crew or any contractor of that trade, keeping its wait and deadline boost. Live NT Road Report and Bureau of Meteorology readings prompt the coordinator about closures, heavy rain and heat, but never change the line (Appendix I).
+Household points (the tier, a crowded house, a repeat) used to come only from the tenant's words, so a household could lose up to 60 points by saying less, and a Tier 1 household losing power, water or cooling its Immediate category. Now whoever the tenant tells asks the same six questions, with a free interpreter where needed (Aboriginal Interpreter Service, TIS National, National Relay Service); the tenancy record gives household size and the job history gives repeats. Any "yes" counts; an unanswered question never removes points. The clock starts when the tenant first told anyone. Channel, language and timing are never scored (a unit test checks). A person can raise urgency at any time; lowering a dangerous repair needs someone who spoke to the tenant or saw it. A missed visit goes to the next trip, a named crew or any contractor of that trade, keeping its wait and deadline boost; a fix that didn't hold reopens with {{RW}} points and its first day. Live NT Road Report and Bureau of Meteorology readings prompt the coordinator about closures, heavy rain and heat, but never change the line (Appendix I).
 
 # 3 Findings
 
 ## 3.1 Left alone, efficiency pushes remote repairs to the back
 
-Under cheapest-jobs-first, town tenants got 90% of urgent repairs within {{d(C0['urgent_p90_town'])}} days. Remote tenants waited up to {{d(C0['urgent_p90_remote'])}} days, and {{pct(C0['overdue_equal_remote'])}} of their urgent repairs passed the 2-day equal clock ({{pct(C0['overdue_official_remote'])}} passed even the official 5-day remote clock). Fault-days, the danger of each fault times the days it stayed unfixed, totalled {{round(C0['harm_days_total'], -3):,.0f}}, and {{C0['open_at_end']}} jobs were still open after the extra eight weeks. No setting cost less per job, which is why it looks reasonable on a cost report.
+Under cheapest-jobs-first, town tenants got 90% of urgent repairs within {{d(C0['urgent_p90_town'])}} days. Remote tenants waited up to {{d(C0['urgent_p90_remote'])}} days, and {{pct(C0['overdue_equal_remote'])}} of their urgent repairs passed the 2-day equal clock ({{pct(C0['overdue_official_remote'])}} passed even the official 5-day remote clock). Fault-days, the danger of each fault times the days it stayed unfixed, totalled {{round(C0['harm_days_total'], -3):,.0f}}, and {{C0['open_at_end']}} jobs were still open after the extra eight weeks, including every overnight 6-hour job it never found worth doing. Almost nothing cost less per job, which is why it looks reasonable on a cost report.
 
 ## 3.2 The trade-off, priced
 
-Figure 2 places every setting on two charts. ReachNT cost {{money(R['cost_per_job'])}} per repair against {{money(C0['cost_per_job'])}}, an extra {{money(R['cost_per_job'] - C0['cost_per_job'])}} per repair or {{m(R['total_cost'] - C0['total_cost'])}} a year across the five hubs. For that, fault-days fell {{pct(1 - R['harm_days_total'] / C0['harm_days_total'])}} ({{round(C0['harm_days_total'], -3):,.0f}} to {{round(R['harm_days_total'], -2):,.0f}}) and the time to fix 9 in 10 urgent remote repairs fell from {{d(C0['urgent_p90_remote'])}} days to {{d(R['urgent_p90_remote'])}}. The guarantee protects urgent jobs: need ranking without it (λ = 0.4) cost {{money(L4['cost_per_job'])}} per repair and left urgent remote repairs at {{d(L4['urgent_p90_remote'])}} days. Ignoring cost altogether cost {{money(N0['cost_per_job'])}} per repair for {{pct(1 - N0['harm_days_total'] / R['harm_days_total'])}} fewer fault-days than ReachNT.
+Figure 2 places every setting on two charts. ReachNT cost {{money(R['cost_per_job'])}} per repair against {{money(C0['cost_per_job'])}}, an extra {{money(R['cost_per_job'] - C0['cost_per_job'])}} per repair or {{m(R['total_cost'] - C0['total_cost'])}} a year across the five hubs. For that, fault-days fell {{pct(1 - R['harm_days_total'] / C0['harm_days_total'])}} ({{round(C0['harm_days_total'], -3):,.0f}} to {{round(R['harm_days_total'], -2):,.0f}}) and the time to fix 9 in 10 urgent remote repairs fell from {{d(C0['urgent_p90_remote'])}} days to {{d(R['urgent_p90_remote'])}}. The guarantee protects urgent jobs: need ranking without it (λ = 0.4) cost {{money(L4['cost_per_job'])}} per repair and left urgent remote repairs at {{d(L4['urgent_p90_remote'])}} days. Against the fairer baseline of cheapest-first with the guarantee, which clears every job, ReachNT cost {{pct(R['cost_per_job'] / F['cost_per_job'] - 1)}} more per repair for {{pct(1 - R['harm_days_total'] / F['harm_days_total'])}} fewer fault-days. Ignoring cost altogether cost {{money(N0['cost_per_job'])}} per repair for {{pct(1 - N0['harm_days_total'] / R['harm_days_total'])}} fewer fault-days than ReachNT.
 
 ## 3.3 What shared trips changed
 
 Against the same setting without them, shared trips cut cost per repair from {{money(G['cost_per_job'])}} to {{money(R['cost_per_job'])}} and fault-days from {{round(G['harm_days_total'], -2):,.0f}} to {{round(R['harm_days_total'], -2):,.0f}}. Communities cut in the wet went from {{d(band(G, 'Remote, cut in the wet'))}} to {{d(band(R, 'Remote, cut in the wet'))}} days at the 90th percentile for urgent repairs. With a tighter budget (λ = 0.5), ReachNT cost {{money(RT['cost_per_job'])}} per repair, less than cheapest-first with a guarantee ({{money(F['cost_per_job'])}}), with fewer fault-days ({{round(RT['harm_days_total'], -3):,.0f}} against {{round(F['harm_days_total'], -3):,.0f}}). Even cheapest-first gains from shared trips ({{round(C0['harm_days_total'], -3):,.0f}} to {{round(CH['harm_days_total'], -3):,.0f}} fault-days).
 
-FIGURE: outputs/figures/fig2_frontier.png | 16.0 | Figure 2. Average cost per repair against total fault-days (left) and against the remote urgent wait (right): days until 9 in 10 urgent remote repairs are fixed. One synthetic year, whole NT. Hexagon markers use shared trips.
+FIGURE: outputs/figures/fig2_frontier.png | 14.5 | Figure 2. Average cost per repair against total fault-days (left) and against the remote urgent wait (right): days until 9 in 10 urgent remote repairs are fixed. One synthetic year, whole NT. Hexagon markers use shared trips.
 
 ## 3.4 Where the wait lands
 
 Under cheapest-first, communities cut in the wet waited up to {{d(band(C0, 'Remote, cut in the wet'))}} days for 9 in 10 urgent repairs, and islands {{d(band(C0, 'Island (fly-in)'))}} (Figure 3). ReachNT brought these to {{d(band(R, 'Remote, cut in the wet'))}} and {{d(band(R, 'Island (fly-in)'))}}. The hardest to serve are small, very remote road communities, where 90% of urgent repairs still took up to {{d(band(R, 'Very remote (road)'))}} days: few jobs share the cost of a long drive, and few have a neighbour within two rings.
 
-FIGURE: outputs/figures/fig3_band_waits.png | 15.0 | Figure 3. Days until 9 in 10 urgent repairs are fixed, by how hard the place is to reach.
+FIGURE: outputs/figures/fig3_band_waits.png | 12.5 | Figure 3. Days until 9 in 10 urgent repairs are fixed, by how hard the place is to reach.
 
 ## 3.5 Why jobs waited
 
-The reason log (Figure 4) separates causes that look the same to a tenant. Under cheapest-first, most remote waiting was a cost decision. Under ReachNT, most of it was a fully booked crew, which calls for more trades or local trades, and a different answer to the tenant.
+The reason log (Figure 4) separates causes that look the same to a tenant: under cheapest-first most remote waiting was a cost decision; under ReachNT most was crews whose week was already full, which calls for more or local trades.
 
-FIGURE: outputs/figures/fig4_reasons.png | 15.0 | Figure 4. Job-weeks remote jobs spent waiting, by the reason the planner logged.
+FIGURE: outputs/figures/fig4_reasons.png | 12.5 | Figure 4. Job-weeks remote jobs spent waiting, by the reason the planner logged.
 
 ## 3.6 Reading free text is the weak link
 
-TABLE: Table 2. Reader accuracy on synthetic reports. "New wording" uses phrasings kept out of training.
+TABLE: Table 2. Reader accuracy on synthetic reports. "New wording" uses phrasings kept out of the model's training; some rules were written after seeing them, so the rules and combined rows flatter real performance.
 | Measure | Familiar wording ({{N['reader']['seen']['n']}}) | New wording ({{N['reader']['heldout']['n']}}) |
 |---|---|---|
 | Spotting a dangerous fault, model ROC-AUC (0.5 = guessing) | {{Qr['seen']['danger']['roc_auc']:.2f}} | {{Qr['heldout']['danger']['roc_auc']:.2f}} |
@@ -149,7 +144,7 @@ TABLE: Table 2. Reader accuracy on synthetic reports. "New wording" uses phrasin
 | Dangerous fault missed and not sent to a person | {{N['reader']['seen']['combined']['danger_missed']*100:.1f}}% | {{N['reader']['heldout']['combined']['danger_missed']*100:.1f}}% |
 | Sent to a person | {{pct(N['reader']['seen']['combined']['to_person'])}} | {{pct(N['reader']['heldout']['combined']['to_person'])}} |
 
-On new wording the model alone is only moderately good at spotting danger, and its confidence is not honest. The safety net works only because it sends four in ten reports to a person. Appendix G has the full measures: calibration, cross-validation, ranking agreement, solver gaps, and the results in four more random years. Real reports will come in Aboriginal English, Kriol and other languages [20], which synthetic English cannot test.
+On new wording the model alone is only moderately good at spotting danger, and its confidence is not honest; the safety net works because it sends four in ten reports to a person (full measures in Appendix G). Real reports in Aboriginal English and Kriol [20] are untested.
 
 ## 3.7 Sensitivity
 
@@ -159,9 +154,9 @@ SENSITIVITY_SENTENCE
 
 We described 3,000 synthetic households in full and in a few words. From the words alone, the short telling lost {{IN['words']['gap_mean']:.0f}} points on average, ranked lower {{pct(IN['words']['short_ranked_lower'])}} of the time, and only {{pct(IN['words']['vulnerable_recognised_short'])}} of Tier 1 or 2 households were recognised. With the standard questions it lost {{IN['intake']['gap_mean']:.1f}} and ranked lower {{pct(IN['intake']['short_ranked_lower'])}} of the time (unanswered questions, assumed 1 in 10); {{pct(IN['intake']['vulnerable_recognised_short'])}} were recognised. When 1 in 10 booked visits missed, ReachNT still fixed 9 in 10 of the missed urgent remote repairs within {{d(MV['guarantee_0.2_h3'][1]['urgent_remote_missed_p90'])}} days, against {{d(MV['cheapest_1'][1]['urgent_remote_missed_p90'])}} under cheapest-first, because a missed job keeps its clock and gets the deadline boost. Misses cost ReachNT {{money(MV['guarantee_0.2_h3'][1]['cost_per_job'] - MV['guarantee_0.2_h3'][0]['cost_per_job'])}} per repair and moved its remote urgent 90th percentile from {{d(MV['guarantee_0.2_h3'][0]['urgent_p90_remote'])}} to {{d(MV['guarantee_0.2_h3'][1]['urgent_p90_remote'])}} days.
 
-## 3.9 Fixes that didn't hold, trades together, and floods
+## 3.9 Trades together, and floods
 
-A repair the tenant says is still broken reopens with {{RW}} rework points and keeps its first day, so the deadline boost puts it on the next trip. Different trades booked to the same community in the same week can share one ute or charter: counted after planning, that saved ReachNT a further {{money(JT['guarantee_0.2_h3']['cost_per_job'] - JT['guarantee_0.2_h3']['cost_per_job_joint'])}} per repair. In a modelled flood of Kalkarindji, Daguragu and Pigeon Hole ({{DZ['Flood, usual crews']['event_jobs']}} repairs, roads cut for four weeks), the usual crews fixed 9 in 10 urgent flood repairs within {{d(DZ['Flood, usual crews']['event_urgent_p90'])}} days, and the rest of the hub slipped from {{d(DZ['No flood']['other_urgent_p90'])}} to {{d(DZ['Flood, usual crews']['other_urgent_p90'])}}; with surge crews from the panel both stayed at {{d(DZ['Flood, surge crews']['event_urgent_p90'])}}.
+Different trades booked to the same community in the same week can share one ute or charter: estimated after planning, less the time one trade waits for another, that saved ReachNT a further {{money(JT['guarantee_0.2_h3']['cost_per_job'] - JT['guarantee_0.2_h3']['cost_per_job_joint'])}} per repair. In a modelled flood of Kalkarindji, Daguragu and Pigeon Hole ({{DZ['Flood, usual crews']['event_jobs']}} repairs, roads cut for four weeks), the usual crews fixed 9 in 10 urgent flood repairs within {{d(DZ['Flood, usual crews']['event_urgent_p90'])}} days, and the rest of the hub slipped from {{d(DZ['No flood']['other_urgent_p90'])}} to {{d(DZ['Flood, usual crews']['other_urgent_p90'])}}; with surge crews from the panel both stayed at {{d(DZ['Flood, surge crews']['event_urgent_p90'])}}.
 
 # 4 Discussion
 
@@ -169,23 +164,23 @@ A repair the tenant says is still broken reopens with {{RW}} rework points and k
 
 The brief names the risk: efficiency quietly decides who waits. ReachNT answers it three ways. The urgency score cannot see place. The equity cost is shown in dollars and days before anyone chooses. The choice is signed, so a tenant told "this was a cost decision" can see who made it and when. This follows the Robodebt Royal Commission's call for plain-language information about automated decisions and a path to review, and the Ombudsman's better practice guide [17]. ReachNT recommends and a person decides. Immediate jobs are always confirmed by phone and made safe by a local officer.
 
-Household points come from the same questions on every channel, the tenancy record and the job history, not only the tenant's words (§2.8, §3.8); no one gains a place by reporting earlier, online or in better English. The tiers never ask Aboriginality, income or who heads the household. Privacy Act transparency rules for automated decisions start on 10 December 2026 for organisations they cover, which may include contractors [18].
+Household points come from the same questions on every channel, the tenancy record and the job history, not only the tenant's words (§2.7, §3.8); no one gains a place by reporting earlier, online or in better English. The tiers never ask Aboriginality, income or who heads the household. Privacy Act transparency rules for automated decisions start on 10 December 2026 for organisations they cover, which may include contractors [18].
 
 ## 4.2 Cultural and community impacts
 
-Most remote tenants are Aboriginal, and many speak Kriol, Aboriginal English or another Aboriginal language first [20]. A reader trained on standard English will under-read them, as Table 2 shows on unfamiliar wording. ReachNT is an assistant to intake staff, never machine-translates into Aboriginal languages, and writes answers to be read out with a Community Housing Officer or interpreter.
+Many remote tenants speak Kriol, Aboriginal English or another Aboriginal language first [20], and a reader trained on standard English will under-read them. ReachNT assists intake staff, never machine-translates, and writes answers to be read out with a Community Housing Officer or interpreter.
 
 Community-level results are sensitive: a map of long waits can read as a judgement on the community rather than the service. Under the CARE principles and Closing the Gap Priority Reform 4, communities should see the data the Department uses, first [19]. The portal uses satellite imagery of Country, not Aboriginal art [23]. No community has seen ReachNT. Co-design with tenants, Aboriginal Housing NT, land councils and the Aboriginal Business Enterprises that hold maintenance contracts [9] must come before any use.
 
 ## 4.3 Limitations
 
-The requests are synthetic, so absolute numbers are illustrations and the comparisons between settings are the finding. Travel uses straight-line distance at a blended road speed, and wet-season cuts outside the register are an assumption. Weekly planning means even town jobs can miss a 2-business-day clock by a few days. Shared trips pair two communities; longer chains would save more. A pilot needs work-order history from the Department's TMS and ASNEX systems [9].
+The requests are synthetic, so absolute numbers are illustrations and the comparisons between settings are the finding. Travel uses straight-line distance at a blended road speed, and wet-season cuts outside the register are an assumption. Weekly planning sees the whole week's reports, and crew hours are pooled per hub and trade, so day-level waits are optimistic for every setting. Cheapest-first never does overnight 6-hour jobs, which inflates its fault-days; the comparison with the guaranteed baseline (§3.2) does not depend on that. Shared trips pair two communities; longer chains would save more. A pilot needs work-order history from the Department's TMS and ASNEX systems [9].
 
 # 5 Recommendations
 
 **For DHLGCD:**
-1. Keep urgency and logistics as separate, published steps; ask every tenant the same short questions on every channel, start the clock at first contact, and test that location, channel and language are not inputs to urgency.
-2. Make the remote allowance in FS17 an explicit, signed decision, reviewed each quarter with its cost and its effect on remote waits, and report urgent waits by access band.
+1. Keep urgency and logistics as separate, published steps; ask every tenant the same questions, start the clock at first contact, and test that place, channel and language never enter urgency.
+2. Make FS17's remote allowance a signed decision, reviewed quarterly with its cost and effect, and report urgent waits by access band.
 3. Plan trips on H3 shared trips, and give Community Housing Officers and tenants read access to each job's status and reasons, closing the gap the ANAO found [10].
 4. Build on PostgreSQL, PostGIS and h3-pg, hosted in Australia, with personal details in an encrypted vault and public outputs at resolution 6.
 
@@ -195,7 +190,7 @@ The requests are synthetic, so absolute numbers are illustrations and the compar
 
 **For communities and their organisations:**
 7. Co-design the tenant answer, the intake questions and the fault vocabulary in local languages with tenants, Aboriginal Housing NT and the Aboriginal Interpreter Service, under ethics approval and land council research permits.
-8. Hold the decision ledger to account through local authorities and tenant groups, and give every tenant a way to ask a person to review their ranking, answered within 10 working days.
+8. Hold the decision ledger to account through local authorities and tenant groups, and let every tenant ask a person to review their ranking.
 
 # References
 
@@ -232,11 +227,11 @@ We used Claude (Anthropic) as a coding and writing assistant: to search for and 
 
 CODE:
 pip install -r requirements.txt
-python run_all.py                      rebuilds every number, figure and the portal data (about 15 minutes on 8 cores)
+python run_all.py                      rebuilds every number, figure and the portal data (about 45 minutes on 4 cores)
 python run_all.py --quality           quality measures only (Appendix G)
 python run_all.py --extras            the inclusion measure and the missed-visit experiment (section 3.8)
-pytest -q tests                        81 checks: need-only urgency, tiers, inclusive intake, reader safety net, planner limits, missed visits, data integrity
-node tests/test_api.mjs                 17 checks on the server: validation, no-access evidence, urgency changes, reassignment, sign-in rules
+pytest -q tests                        104 checks: need-only urgency, tiers, inclusive intake, reader safety net, planner limits, missed visits, data integrity
+node tests/test_api.mjs                 44 checks on the server: validation, no-access evidence, urgency changes, reassignment, sign-in rules
 https://reachnt.vercel.app             the ReachNT portal, desktop and phone (or serve web/ locally); works offline
 https://github.com/harshrastogii/reachnt   all code, data links and documents
 notebooks/01_walkthrough.ipynb         the method step by step
@@ -276,6 +271,8 @@ TENANT_EXAMPLE
 
 # Appendix F: Who sees what
 
+Names, phone numbers and addresses sit in one `pii` schema, encrypted with pgcrypto and readable only by intake staff through a function that logs every read (Appendix F). Work is keyed by house ID and H3 cell; row-level security limits a tradesperson to their trips and nearby jobs, a tenant to their own jobs, and the public to resolution-6 summaries. The decision ledger is append-only, each row hashing the one before. PostgreSQL, PostGIS and h3-pg are free and open source; a pilot fits Neon's Sydney free tier [22], as a year of data is under 1 GB.
+
 TABLE: Table F1. Data zones and access in the ReachNT database (docs/schema.sql).
 | Zone | Holds | Who can read it |
 |---|---|---|
@@ -305,7 +302,7 @@ TABLE: Table I1. What used to disadvantage a tenant, and what ReachNT does inste
 | Saying less, limited English, a relayed message | The same six questions on every channel, read out by staff or an interpreter: anyone in danger now; anyone needing power, cooling or medical supplies (Tier 1); a baby under 12 months or a frail elder (Tier 1); young children, pregnancy, illness or trouble getting around (Tier 2); how many people live there; told anyone before. The tenancy record gives household size (more than 2 people per bedroom is crowded) and the job history gives repeats. Any "yes" counts; "not asked" never removes points and triggers a call-back. |
 | Language | Words kept as said. Free Aboriginal Interpreter Service, TIS National and National Relay Service. Language recorded only to book an interpreter, never scored. |
 | Digital literacy, channel | Repairs line, Community Housing Officer, maintenance officer, tradesperson, front counter and app create the same record. Everything in the app can also be done by phone or through the housing officer. |
-| Submission timing | The clock starts at first contact with anyone. The line is ordered by need; waiting adds 3 points a day only after half the clock, so no job waits forever and an early caller with a minor fault never jumps a dangerous one. |
+| Submission timing | The clock starts at first contact with anyone. The line is ordered by need; waiting adds 3 points a day only after half the clock, so no job waits forever, and a minor fault would need many months of waiting to outrank a dangerous one. |
 | Unchecked machine decisions | A person can raise or confirm urgency at any time, from a call, a visit, a photo or a review. Lowering a dangerous repair needs someone who spoke to the tenant or saw the fault, and a reason the tenant reads. The reader can never lower danger. Enforced in the portal, the server and a database constraint. |
 
 **When time runs short.** The planner values a job by its need points, adds 400 when its clock ends within 7 days and, under ReachNT, 6,000 more for an urgent or dangerous job, which puts it on the next trip. The coordinator sees the time left and this arithmetic on every waiting repair.

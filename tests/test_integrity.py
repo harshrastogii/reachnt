@@ -1,9 +1,9 @@
-import numpy as np
 """Integrity and robustness checks: the data is sane, every simulated plan keeps its books, and the reader fails safe.
 
 Data and simulation checks skip when the pipeline outputs are missing (run python run_all.py first).
 """
 from __future__ import annotations
+import numpy as np
 
 import glob
 import re

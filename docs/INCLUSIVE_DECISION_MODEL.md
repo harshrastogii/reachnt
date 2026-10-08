@@ -74,7 +74,7 @@ The channel is stored only to check fairness by channel. Everything a tenant can
 
 ### Submission timing
 - The clock starts at **first contact with anyone**. The intake form asks when the tenant first told someone, so a report a housing officer heard on Tuesday and typed in on Thursday has been waiting since Tuesday.
-- The line is ordered by need, not first come first served. Waiting time adds points only after half the clock has passed (+3 a day), so nothing waits forever, and an early caller with a minor fault never jumps a later caller with a dangerous one.
+- The line is ordered by need, not first come first served. Waiting time adds points only after half the clock has passed (+3 a day), so nothing waits forever. A minor fault would need many months of waiting to outrank a dangerous one, and the guarantee puts urgent and dangerous jobs on the next trip as their clock runs out.
 - A missed visit never restarts the clock.
 
 ### Unchecked machine decisions
@@ -131,10 +131,10 @@ Nothing here changes anyone's place in line. The coordinator decides, and a decl
 
 | | Words only (before) | With the standard questions (now) |
 |---|---|---|
-| Points lost by the short telling (households with something to tell) | 43 on average | 5 on average |
-| Short telling ranked lower than the full one | 97% | 12% |
-| Places lost in a shared queue | 14% of the queue | 1.4% |
-| Tier 1 or Tier 2 households recognised from a short telling | 4% | 91% |
+| Points lost by the short telling (households with something to tell) | 50 on average (median 20) | 5 on average (median 0) |
+| Short telling ranked lower than the full one | 95% | 6% |
+| Places lost in a shared queue | 14% of the queue | 1.2% |
+| Tier 1 or Tier 2 households recognised from a short telling | 13% | 89% |
 
 What's left comes from questions left unanswered (we assume 1 in 10). The average is higher than before tiers because a Tier 1 household that is never asked can also miss being raised to Immediate when it loses power, water or cooling. That is why every unanswered question triggers a call-back, the same day for a lifeline fault.
 
@@ -142,9 +142,9 @@ What's left comes from questions left unanswered (we assume 1 in 10). The averag
 
 | | Cheapest first | ReachNT |
 |---|---|---|
-| 9 in 10 urgent remote repairs fixed within | 62 → 74 days | 3 → 9 days |
+| 9 in 10 urgent remote repairs fixed within | 62 → 72 days | 3 → 9 days |
 | 9 in 10 *missed* urgent remote repairs fixed within | 126 days | 17 days |
-| Cost per repair | $559 → $608 | $816 → $873 |
+| Cost per repair | $561 → $611 | $821 → $879 |
 
 Under ReachNT a missed urgent job keeps its waiting time and gets the deadline boost, so it goes on the next trip out. Under cheapest-first it waits for a cheap trip.
 

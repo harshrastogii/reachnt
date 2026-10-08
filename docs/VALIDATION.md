@@ -1,6 +1,6 @@
 # Validation: what we checked, what we fixed, what is still missing
 
-Checked 8 October 2026 against the live portal (https://reachnt.vercel.app), the Python engine and the standards that similar services now have to meet. Every check that can be automated runs in `tests/` (81 Python checks, 22 server checks), which GitHub Actions runs on every push.
+Checked 8 October 2026 against the live portal (https://reachnt.vercel.app), the Python engine and the standards that similar services now have to meet. Every check that can be automated runs in `tests/` (104 Python checks, 44 server checks), which GitHub Actions runs on every push.
 
 ## 1. Checks we ran
 
@@ -22,7 +22,7 @@ Checked 8 October 2026 against the live portal (https://reachnt.vercel.app), the
 | Reader | ROC-AUC, PR-AUC, calibration, cross-validation | See report Appendix G. The model's confidence runs ahead of its accuracy on new wording, so no percentage is shown to tenants. |
 | Data | 70 communities, inside the NT, houses > 0, every community has a hub, unique ids, valid hazards, request days within the year | Pass |
 | Simulation | In all 14 plans: done + open = all jobs, no negative waits, nothing fixed before it was reported, same requests in every plan | Pass (66 of 66) |
-| Simulation | Results hold in other random years; solver close to optimal | Pass (Appendix G: five years; 99.2% of 25,972 weekly plans proved optimal) |
+| Simulation | Results hold in other random years; solver close to optimal | Pass (Appendix G: five years; 99.5% of 26,018 weekly plans proved optimal) |
 | Build | A fresh install can run the code | **Was broken:** `requirements.txt` did not list `h3`, `scipy` or `requests`. Fixed, and CI now installs from scratch on every push. |
 | Links | 45 links in the report and research notes | 36 load; 7 are government sites that refuse automated requests (they open in a browser); **2 were dead and are fixed in our notes** (the NIAA review needs `.pdf`; the CARE principles page moved, so we cite Carroll et al. 2020, https://doi.org/10.5334/dsj-2020-043). |
 | Page weight | Brotli on the wire | Page 2 KB, app 28 KB, data 195 KB, map library 217 KB. Bundled offline tiles load only when needed. |

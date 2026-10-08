@@ -1,24 +1,30 @@
 {
  "words": {
-  "gap_mean": 43.34619625137817,
+  "gap_mean": 50.11596548004315,
+  "gap_median": 20.0,
   "gap_max": 960,
-  "short_ranked_lower": 0.9724366041896362,
-  "queue_places_lost_pct": 14.441381844909962,
-  "short_points_missed": 28.054024255788313,
-  "vulnerable_recognised_short": 0.03530751708428246,
+  "category_cliffs": 72,
+  "gap_mean_without_cliffs": 19.806397306397308,
+  "short_ranked_lower": 0.948220064724919,
+  "queue_places_lost_pct": 14.215318230852212,
+  "short_points_missed": 50.482740021574976,
+  "vulnerable_recognised_short": 0.12627291242362526,
   "vulnerable_recognised_full": 1.0
  },
  "intake": {
-  "gap_mean": 5.25909592061742,
+  "gap_mean": 4.635922330097087,
+  "gap_median": 0.0,
   "gap_max": 940,
-  "short_ranked_lower": 0.12017640573318633,
-  "queue_places_lost_pct": 1.352747151782433,
-  "short_points_missed": -10.385887541345094,
-  "vulnerable_recognised_short": 0.9145785876993167,
+  "category_cliffs": 7,
+  "gap_mean_without_cliffs": 1.5240931239848403,
+  "short_ranked_lower": 0.05771305285868392,
+  "queue_places_lost_pct": 1.1512315713772026,
+  "short_points_missed": 4.646709816612729,
+  "vulnerable_recognised_short": 0.8920570264765784,
   "vulnerable_recognised_full": 1.0
  },
  "n": 3000,
- "households_with_something_to_say": 0.6046666666666667,
+ "households_with_something_to_say": 0.618,
  "answer_rate": 0.9,
  "note": "Synthetic households. Answers are assumed true when given; unanswered questions earn no points."
 }

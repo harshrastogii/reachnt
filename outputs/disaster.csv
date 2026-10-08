@@ -1,4 +1,4 @@
-label,cost_per_job,cost_per_job_joint,event_jobs,event_urgent,event_houses,event_urgent_p90,event_all_p90,event_fixed_within_28,event_open_at_end,event_made_safe_same_day,other_urgent_p90,other_jobs
-No flood,816.1985636040494,676.8575787970509,0,0,0,,,,0,,3.0,708
-"Flood, usual crews",818.891012395445,678.4186475468192,94,74,44,14.0,17.700000000000003,0.9787234042553191,0,1.0,10.0,708
-"Flood, surge crews",822.5395783127706,679.7754258347763,94,74,44,3.0,5.400000000000006,1.0,0,1.0,3.0,708
+label,cost_per_job,cost_per_job_joint,event_jobs,event_urgent,event_houses,event_urgent_p90,event_all_p90,event_fixed_within_28,event_open_at_end,event_made_safe_same_day,event_made_safe_within_1_day,other_urgent_p90,other_jobs
+No flood,821.3666166637556,716.2544783259107,0,0,0,,,,0,,,3.0,708
+"Flood, usual crews",824.341511478435,717.6156529229683,94,74,44,14.0,15.700000000000003,0.9787234042553191,0,1.0,1.0,10.0,708
+"Flood, surge crews",827.7264526843269,718.4414339410066,94,74,44,3.0,5.400000000000006,1.0,0,1.0,1.0,3.0,708

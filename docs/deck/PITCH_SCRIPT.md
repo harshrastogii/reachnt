@@ -6,7 +6,7 @@ Slides: `DataChallenge_Team AIC015_Slides.pptx` (or `.pdf`). The same script is 
 
 **Who speaks:** Harsh opens (slide 1). Aashish presents the problem, the inclusive model (slide 6), H3 (his idea), floods (slide 10) and trust, and gives the recommendations. Harsh presents the solution, the AI, planning, results, the demo and the close. Swap freely; the notes don't depend on who says them.
 
-**Timing:** about 9 minutes 40 seconds spoken, which leaves 20 seconds of slack. If you're running late, cut the live demo on slide 11 and talk over the screenshots.
+**Timing:** about 9 minutes 50 seconds spoken, which leaves 10 seconds of slack. If you're running late, cut the live demo on slide 11 and talk over the screenshots.
 
 **If you only have 5 minutes:** use slides 1, 3, 4, 6, 9, 11 and 15, and shorten each one to its first two sentences.
 
@@ -64,11 +64,12 @@ We tested it on wording it had never seen. The model alone is decent, a ROC-AUC 
 And we're honest about its limits: its confidence isn't reliable, so we never show tenants a percentage.
 
 ### 6. Fair to people who say less  
-*AASHISH, about 35 seconds*
+*AASHISH, about 40 seconds*
 
 Thanks Harsh. There's a quieter unfairness too.
 If points come only from what tenants say, "my nana lives here, nine of us, third time I rang" beats "toilet blocked, please come". Same house, same need.
 So whoever the tenant tells asks the same six questions, with a free interpreter, and the tenancy record fills in the rest.
+Tier one, like someone on dialysis or a newborn, gets more points, and losing power or water becomes an emergency for them.
 On three thousand made-up households, saying less cost 19 points from words alone. With the questions, about 2.
 And the clock starts when the tenant first told anyone.
 
@@ -98,11 +99,12 @@ We didn't trust one lucky year, so we ran five. The result held every time.
 We're not saying cost doesn't matter. We're saying the trade-off should be visible, priced, and signed by a person.
 
 ### 10. Floods and cyclones  
-*AASHISH, about 35 seconds*
+*AASHISH, about 40 seconds*
 
 Floods and cyclones hit whole communities at once. The coordinator declares an event: every house made safe within 48 hours, one team trip with all the trades, and surge crews from the contractor panel.
 We modelled a flood like January 2023 at Kalkarindji. With the usual crews, flood repairs took 15 days, and everyone else in the region slipped from 3 to 10.
 With surge crews, both stayed at 3 days. A disaster shouldn't quietly take other communities' trades.
+The portal also reads the NT Road Report and the Bureau of Meteorology, so heavy rain near a community prompts the coordinator to declare a flood. It prompts; a person decides.
 
 ### 11. The product (live demo)  
 *HARSH, about 65 seconds, including a short live demo if there's time*
@@ -168,6 +170,12 @@ They record why: no one home, can't get in, need parts, needs another trade, or 
 
 **An urgency can change. Who updates it?**
 Any person, any time: when the tenant rings, when the housing officer or a tradesperson sees it, from a photo, or after a review. Raising it takes effect at once, and "dangerous" sends the maintenance officer that day. Lowering a dangerous repair needs someone who spoke to the tenant or saw it, and a reason the tenant can read. The computer can never lower it. Tenants and tradespeople can also press "it got worse", and a person calls back the same day.
+
+**Why tiers? Why not ask whether someone is Aboriginal, or who heads the household?**
+The tiers ask only what changes the harm from a fault. Tier 1 is life-preservation: someone who needs power, cooling or medical supplies, like dialysis, insulin or oxygen, a baby under 12 months, or a frail elder. They get 40 points, and losing power, water or cooling becomes Immediate. Tier 2 is young children, pregnancy, illness or trouble getting around: 25 points. We ask about an elder "old enough for aged care", so nobody has to state their Aboriginality. Who heads the household, income and how isolated the community is aren't need for a repair, so they're not in the score. Isolation belongs in trip planning.
+
+**Where do the road and weather warnings come from? Do they change the order?**
+The NT Road Report's public feed for closures and flooding, and Bureau of Meteorology station observations for rain since 9 am and temperature, read every 10 minutes. If a feed is down, the portal shows a saved copy and says so. They only prompt the coordinator: a road closed near a community, heavy rain ("Declare a flood?"), or heat for Tier 1 homes without power or cooling. Nothing changes anyone's place unless a person decides.
 
 **Doesn't ranking by need still favour people who explain well?**
 That's what we fixed. Points for a baby, an elder or a crowded house used to come only from the tenant's words. Now everyone is asked the same questions, the tenancy record fills in household size, and the repair history fills in repeats. Saying less used to cost 19 points on average; now it costs about 2. When or how you report, your language and whether you use the app are never in the score, and a test fails if they ever are.

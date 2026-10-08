@@ -256,7 +256,12 @@ hazards:
       - "paint|cupboard door|handle|hinge|fence|gate|curtain|tile|crack"
 
 modifiers:
-  vulnerable:
+  tier1:          # Tier 1, life-preservation: someone needs power, cooling or medical supplies, a newborn, a frail elder
+    patterns:
+      - "dialysis|renal|kidney machine|insulin|diabet|oxygen|ventilat|life support|nebuli[sz]er|feeding tube"
+      - "new ?born|new baby|baby|babies|infant"
+      - "frail|bed.?ridden|can.?t get out of bed|very old"
+  vulnerable:     # Tier 2, high systemic risk: young children, pregnancy, illness, disability or limited mobility, elders
     patterns:
       - "bab(y|ies)|newborn|little ones|kids|children|grand ?kids|toddler|pregnant"
       - "old (people|lady|man|nana|granny|grandmother|grandfather)|elder|nanna|nana|granny|aged"
@@ -283,15 +288,15 @@ intake_questions:
   - id: danger_now
     ask: Is anyone in danger right now? (sparks, smoke, gas, water near power, sewage inside, something falling)
     means: danger              # yes: a person calls today and checks whether it is Immediate; never lowers a reading
-  - id: young_child
-    ask: Does a baby or young child live there?
-    means: vulnerable
-  - id: elder
-    ask: Does an elder or older person live there?
-    means: vulnerable
-  - id: health
-    ask: Is anyone there sick, pregnant, or living with a disability?
-    means: vulnerable
+  - id: life_support
+    ask: Does anyone need power, cooling or medical supplies to stay well? (dialysis, insulin, oxygen, medicine kept in the fridge)
+    means: tier1               # Tier 1, life-preservation
+  - id: baby_elder
+    ask: Is there a baby under 12 months, or a frail elder? (an elder old enough for aged care)
+    means: tier1
+  - id: child_mobility
+    ask: Are there young children, or is anyone pregnant, sick, or finding it hard to get around? (wheelchair, walking frame)
+    means: tier2               # Tier 2, high systemic risk
   - id: people
     ask: How many people are living there now? (the tenancy record fills this in; ask if it may have changed)
     means: crowded             # more than crowded_people_per_bedroom people per bedroom (params.yaml)

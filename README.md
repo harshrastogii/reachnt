@@ -54,6 +54,11 @@ With 1 in 10 booked visits missing, ReachNT still fixed 9 in 10 of the *missed* 
 - **Trades travelling together.** Different trades booked to the same community (or the same shared trip) in the same week share one ute (3 seats) or one charter (5 seats). Counted after planning, so it is a floor: it saves ReachNT a further $130 per repair (1,482 of 8,199 trips shared) and cheapest-first $45. Different trades going to neighbouring communities are suggested to share one loop.
 - **Floods, cyclones and fires.** The coordinator declares an event over the communities hit. The portal plans the response (make safe within 48 hours, one team trip, surge crews from the contractor panel, a message to every household) and tags every job from the area. In a modelled flood of Kalkarindji, Daguragu and Pigeon Hole (94 repairs, roads cut for 4 weeks), the usual crews fixed 9 in 10 urgent flood repairs within 15 days and the rest of the Katherine hub slipped from 3 to 10 days; with surge crews (double for 8 weeks) both stayed at 3 days.
 
+## Who lives there, in tiers; roads and weather now
+
+- **Tiers.** Tier 1, life-preservation: someone needs power, cooling or medical supplies (dialysis, insulin, oxygen), a baby under 12 months, or a frail elder: 40 points, and losing power, water or cooling becomes Immediate. Tier 2: young children, pregnancy, illness or limited mobility: 25 points. Tier 3: no extra points. Aboriginality, who heads the household, income and the community's isolation are never used.
+- **Roads and weather now** (Trips tab). `web/api/warnings.js` reads the NT Road Report and Bureau of Meteorology observations (10-minute cache; a labelled saved snapshot when a feed is down, built by `scripts/warnings_snapshot.py`). It prompts the coordinator about closures near a community, heavy rain ("Declare a flood?") and heat for Tier 1 households without power, water or cooling. It never changes the line.
+
 ## How a repair request gets into ReachNT
 
 The tenant tells someone, and that person logs it: in the **New report** tab, or in the **Housing officer** view. The coordinator doesn't upload requests; they look after the line, the trips and the checks. The housing officer also records, for tenants who don't use the app, whether a repair worked, that it got worse, or that they want a review; each update is marked as recorded for the tenant.
@@ -121,7 +126,7 @@ The planner is single-threaded with a fixed seed, so every run gives the same nu
 ## How it works
 
 1. **Read** (`intake.py`): phrase rules from `config/taxonomy.yaml` plus a TF-IDF / logistic regression model. Unsure, conflicting or possibly dangerous readings go to a person.
-2. **Rank by need only** (`urgency.py`, `intake.household`): the NT category sets the clock; points for harm, Healthy Living Practice, vulnerable or crowded household, repeat report and waiting. Household points come from the standard questions, the tenancy record and the job history as well as the words, so saying less costs nothing. A test fails if distance, cost, channel, language or the like appear.
+2. **Rank by need only** (`urgency.py`, `intake.household`): the NT category sets the clock; points for harm, Healthy Living Practice, who lives there (Tier 1 life-preservation 40, Tier 2 25; a Tier 1 household losing power, water or cooling is Immediate), a crowded house, a repeat report and waiting. Household points come from the standard questions, the tenancy record and the job history as well as the words, so saying less costs nothing. A test fails if distance, cost, channel, language or the like appear.
 3. **H3** (`geo.py`): communities get H3 cells at resolutions 3–7; houses are resolution-10 cells; communities whose resolution-4 cells are within 2 rings form run zones (68 pairs).
 4. **Plan trips** (`planner.py`): weekly, per hub and trade, OR-Tools CP-SAT chooses single trips and run zones under crew hours, road closures and airstrips.
 5. **Show the trade-off** (`simulate.py`, `experiments.py`): one year under 14 settings plus a sensitivity sweep.
@@ -137,7 +142,8 @@ The planner is single-threaded with a fixed seed, so every run gives the same nu
 | NT Annual Traffic Report 2023 restriction register | CC BY 4.0 |
 | Digital Earth Australia Landsat 8/9 geomedian 2024 (bundled tiles) | CC BY 4.0, Geoscience Australia |
 | Esri World Imagery (live tiles only, not stored) | Esri terms, attribution shown |
-| Road Report NT live feed | NTG, read only |
+| NT Road Report live feed (closures, flooding; `web/api/warnings.js`) | NTG, read only |
+| Bureau of Meteorology station observations (rain since 9 am, temperature; `web/api/warnings.js`) | © Commonwealth of Australia, Bureau of Meteorology |
 | OurAirports | Public domain |
 | OpenStreetMap settlement points and buildings (map positions only, `scripts/osm_settlements.py`) | ODbL 1.0, © OpenStreetMap contributors |
 | NIAA/PwC-IC Review of the NPRH NT (2023), Appendix B | Commonwealth report, figures quoted |

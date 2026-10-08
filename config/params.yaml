@@ -119,7 +119,10 @@ planning:
 
 triage:
   confidence_threshold: 0.55     # below this the report goes to a person
-  vulnerable_points: 25
+  tier1_points: 40               # ASSUMPTION Tier 1, life-preservation: needs power, cooling or medical supplies; newborn; frail elder
+  vulnerable_points: 25          # Tier 2, high systemic risk: young children, pregnancy, illness, disability, limited mobility
+  # Tier 1 + one of these faults is Immediate: losing power, water or cooling is a danger to that household. ASSUMPTION
+  lifeline_faults: [no_power, no_water, aircon_fan]
   crowded_points: 10
   repeat_points: 10
   rework_points: 50              # ASSUMPTION: a fix the tenant says didn't work comes back ahead of a fresh report of the same fault

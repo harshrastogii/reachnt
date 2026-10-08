@@ -64,6 +64,8 @@ def modifier_hits(text: str) -> dict[str, str]:
             if m:
                 out[k] = m.group(0)
                 break
+    if "tier1" in out:                      # one tier per household: Tier 1 outranks Tier 2
+        out.pop("vulnerable", None)
     return out
 
 
@@ -152,6 +154,8 @@ def read(text: str, clf: Classifier | None) -> Reading:
     if source == "model":
         # no percentage: on unfamiliar wording the model's confidence runs ahead of its accuracy (evaluate.py, calibration)
         reasons.append(f"No listed phrase matched. The model's best guess is '{H[mh]['label']}'.")
+    if primary and "tier1" in mods and primary in params()["triage"]["lifeline_faults"] and H[primary]["category"] != "immediate":
+        reasons.append("Someone there needs power, cooling or medical supplies, so this is treated as Immediate. A person calls today.")
     if primary and H[primary]["category"] == "immediate":
         reasons.append("Immediate jobs are confirmed by phone and made safe by the local Housing Maintenance Officer.")
     hazards = sorted(set(hits) | ({primary} if primary else set()), key=lambda k: (CAT_RANK[H[k]["category"]], -H[k]["harm"]))
@@ -163,7 +167,9 @@ def read(text: str, clf: Classifier | None) -> Reading:
 # that "toilet broke pls come" does not, for the same household. So the household side of the score comes from the
 # same short questions asked on every channel, the tenancy record and the house's job history, as well as the words.
 # Any source saying yes counts. An unanswered question never removes points; it asks for a call-back.
-VULNERABLE_QUESTIONS = ("young_child", "elder", "health")
+TIER1_QUESTIONS = ("life_support", "baby_elder")     # Tier 1, life-preservation
+TIER2_QUESTIONS = ("child_mobility",)                 # Tier 2, high systemic risk
+VULNERABLE_QUESTIONS = TIER1_QUESTIONS + TIER2_QUESTIONS
 
 
 def household(words: dict | None = None, answers: dict | None = None, record: dict | None = None,
@@ -178,8 +184,10 @@ def household(words: dict | None = None, answers: dict | None = None, record: di
     """
     words, answers, record, history = words or {}, answers or {}, record or {}, history or {}
     T = params()["triage"]
-    src: dict[str, list[str]] = {"vulnerable": [], "crowded": [], "repeat": []}
-    if any(answers.get(q) == "yes" for q in VULNERABLE_QUESTIONS):
+    src: dict[str, list[str]] = {"tier1": [], "vulnerable": [], "crowded": [], "repeat": []}
+    if any(answers.get(q) == "yes" for q in TIER1_QUESTIONS):
+        src["tier1"].append("answer")
+    if any(answers.get(q) == "yes" for q in TIER2_QUESTIONS):
         src["vulnerable"].append("answer")
     people = answers.get("people") if isinstance(answers.get("people"), (int, float)) else record.get("people")
     if people and record.get("bedrooms") and people / record["bedrooms"] > T["crowded_people_per_bedroom"]:
@@ -194,4 +202,6 @@ def household(words: dict | None = None, answers: dict | None = None, record: di
     asked = [q["id"] for q in taxonomy().get("intake_questions", [])]
     unanswered = [q for q in asked if answers.get(q) in (None, "unknown") and not (q == "people" and record.get("people"))]
     mods = {k: 1 for k, v in src.items() if v}
-    return mods, {k: v for k, v in src.items() if v}, unanswered
+    if "tier1" in mods:                     # one tier per household: the highest one counts
+        mods.pop("vulnerable", None)
+    return mods, {k: v for k, v in src.items() if v and k in mods}, unanswered

@@ -74,6 +74,7 @@ Added after checking ReachNT against UK and Australian repair and automated-deci
 | `ops.reader_audit` | The weekly re-reading of 1 in 20 automatically read reports | Ongoing quality assurance (Ombudsman ADM guide) |
 | `ops.tenant_confirmation` | Whether the tenant says the repair worked | "Still broken" reopens the job |
 | `ops.job.channel`, `first_contact_at`, `language`, `interpreter` | How the report arrived and when the tenant first told anyone | The clock starts at first contact; channel and language are kept only to book interpreters and check fairness, never scored (`docs/INCLUSIVE_DECISION_MODEL.md`) |
+| `ops.job.tier` | Who lives there: 1 life-preservation (power, cooling or medical supplies; baby under 12 months; frail elder), 2 high systemic risk, 3 none | Tier 1 losing power, water or cooling is Immediate; never Aboriginality, income or who heads the household |
 | `ops.intake_answer` | The standard questions, asked the same way on every channel, with the source (asked, tenancy record, job history) | Saying less costs no points; "unknown" never removes any |
 | `ops.urgency_check` | Every time a person checks or changes urgency: who, how (call, on site, photo, review), from what to what, and why | Append-only; a CHECK refuses lowering a dangerous repair unless the source spoke to the tenant or saw the fault |
 | `ops.job_offer` | Who goes after a missed visit: next trip, a named crew, or open to any contractor of that trade | One open offer per job; the first to accept gets it |

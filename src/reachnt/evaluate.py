@@ -144,7 +144,11 @@ def _cross_validation(tr, H, folds=5):
 
 def _ranking(df, rd):
     """Queue from read reports vs queue from true faults. A report sent to a person is assumed read correctly."""
-    mods = lambda r: {k: 1 for k in ("vulnerable", "crowded", "repeat") if getattr(r, k)}
+    def mods(r):   # the corpus flags a vulnerable household; its tier comes from what it lives with
+        m = {k: 1 for k in ("crowded", "repeat") if getattr(r, k)}
+        if r.vulnerable:
+            m["tier1" if "tier1" in intake.modifier_hits(r.text) else "vulnerable"] = 1
+        return m
     true = np.array([urgency.score(r.hazard, mods(r)).total for r in df.itertuples()])
     read = np.array([urgency.score(x.hazard, x.modifiers).total if x.hazard else 0 for x in rd])
     checked = np.where([x.needs_human for x in rd], true, read)
@@ -241,21 +245,24 @@ def inclusion(n: int = 3000, seed: int = 21) -> dict:
         base = synth.make_report(h, rng, "heldout" if rng.random() < 0.3 else "train")
         extra = [synth.MODIFIER_PHRASES[k][rng.integers(len(synth.MODIFIER_PHRASES[k]))] for k, on in
                  (("vulnerable", v), ("crowded", c), ("repeat", r)) if on]
+        # the household's true tier: Tier 1 if what they live with is life-preservation (a newborn, dialysis), else Tier 2
+        t1 = bool(v and "tier1" in intake.modifier_hits(extra[0]))
+        vkey = "tier1" if t1 else "vulnerable"
         full = ", ".join([base] + extra)
         bedrooms = int(rng.integers(2, 5))
         people = int(bedrooms * (rng.uniform(2.1, 4) if c else rng.uniform(0.5, 2)))
-        which = rng.choice(list(intake.VULNERABLE_QUESTIONS)) if v else None
+        which = (rng.choice(list(intake.TIER1_QUESTIONS)) if t1 else intake.TIER2_QUESTIONS[0]) if v else None
         answers = {q: ("unknown" if rng.random() > rate else ("yes" if q == which else "no")) for q in intake.VULNERABLE_QUESTIONS}
         answers["before"] = "unknown" if rng.random() > rate else ("yes" if r else "no")
         record, history = dict(people=people, bedrooms=bedrooms), dict(same_fault_open_or_recent=bool(r and rng.random() < rate))
-        true = urgency.score(h, {k: 1 for k, on in (("vulnerable", v), ("crowded", c), ("repeat", r)) if on}).total
+        true = urgency.score(h, {k: 1 for k, on in ((vkey, v), ("crowded", c), ("repeat", r)) if on}).total
         out = dict(true=true, v=v, c=c, r=r)
         for tell, text in (("full", full), ("short", base)):
-            words = {k: x for k, x in intake.modifier_hits(text).items() if k in ("vulnerable", "crowded", "repeat")}
+            words = {k: x for k, x in intake.modifier_hits(text).items() if k in ("tier1", "vulnerable", "crowded", "repeat")}
             mods, _, _ = intake.household(words, answers, record, history)
             for m, mm in (("words", words), ("intake", mods)):
                 out[f"{tell}_{m}"] = urgency.score(h, {k: 1 for k in mm}).total
-                out[f"{tell}_{m}_vulnerable"] = "vulnerable" in mm
+                out[f"{tell}_{m}_vulnerable"] = "vulnerable" in mm or "tier1" in mm
         rows.append(out)
     import pandas as pd
     d = pd.DataFrame(rows)

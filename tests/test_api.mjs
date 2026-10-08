@@ -6,6 +6,7 @@ import fs from "node:fs";
 const API = ["../web/api/", "../../3_Interactive_Prototype/web/api/"].map((p) => new URL(p, import.meta.url)).find((u) => fs.existsSync(u));
 const { default: handler } = await import(new URL("sync.js", API));
 const { sign } = await import(new URL("_auth.js", API));
+const warnings = await import(new URL("warnings.js", API));
 
 const call = (body, headers = {}, method = "POST") => new Promise((done) => {
   const res = { code: 200, status(c) { this.code = c; return this; }, json(j) { done({ code: this.code, ...j }); } };
@@ -40,7 +41,7 @@ await check("a review needs a reason; a confirmation needs fixed or still broken
 });
 
 const intake = (extra = {}) => ({ id: "N0001", kind: "intake", status: "new", channel: "cho", words: "toilet broke pls come", language: "Kriol",
-  interpreter: "ais", hazard: "toilet_blocked", first_contact_day: 208, answers: { young_child: "yes", elder: "unknown", people: 9, before: "no" }, ...extra });
+  interpreter: "ais", hazard: "toilet_blocked", first_contact_day: 208, answers: { child_mobility: "yes", baby_elder: "unknown", people: 9, before: "no" }, ...extra });
 await check("a new report needs the tenant's words, a known channel and only the standard questions", async () => {
   const r = await call({ updates: [intake(), intake({ id: "N0002", words: " " }), intake({ id: "N0003", channel: "fax" }),
     intake({ id: "N0004", answers: { english_level: "low" } }), intake({ id: "N0005", answers: { people: 99 } })] });
@@ -124,5 +125,21 @@ await check("only a coordinator can declare a flood or cyclone, over real commun
   assert.deepEqual(c.rejected, ["EV-0002:event", "EV-0003:event"]);
   const t = await call({ updates: [ev()] }, bearer(sign({ role: "tradesperson", jobs: [] }, S)));
   assert.deepEqual(t.rejected, ["EV-0001:event"]);
+});
+await check("roads and weather: live feeds are read, and only closures and flooding are kept", async () => {
+  const fake = async (url) => ({ ok: true, json: async () => url.includes("roadreport")
+    ? { response: [{ status: "CURRENT", roadName: "Buntine Highway", restrictionType: "Road Closed", obstructionType: "Flooding", startPoint: [-17.4, 130.8] },
+                   { status: "CURRENT", roadName: "Stuart Highway", restrictionType: "With Caution", obstructionType: "Roadworks" }] }
+    : { observations: { data: [{ local_date_time_full: "20270105090000", air_temp: 31, apparent_t: 38.5, rain_trace: "152.4" }] } } });
+  const w = await warnings.build(fake);
+  assert.equal(w.roads_source, "live"); assert.equal(w.weather_source, "live");
+  assert.deepEqual(w.roads.map((r) => r.road), ["Buntine Highway"]);
+  assert.ok(w.weather.length > 0 && w.weather.every((x) => x.rain_since_9am === 152.4));
+});
+await check("roads and weather: when the feeds are down, the saved snapshot is used and labelled", async () => {
+  const down = async () => { throw new Error("no route"); };
+  const w = await warnings.build(down);
+  assert.equal(w.roads_source, "snapshot"); assert.equal(w.weather_source, "snapshot");
+  assert.ok(Array.isArray(w.roads) && w.weather.length > 0 && w.roads_saved);
 });
 console.log(`${n} API checks passed`);

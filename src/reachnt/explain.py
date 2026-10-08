@@ -77,7 +77,7 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
     else:
         waited = float(job["wait_days"])
         is_open = bool(job.get("open_at_end"))
-    mods = {k: 1 for k in ("vulnerable", "crowded", "repeat") if job.get(k)}
+    mods = {k: 1 for k in ("tier1", "vulnerable", "crowded", "repeat") if job.get(k)}
     u = urgency.score(job["hazard"], mods, waited, clock)
     sections = []
 
@@ -87,6 +87,8 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
     sections.append(("What we heard", heard))
 
     how = [f"This is {_a(CAT_WORD[cat])} repair."]
+    if cat == "immediate" and H["category"] != "immediate":
+        how.append("Someone in your house needs power, cooling or medical supplies, so losing it is treated as dangerous.")
     if cat == "immediate":
         how.append(f"The local Housing Maintenance Officer makes it safe the same day. Then {_a(trade)} does the full fix.")
     bd = 10 if cat == "routine" else 2

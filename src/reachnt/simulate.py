@@ -48,14 +48,17 @@ def read_requests(req: pd.DataFrame, com: pd.DataFrame | None = None) -> pd.Data
     req["read_hazard"] = [r.hazard for r in reads]
     req["needs_human"] = [r.needs_human for r in reads]
     req["read_source"] = [r.source for r in reads]
+    req["tier1"] = [("tier1" in r.modifiers) for r in reads]
     req["vulnerable"] = [("vulnerable" in r.modifiers) for r in reads]
     req["crowded"] = [("crowded" in r.modifiers) for r in reads]
     req["repeat"] = [("repeat" in r.modifiers) for r in reads]
     # a person reviews flagged reports next business day and records the true fault (ASSUMPTION: review is correct)
     req["hazard"] = np.where(req.needs_human | req.read_hazard.isna(), req.true_hazard, req.read_hazard)
     req["available_day"] = req.day + np.where(req.needs_human, 1, 0)
-    req["category"] = req.hazard.map(lambda h: H[h]["category"])
-    req["true_category"] = req.true_hazard.map(lambda h: H[h]["category"])
+    mods = [{k: 1 for k in ("tier1", "vulnerable") if r.modifiers.get(k)} for r in reads]
+    # Tier 1 households (power, cooling or medical supplies; newborn; frail elder) losing power, water or cooling: Immediate
+    req["category"] = [urgency.category(h, m) for h, m in zip(req.hazard, mods)]
+    req["true_category"] = [urgency.category(h, m) for h, m in zip(req.true_hazard, mods)]
     req["trade"] = req.hazard.map(lambda h: H[h]["trade"])
     req["hours"] = req.hazard.map(lambda h: H[h]["hours"])
     req["harm"] = req.true_hazard.map(lambda h: H[h]["harm"])
@@ -99,7 +102,7 @@ def job_value(job: dict, policy: Policy, day_end: float) -> float:
         return v
     clock = job["clock_" + policy.regime]
     waited = day_end - job["day"]
-    u = urgency.score(job["hazard"], {k: 1 for k in ("vulnerable", "crowded", "repeat") if job[k]}, waited, clock)
+    u = urgency.score(job["hazard"], {k: 1 for k in ("tier1", "vulnerable", "crowded", "repeat") if job.get(k)}, waited, clock)
     v = u.total
     due = job["day"] + clock - day_end <= P["due_soon_days"]
     if due:

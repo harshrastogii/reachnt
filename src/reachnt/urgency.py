@@ -6,6 +6,13 @@ That rule is tested in tests/test_urgency.py.
 
     points = category base + harm + Healthy Living Practice rank + exposure + repeat + ageing + rework
 
+Who lives there, in tiers (from the standard questions, the tenancy record and the tenant's words):
+  Tier 1, life-preservation: someone needs power, cooling or medical supplies (dialysis, insulin, oxygen), a baby
+          under 12 months, or a frail elder. More points, and losing power, water or cooling is Immediate for them.
+  Tier 2, high systemic risk: young children, pregnancy, illness, disability or limited mobility.
+  Tier 3: everyone else. No extra points.
+Age is asked as "old enough for aged care", so the score never needs anyone's Aboriginality.
+
 Rework: a repair that was marked done but the tenant (or their housing officer) says is still broken comes back with
 extra points, and keeps the day it was first reported, so its clock has usually run out and the planner's deadline
 boost sends it on the next trip.
@@ -53,13 +60,27 @@ def clock_days(category: str, remote: bool, regime: str = "equal") -> float:
     return C[key]["remote" if remote else "town"] * 7 / 5
 
 
+def tier(modifiers: dict) -> int:
+    """1 life-preservation, 2 high systemic risk ("vulnerable"), 3 standard."""
+    return 1 if "tier1" in modifiers else 2 if "vulnerable" in modifiers else 3
+
+
+def category(hazard: str, modifiers: dict) -> str:
+    """The FS17 category of the fault, raised to Immediate when a Tier 1 household loses power, water or cooling."""
+    cat = taxonomy()["hazards"][hazard]["category"]
+    if tier(modifiers) == 1 and hazard in params()["triage"]["lifeline_faults"]:
+        return "immediate"
+    return cat
+
+
 def score(hazard: str, modifiers: dict, days_waited: float = 0.0, clock: float | None = None) -> Urgency:
     H = taxonomy()["hazards"][hazard]
     T = params()["triage"]
-    cat = H["category"]
+    cat = category(hazard, modifiers)
     clock = clock if clock is not None else clock_days(cat, False)
     hlp_pts = (10 - H["hlp"]) * 4                    # Safety (0) = 40 ... HLP 9 = 4
-    exposure = (T["vulnerable_points"] if "vulnerable" in modifiers else 0) + (T["crowded_points"] if "crowded" in modifiers else 0)
+    tier_pts = {1: T["tier1_points"], 2: T["vulnerable_points"], 3: 0}[tier(modifiers)]
+    exposure = tier_pts + (T["crowded_points"] if "crowded" in modifiers else 0)
     repeat = T["repeat_points"] if "repeat" in modifiers else 0
     over_half = max(0.0, days_waited - clock / 2)
     ageing = int(round(params()["planning"]["ageing_points_per_day"] * over_half))

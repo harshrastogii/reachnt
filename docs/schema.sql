@@ -108,7 +108,8 @@ CREATE TABLE ops.job (
   trade         text NOT NULL,
   read_by       text NOT NULL,                        -- rules, model, rules+model, person
   checked_by_person boolean NOT NULL DEFAULT false,
-  vulnerable    boolean NOT NULL DEFAULT false,
+  vulnerable    boolean NOT NULL DEFAULT false,         -- Tier 1 or Tier 2 (kept for simple filters)
+  tier          smallint NOT NULL DEFAULT 3 CHECK (tier IN (1,2,3)),   -- 1 life-preservation, 2 high systemic risk, 3 none
   crowded       boolean NOT NULL DEFAULT false,
   repeat_report boolean NOT NULL DEFAULT false,
   made_safe_at  timestamptz,                         -- first clock: an Immediate fault made safe (4 h in FS17)
@@ -218,7 +219,7 @@ CREATE TABLE ops.reader_audit (
 -- tenant said, in what language, or how. 'unknown' never removes points; it asks for a call-back (config/taxonomy.yaml).
 CREATE TABLE ops.intake_answer (
   job_id      bigint NOT NULL REFERENCES ops.job,
-  question    text NOT NULL CHECK (question IN ('danger_now','young_child','elder','health','people','before')),
+  question    text NOT NULL CHECK (question IN ('danger_now','life_support','baby_elder','child_mobility','people','before')),
   answer      text NOT NULL CHECK (answer IN ('yes','no','unknown') OR answer ~ '^[0-9]{1,2}$'),
   source      text NOT NULL CHECK (source IN ('asked','tenancy_record','job_history')),
   at          timestamptz NOT NULL DEFAULT now(),

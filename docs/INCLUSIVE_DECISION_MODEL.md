@@ -2,7 +2,7 @@
 
 ReachNT decides the order in which repairs are done. In a regional or remote community, the easy way to do that is unfair without anyone meaning it to be. A tenant who rings early, fills in every field, writes good English and uses the app gets ahead of a tenant who tells the Community Housing Officer in Kriol that the toilet is broken.
 
-ReachNT's rule is that **the place in line follows need only**. Need means the fault, who lives in the house, and how long the household has waited.
+ReachNT's rule is that **the place in line follows need only**. Need means the fault, who lives in the house (in three tiers), and how long the household has waited.
 
 The rule is written into the code, tested on every change and measured. It applies to Aboriginal and Torres Strait Islander tenants, to migrants and refugees, and to anyone else who finds forms, English, phones or apps hard.
 
@@ -11,13 +11,28 @@ The rule is written into the code, tested on every change and measured. It appli
 | Counts | Never counts |
 |---|---|
 | The fault and how dangerous it is (FS17 category, harm, Healthy Living Practice) | Where the house is: distance, travel cost, community, region |
-| Who lives there: a baby or young child, an elder, someone sick, pregnant or living with a disability, a crowded house | How the report arrived: phone, Community Housing Officer, maintenance officer, tradesperson, app |
+| Who lives there, in three tiers (below), and a crowded house | How the report arrived: phone, Community Housing Officer, maintenance officer, tradesperson, app |
 | A repeat of a fault that wasn't fixed | When in the day or week the tenant got in touch, and who got in first |
 | How long the household has waited, counted from the day they first told anyone | How much the tenant said, how well they spelled it, or their English |
 | | Their language, or whether they needed an interpreter |
 | | Whether they own a phone or use the app |
 
 `urgency.score` reads only the fault, the household modifiers and days waited. `tests/test_core.py::test_urgency_signature_has_no_place_or_cost_inputs` fails if the function mentions any of these: distance, cost, community, remote, band, channel, language, English, interpreter, submitted, form, app, phone or logged.
+
+### Who lives there: three tiers
+
+| Tier | Who | What it adds |
+|---|---|---|
+| 1. Life-preservation | Someone who needs power, cooling or medical supplies to stay well (dialysis, insulin, oxygen, medicine kept in the fridge); a baby under 12 months; a frail elder | 40 points. Losing power, water or cooling (`lifeline_faults`) becomes **Immediate**: made safe the same day |
+| 2. High systemic risk | Young children; someone pregnant, sick, or finding it hard to get around | 25 points |
+| 3. Everyone else | | No extra points |
+
+One tier counts per household, the highest. The points are assumptions in `config/params.yaml` (`tier1_points`, `vulnerable_points`), to be set with the community.
+
+What the tiers deliberately leave out:
+- **Aboriginality.** Age is asked as "an elder old enough for aged care", so nobody has to state it and the score never needs it.
+- **Who heads the household**, income or employment. These are not need for a repair, and using them would treat similar houses differently.
+- **Isolation or flood risk of the community.** That is about where the house is. It belongs in trip planning (charters, wet-season pre-positioning), not in anyone's place in line.
 
 ## 2. The five ways the old way was unfair, and what ReachNT does
 
@@ -27,9 +42,9 @@ Before this change, the household part of the score came only from the tenant's 
 Now three sources fill it in, and any "yes" counts:
 1. **The same short questions, asked every time, on every channel.** Staff or an interpreter read them out (`config/taxonomy.yaml` → `intake_questions`):
    - Is anyone in danger right now?
-   - Does a baby or young child live there?
-   - Does an elder or older person live there?
-   - Is anyone there sick, pregnant, or living with a disability?
+   - Does anyone need power, cooling or medical supplies to stay well? (Tier 1)
+   - Is there a baby under 12 months, or a frail elder? (Tier 1)
+   - Are there young children, or is anyone pregnant, sick, or finding it hard to get around? (Tier 2)
    - How many people are living there now?
    - Have you told anyone about this fault before?
 2. **The tenancy record** fills in household size and bedrooms. More than 2 people per bedroom counts as crowded.
@@ -99,6 +114,17 @@ When a disaster hits whole communities, need still sets the order, and the coord
 
 The point for fairness is the rest of the region. In the modelled flood, without surge crews the other Katherine-hub communities' urgent repairs slipped from 3 to 10 days (9 in 10). With surge crews they stayed at 3. A disaster should not quietly take other communities' trades.
 
+## 3c. Roads and weather now: prompts, not decisions
+
+The Trips tab reads the **NT Road Report** (closures and flooding) and **Bureau of Meteorology** station observations (rain since 9 am, temperature) through `web/api/warnings.js`, cached for 10 minutes. If either feed can't be reached, a saved snapshot is shown and labelled with its date.
+
+It turns them into prompts for the coordinator:
+- a road closed on a community's access road, or within 30 km: how many repairs wait there, and whether an airstrip lets a charter still go;
+- more than 50 mm of rain since 9 am within 80 km: "Declare a flood?", with the communities ticked;
+- heat that feels like 38°C or more within 80 km: the Tier 1 households there waiting on power, water or cooling.
+
+Nothing here changes anyone's place in line. The coordinator decides, and a declared event is a signed decision like any other.
+
 ## 4. Measured, not just claimed
 
 **Saying less** (`evaluate.inclusion()`, 3,000 synthetic households, each described twice: once in full, once in a few words):
@@ -139,7 +165,9 @@ Both measures use synthetic data. They show that the mechanism works, not how re
 | Piece | File |
 |---|---|
 | Standard questions | `config/taxonomy.yaml` (`intake_questions`) |
-| Crowding threshold, assumed answer rate | `config/params.yaml` (`triage`) |
+| Tier points, lifeline faults, crowding threshold, assumed answer rate | `config/params.yaml` (`triage`) |
+| Tier and the Immediate rule for Tier 1 | `src/reachnt/urgency.py` (`tier`, `category`) |
+| Roads and weather now | `web/api/warnings.js`, `scripts/warnings_snapshot.py`, `web/data/warnings_snapshot.json` |
 | Household modifiers from answers, record, history and words | `src/reachnt/intake.py` (`household`) |
 | Need score | `src/reachnt/urgency.py` |
 | Deadline boost | `src/reachnt/simulate.py` (`job_value`) |

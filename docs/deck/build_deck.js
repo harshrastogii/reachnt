@@ -192,7 +192,7 @@ tell.forEach(([h, b, fill], i) => {
 });
 card(s, 3.55, 4.6, 4.75, 1.95, HEX.goodSoft, "ask-card");
 text(s, "So everyone is asked the same six questions", { x: 3.8, y: 4.72, w: 4.3, h: 0.35, fontSize: 14, bold: true, color: HEX.ink, objectName: "ask-h" });
-text(s, "Anyone in danger now? A baby or young child? An elder? Someone sick, pregnant or with a disability? How many people live there? Told anyone before? The tenancy record and repair history fill in the rest. \"Not asked\" never takes points away.",
+text(s, "Anyone in danger now? Needs power, cooling or medicine; a baby under 1 or a frail elder (Tier 1)? Young children, pregnant, sick or hard to get around (Tier 2)? How many live there? Told anyone before? Records fill in the rest. \"Not asked\" never costs points.",
   { x: 3.8, y: 5.1, w: 4.3, h: 1.4, fontSize: 12.5, color: HEX.ink2, objectName: "ask-b" });
 const fair = [[`${Math.round(IN.words.gap_mean)} → ${Math.round(IN.intake.gap_mean)}`, "points a household lost for saying less (average)", HEX.good],
               [`${pct(IN.words.short_ranked_lower)} → ${pct(IN.intake.short_ranked_lower)}`, "of short reports ranked below the same household told in full", HEX.hex],
@@ -208,6 +208,7 @@ s.addNotes(`[AASHISH, about 35 seconds]
 Thanks Harsh. There's a quieter unfairness too.
 If points come only from what tenants say, "my nana lives here, nine of us, third time I rang" beats "toilet blocked, please come". Same house, same need.
 So whoever the tenant tells asks the same six questions, with a free interpreter, and the tenancy record fills in the rest.
+Tier one, like someone on dialysis or a newborn, gets more points, and losing power or water becomes an emergency for them.
 On three thousand made-up households, saying less cost ${Math.round(IN.words.gap_mean)} points from words alone. With the questions, about ${Math.round(IN.intake.gap_mean)}.
 And the clock starts when the tenant first told anyone.`);
 
@@ -332,12 +333,13 @@ const frow = (y, label, a, b, name) => {
 frow(2.85, "In the flooded communities", fl.event_urgent_p90 || 15, fsu.event_urgent_p90 || 3, "fl-event");
 frow(4.1, `Everywhere else in the hub (${Math.round(f0.other_urgent_p90 || 3)} with no flood)`, fl.other_urgent_p90 || 10, fsu.other_urgent_p90 || 3, "fl-other");
 text(s, "Every dangerous fault was made safe the day it was reported.", { x: 8.15, y: 5.5, w: 4.3, h: 0.7, fontSize: 13, italic: true, color: HEX.ink2, objectName: "fl-safe" });
-text(s, "Need still sets the order inside the flooded area. The question for fairness is everyone else: without surge crews, the flood quietly takes their trades.",
+text(s, "Live NT Road Report and Bureau of Meteorology readings prompt the coordinator: a road closure, heavy rain (\u201cDeclare a flood?\u201d) or heat for Tier 1 homes. A person decides.",
   { x: 0.6, y: 6.05, w: 7.0, h: 0.75, fontSize: 13.5, italic: true, color: HEX.ink2, objectName: "fl-foot" });
 s.addNotes(`[AASHISH, about 35 seconds]
 Floods and cyclones hit whole communities at once. The coordinator declares an event: every house made safe within 48 hours, one team trip with all the trades, and surge crews from the contractor panel.
 We modelled a flood like January 2023 at Kalkarindji. With the usual crews, flood repairs took ${Math.round(fl.event_urgent_p90 || 15)} days, and everyone else in the region slipped from ${Math.round(f0.other_urgent_p90 || 3)} to ${Math.round(fl.other_urgent_p90 || 10)}.
-With surge crews, both stayed at ${Math.round(fsu.event_urgent_p90 || 3)} days. A disaster shouldn't quietly take other communities' trades.`);
+With surge crews, both stayed at ${Math.round(fsu.event_urgent_p90 || 3)} days. A disaster shouldn't quietly take other communities' trades.
+The portal also reads the NT Road Report and the Bureau of Meteorology, so heavy rain near a community prompts the coordinator to declare a flood. It prompts; a person decides.`);
 
 // ================================================================ 11 product
 pres.addSection({ title: "Product" });

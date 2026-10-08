@@ -56,9 +56,9 @@ def test_equal_clock_has_no_remote_allowance_official_does():
 
 # ---------------------------------------------------------------- inclusive intake: saying less costs no points
 def test_short_and_full_tellings_score_the_same_once_the_questions_are_asked():
-    full = intake.modifier_hits("toilet blocked, my nana lives here, 9 of us living here, this is the third time")
+    full = intake.modifier_hits("toilet blocked, the kids are sick, 9 of us living here, this is the third time")
     short = intake.modifier_hits("toilet blocked pls come")
-    answers = dict(young_child="no", elder="yes", health="no", before="yes", danger_now="no")
+    answers = dict(life_support="no", baby_elder="no", child_mobility="yes", before="yes", danger_now="no")
     record, history = dict(people=9, bedrooms=3), dict(same_fault_open_or_recent=True)
     a, _, _ = intake.household(full, answers, record, history)
     b, src, unanswered = intake.household(short, answers, record, history)
@@ -68,11 +68,35 @@ def test_short_and_full_tellings_score_the_same_once_the_questions_are_asked():
 
 
 def test_an_unknown_answer_never_lowers_a_score():
-    words = intake.modifier_hits("no hot water for the baby")
-    known, _, _ = intake.household(words, dict(young_child="no"))
-    unknown, _, unanswered = intake.household(words, dict(young_child="unknown"))
+    words = intake.modifier_hits("no hot water, the kids are sick")
+    known, _, _ = intake.household(words, dict(child_mobility="no"))
+    unknown, _, unanswered = intake.household(words, dict(child_mobility="unknown"))
     assert known == unknown == {"vulnerable": 1}               # the words still count; "no" or "unknown" takes nothing away
-    assert "young_child" in unanswered                          # and an unanswered question asks for a call-back
+    assert "child_mobility" in unanswered                       # and an unanswered question asks for a call-back
+
+
+# ---------------------------------------------------------------- vulnerability tiers
+def test_tier_one_outranks_tier_two_outranks_none():
+    t1 = urgency.score("hot_water", {"tier1": 1}).total
+    t2 = urgency.score("hot_water", {"vulnerable": 1}).total
+    t3 = urgency.score("hot_water", {}).total
+    assert t1 > t2 > t3 and t1 - t3 == params()["triage"]["tier1_points"]
+
+
+def test_losing_power_water_or_cooling_is_immediate_for_tier_one_only():
+    for fault in params()["triage"]["lifeline_faults"]:
+        assert urgency.category(fault, {"tier1": 1}) == "immediate"
+        assert urgency.category(fault, {"vulnerable": 1}) == taxonomy()["hazards"][fault]["category"]
+    assert urgency.category("pests", {"tier1": 1}) == "routine"           # only faults that cut power, water or cooling
+
+
+def test_tiers_come_from_answers_and_words_and_one_tier_counts():
+    assert intake.modifier_hits("power off, my husband is on dialysis").get("tier1")
+    assert "vulnerable" not in intake.modifier_hits("no power, new baby and the kids are sick")
+    mods, src, _ = intake.household({}, dict(life_support="yes", child_mobility="yes"))
+    assert mods == {"tier1": 1} and src == {"tier1": ["answer"]}
+    mods, _, _ = intake.household({}, dict(child_mobility="yes"))
+    assert mods == {"vulnerable": 1}
 
 
 def test_inclusion_measure_shows_the_gap_closing():

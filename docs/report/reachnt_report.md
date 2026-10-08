@@ -57,15 +57,15 @@ Each community belongs to the nearest of five crew bases (Darwin, Katherine, Ten
 
 ## 2.2 Reading a fault report
 
-Phrase rules, written from the FS17 examples and the s 63 emergency list, match 23 fault types (including damp and mould, which England's 2025 Awaab's Law singles out) and four modifiers (vulnerable occupant, crowded house, repeat report, negation). A TF-IDF and logistic regression model (scikit-learn) catches wording the rules miss. A person reads the report when no rule matches and the model is under 55% sure, when the two disagree on category, when the model gives 25% or more to a dangerous fault, or when a danger word (smoke, melting, sparks, sewage) appears in a reading that is not Immediate. A negated danger ("no sparks now") stays Immediate and goes to a person: the reader never downgrades danger on its own. Both the Python engine and the portal use the same rules file.
+Phrase rules, written from the FS17 examples and the s 63 emergency list, match 23 fault types (including damp and mould, which England's 2025 Awaab's Law singles out) and five modifiers (a Tier 1 or Tier 2 occupant, crowded house, repeat report, negation). A TF-IDF and logistic regression model (scikit-learn) catches wording the rules miss. A person reads the report when no rule matches and the model is under 55% sure, when the two disagree on category, when the model gives 25% or more to a dangerous fault, or when a danger word (smoke, melting, sparks, sewage) appears in a reading that is not Immediate. A negated danger ("no sparks now") stays Immediate and goes to a person: the reader never downgrades danger on its own. Both the Python engine and the portal use the same rules file.
 
 ## 2.3 Need-only urgency
 
 Category sets the clock. Inside a category, points order the line:
 
-**points = category (1000/500/100) + harm (0–100) + Healthy Living Practice (Safety 40 down to HLP 9 at 4) + who lives there (vulnerable +25, crowded +10) + repeat report (+10) + waiting (+3 a day past half the clock)**
+**points = category (1000/500/100) + harm (0–100) + Healthy Living Practice (Safety 40 down to HLP 9 at 4) + who lives there (Tier 1 +40 or Tier 2 +25, crowded +10) + repeat report (+10) + waiting (+3 a day past half the clock)**
 
-Harm values adapt the HHSRS severity weighting [14]. The waiting term means no job waits forever. The only inputs are the fault, what the report says and days waited; a unit test fails if distance, cost, region or community appear in the function.
+Tier 1 (life-preservation) is someone who needs power, cooling or medical supplies, a baby under 12 months or a frail elder; for them, losing power, water or cooling is Immediate. Tier 2 is young children, pregnancy, illness or limited mobility. Aboriginality, income and who heads the household are never asked. Harm values adapt the HHSRS severity weighting [14]. The waiting term means no job waits forever. The only inputs are the fault, what the report says and days waited; a unit test fails if distance, cost, region or community appear in the function.
 
 FIGURE: outputs/figures/fig1_map.png | 11.5 | Figure 1. The 70 communities by access band, each community's H3 resolution-4 hexagon, and the 68 possible shared trips (pairs of communities within two hexagon rings that can share a trip).
 
@@ -105,7 +105,7 @@ ReachNT will hold names, phone numbers and addresses, so the design keeps them i
 
 ## 2.8 Inclusive intake and decisions
 
-Household points (a baby, an elder, a crowded house, a repeat) used to come only from the tenant's words, so a household could lose up to 45 points by saying less. Now whoever the tenant tells asks the same six questions, with a free interpreter where needed (Aboriginal Interpreter Service, TIS National, National Relay Service); the tenancy record gives household size and the job history gives repeats. Any "yes" counts; an unanswered question never removes points. The clock starts when the tenant first told anyone. Channel, language and timing are never scored (a unit test checks). A person can raise urgency at any time; lowering a dangerous repair needs someone who spoke to the tenant or saw it. A missed visit goes to the next trip, a named crew or any contractor of that trade, keeping its wait and deadline boost (Appendix I).
+Household points (the tier, a crowded house, a repeat) used to come only from the tenant's words, so a household could lose up to 45 points by saying less. Now whoever the tenant tells asks the same six questions, with a free interpreter where needed (Aboriginal Interpreter Service, TIS National, National Relay Service); the tenancy record gives household size and the job history gives repeats. Any "yes" counts; an unanswered question never removes points. The clock starts when the tenant first told anyone. Channel, language and timing are never scored (a unit test checks). A person can raise urgency at any time; lowering a dangerous repair needs someone who spoke to the tenant or saw it. A missed visit goes to the next trip, a named crew or any contractor of that trade, keeping its wait and deadline boost. The Trips tab reads the NT Road Report and Bureau of Meteorology observations and prompts the coordinator about closures, heavy rain and heat for Tier 1 households; it never changes the line (Appendix I).
 
 # 3 Findings
 
@@ -169,7 +169,7 @@ A repair the tenant says is still broken reopens with {{RW}} rework points and k
 
 The brief names the risk: efficiency quietly decides who waits. ReachNT answers it three ways. The urgency score cannot see place. The equity cost is shown in dollars and days before anyone chooses. The choice is signed, so a tenant told "this was a cost decision" can see who made it and when. This follows the Robodebt Royal Commission's call for plain-language information about automated decisions and a path to review, and the Ombudsman's better practice guide [17]. ReachNT recommends and a person decides. Immediate jobs are always confirmed by phone and made safe by a local officer.
 
-The score uses what is known about the household (a baby, an elder, a crowded house). Taken from the tenant's words alone, that rewarded people who say more; ReachNT takes it from the same questions on every channel, the tenancy record and the job history (§2.8, §3.8), and no one gains a place by reporting earlier, online or in better English. Privacy Act transparency rules for automated decisions start on 10 December 2026 for organisations they cover, which may include contractors [18].
+The score uses what is known about the household (its tier, a crowded house). Taken from the tenant's words alone, that rewarded people who say more; ReachNT takes it from the same questions on every channel, the tenancy record and the job history (§2.8, §3.8), and no one gains a place by reporting earlier, online or in better English. Privacy Act transparency rules for automated decisions start on 10 December 2026 for organisations they cover, which may include contractors [18].
 
 ## 4.2 Cultural and community impacts
 
@@ -252,7 +252,7 @@ TABLE: Table C1. Data sources. Job-level requests are synthetic; everything else
 | NTG remote communities list 2021 (CC BY) | Coordinates and land council for each community |
 | ABS 2021 Census, Indigenous Profile I13 (CC BY 4.0) | Households renting from the housing authority in the five hub towns (3,864) |
 | NT Annual Traffic Report 2023 restriction register (CC BY) | Wet-season closures for 14 communities, e.g. Lajamanu Road closed Nov–Apr |
-| Road Report NT live feed; OurAirports | Current closures; airstrips within 8 km |
+| NT Road Report live feed; Bureau of Meteorology observations; OurAirports | Current closures and flooding, rain and heat (portal prompts); airstrips within 8 km |
 | DHLGCD FS17 [5]; RTA 1999 (NT) s 63 [16]; Healthabitat [8] | Response clocks; emergency repairs in law; order of health impact |
 | Grealy et al. 2022, Table 3 [7]; Nous 2017 [6] | Job mix by trade (38,492 APY jobs); cost structure for calibration |
 | Digital Earth Australia Landsat geomedian 2024; Esri World Imagery | Satellite basemap in the portal (offline and online) |
@@ -261,6 +261,7 @@ NTG remote communities list: https://data.nt.gov.au/dataset/remote-communities-w
 ABS 2021 Census DataPacks (Indigenous Profile, ILOC): https://www.abs.gov.au/census/find-census-data/datapacks
 NT Annual Traffic Report 2023: https://data.nt.gov.au/dataset/annual-traffic-report-2023
 Road Report NT: https://roadreport.nt.gov.au
+Bureau of Meteorology observations: http://www.bom.gov.au/nt/observations/
 OurAirports: https://ourairports.com/data/
 Digital Earth Australia Landsat geomedian: https://www.dea.ga.gov.au
 ABS ASGS 2021 boundaries (coastline): https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3
@@ -301,7 +302,7 @@ ReachNT's rule is that a repair's place in line follows need only: the fault, wh
 TABLE: Table I1. What used to disadvantage a tenant, and what ReachNT does instead.
 | Disadvantage | What ReachNT does |
 |---|---|
-| Saying less, limited English, a relayed message | The same six questions on every channel, read out by staff or an interpreter: anyone in danger now; a baby or young child; an elder; someone sick, pregnant or with a disability; how many people live there; told anyone before. The tenancy record gives household size (more than 2 people per bedroom is crowded) and the job history gives repeats. Any "yes" counts; "not asked" never removes points and triggers a call-back. |
+| Saying less, limited English, a relayed message | The same six questions on every channel, read out by staff or an interpreter: anyone in danger now; anyone needing power, cooling or medical supplies (Tier 1); a baby under 12 months or a frail elder (Tier 1); young children, pregnancy, illness or trouble getting around (Tier 2); how many people live there; told anyone before. The tenancy record gives household size (more than 2 people per bedroom is crowded) and the job history gives repeats. Any "yes" counts; "not asked" never removes points and triggers a call-back. |
 | Language | Words kept as said. Free Aboriginal Interpreter Service, TIS National and National Relay Service. Language recorded only to book an interpreter, never scored. |
 | Digital literacy, channel | Repairs line, Community Housing Officer, maintenance officer, tradesperson, front counter and app create the same record. Everything in the app can also be done by phone or through the housing officer. |
 | Submission timing | The clock starts at first contact with anyone. The line is ordered by need; waiting adds 3 points a day only after half the clock, so no job waits forever and an early caller with a minor fault never jumps a dangerous one. |
@@ -310,6 +311,8 @@ TABLE: Table I1. What used to disadvantage a tenant, and what ReachNT does inste
 **When time runs short.** The planner values a job by its need points, adds 400 when its clock ends within 7 days and, under ReachNT, 6,000 more for an urgent or dangerous job, which puts it on the next trip. The coordinator sees the time left and this arithmetic on every waiting repair.
 
 **Tenants without the app.** The Community Housing Officer has their own view: they log reports with the same questions and record what a tenant tells them (fixed, still broken, it got worse, a review), only for their own communities, each marked as recorded for the tenant. "Still broken" reopens the job with rework points and its first day.
+
+**Roads and weather now.** The portal reads the NT Road Report and Bureau of Meteorology station observations every 10 minutes (a labelled saved copy when a feed is down). A closure on a community's access road, more than 50 mm of rain since 9 am, or heat that feels like 38°C or more near a community becomes a prompt: how many repairs wait there and whether a charter can go, "Declare a flood?", or the Tier 1 households without power, water or cooling. Nothing changes anyone's place unless the coordinator decides.
 
 **Floods, cyclones and fires.** The coordinator declares an event over the communities hit. The portal plans the response (make every house safe within 48 hours, one team trip with the trades needed, surge crews from the contractor panel, a message to every household) and tags every job from the area, while need still sets the order and other communities keep their trips.
 

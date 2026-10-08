@@ -114,8 +114,17 @@
   const clockOf = (cat) => { const C = RN.clocks.equal; return (cat === "routine" ? C.routine_business_days.town : C.urgent_business_days.town) * 7 / 5; };
   // urgency.score, line for line: need only. Nothing about place, cost, channel, language or how much was said.
   const REWORK = RN.triage.rework_points || 50;
-  function needScore(hz, exposure, repeat, waited, rework = 0) {
-    const h = H[hz], cat = h.category, clock = clockOf(cat);
+  // Tiers of who lives there: 1 life-preservation (power, cooling or medical supplies; a baby under 12 months; a frail
+  // elder), 2 high systemic risk (young children, pregnancy, illness, limited mobility), 3 everyone else.
+  const tierOf = (mods) => (mods.tier1 ? 1 : mods.vulnerable ? 2 : 3);
+  const tierPts = (t) => (t === 1 ? RN.triage.tier1_points ?? 40 : t === 2 ? RN.triage.vulnerable_points : 0);
+  const LIFELINE = new Set(RN.triage.lifeline_faults || []);
+  // urgency.category: losing power, water or cooling is Immediate for a Tier 1 household
+  const catOf = (hz, tier) => (tier === 1 && LIFELINE.has(hz) ? "immediate" : H[hz].category);
+  const tierChip = (r) => (r.tier && r.tier < 3 ? `<span class="chip person" title="${TIER_CHIP[r.tier]}">Tier ${r.tier}</span>` : "");
+  const TIER_CHIP = { 1: "Tier 1: needs power, cooling or medicine, or a baby or frail elder", 2: "Tier 2: young children, pregnancy, illness or mobility" };
+  function needScore(hz, exposure, repeat, waited, rework = 0, cat = H[hz].category) {
+    const h = H[hz], clock = clockOf(cat);
     const ageing = Math.round(PL.ageing_points_per_day * Math.max(0, waited - clock / 2));
     const p = { category: cat, base: BASE[cat], harm: h.harm, hlp: (10 - h.hlp) * 4, exposure, repeat, ageing, rework };
     p.total = p.base + p.harm + p.hlp + p.exposure + p.repeat + p.ageing + p.rework; return p;
@@ -127,7 +136,7 @@
     if (pol === "cheapest" || pol === "floor") return 1000 + (pol === "floor" && cat !== "routine" && due ? PL.floor_bonus : 0);
     return needTotal + (due ? PL.deadline_bonus : 0) + (pol === "guarantee" && due && cat !== "routine" ? PL.floor_bonus : 0);
   }
-  const planNeed = (r) => needScore(r.hazard, r.score.exposure, r.score.repeat, dayEnd() - r.day, r.score.rework || 0).total;
+  const planNeed = (r) => needScore(r.hazard, r.score.exposure, r.score.repeat, dayEnd() - r.day, r.score.rework || 0, r.category).total;
   const timeLeft = (r) => clockOf(r.category) - r.wait;   // days left on the same-everywhere clock
   function dueChip(r) {
     if (r.done) return "";
@@ -147,7 +156,7 @@
   // a fix the tenant says didn't work: reopened with extra points, keeping the day it was first reported
   function reopen(x, c) {
     x.rework = c; x.done = false; x.trip = false; x.now = "rework";
-    x.score = needScore(x.hazard, x.score.exposure, x.score.repeat, x.wait, REWORK);
+    x.score = needScore(x.hazard, x.score.exposure, x.score.repeat, x.wait, REWORK, x.category);
     x.value = planValue(x.category, planNeed(x), x.day);
     x.score_text = scoreText(x.score);
   }
@@ -162,9 +171,9 @@
   const assignsAll = () => store("rn-assign") || {};
   function rehazard(x, hz, day) {
     const h = H[hz]; const wasTrade = x.trade;
-    x.hazard = hz; x.category = h.category;
+    x.hazard = hz; x.category = catOf(hz, x.tier || 3);
     if (!(x.assign && x.assign.trade)) x.trade = h.trade;
-    x.score = needScore(hz, x.score.exposure, x.score.repeat, x.wait, x.score.rework || 0);
+    x.score = needScore(hz, x.score.exposure, x.score.repeat, x.wait, x.score.rework || 0, x.category);
     x.value = planValue(x.category, planNeed(x), x.day);
     if (x.category === "immediate" && x.made_safe == null) x.made_safe = day;
     if (x.trade !== wasTrade && x.done) { x.done = false; x.trip = false; x.now = "needs_other_trade"; }
@@ -174,13 +183,13 @@
   }
   function freshRow(j, base) {   // a report logged in the portal this week: not planned yet, its clock running from first contact
     const c = comById[j.site]; const same = base.find((r) => r.site === j.site);
-    const h = H[j.hazard]; const wait = Math.max(0, today() - j.day);
+    const h = H[j.hazard]; const wait = Math.max(0, today() - j.day); const tier = tierOf(j.mods); const cat = catOf(j.hazard, tier);
     const x = { id: j.id, fresh: true, intake: j, site: j.site, place: j.place, band: c ? c.band : "Town", trade: h.trade, hazard: j.hazard,
-      category: h.category, text: j.text, house: j.house, cell: j.cell, day: j.day, done: false, trip: false, run: "",
+      category: cat, tier, text: j.text, house: j.house, cell: j.cell, day: j.day, done: false, trip: false, run: "",
       mode: same ? same.mode : "road", reachable: same ? same.reachable : true, trip_cost: c ? c.trip_cost : 0, wait,
-      needs_human: j.needs_human, vulnerable: !!j.mods.vulnerable, reasons: [], now: "new", made_safe: h.category === "immediate" ? today() : null,
+      needs_human: j.needs_human, vulnerable: tier < 3, reasons: [], now: "new", made_safe: cat === "immediate" ? today() : null,
       merged_into: "", came_back: null, history: j.history || [], rank: 0, of: 0 };
-    x.score = needScore(j.hazard, j.exposure, j.repeat, wait);
+    x.score = needScore(j.hazard, j.exposure, j.repeat, wait, 0, cat);
     x.value = planValue(x.category, planNeed(x), x.day);
     const keep = (t) => ((base[0] && base[0].sections.find(([k]) => k === t)) || [t, ""]);
     x.sections = [["What we heard", `You told us: "${j.text}". We read this as: ${h.label.toLowerCase()}.${j.needs_human ? " A person checks your report before it goes in the line." : ""}`],
@@ -279,7 +288,8 @@
     P.t(`${r.place} · house hexagon ${r.cell} (centre ${hexCentre(r.cell)}) · about ${H[r.hazard].hours} h on site`, 9, "normal", [74, 82, 92]);
     P.t(`Tenant said: “${r.text}”`, 10);
     if (r.category === "immediate") P.t("Dangerous: check the Housing Maintenance Officer made it safe before starting.", 9.5, "bold", [180, 38, 30]);
-    if (r.vulnerable) P.t("Someone vulnerable lives here (a baby, an elder or someone unwell).", 9.5, "normal", [74, 82, 92]);
+    if (r.tier === 1) P.t("Tier 1: someone here needs power, cooling or medical supplies, or there is a baby or a frail elder.", 9.5, "bold", [74, 82, 92]);
+    else if (r.vulnerable) P.t("Tier 2: young children, someone pregnant, sick or finding it hard to get around.", 9.5, "normal", [74, 82, 92]);
     P.box("Done"); P.box("Not done. Reason: ______________________________________");
     P.gap(1); P.rule();
   }
@@ -622,7 +632,7 @@
     $$("#coord .tabs button[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === state.tab)));
     const body = $("#coord-body");
     if (state.tab === "queue") body.innerHTML = queueHTML();
-    if (state.tab === "trips") { body.innerHTML = tripsHTML(); bindEvent(body); }
+    if (state.tab === "trips") { body.innerHTML = tripsHTML(); bindEvent(body); bindWarn(body); }
     if (state.tab === "checks") { body.innerHTML = checksHTML(); bindChecks(body); }
     if (state.tab === "reader") { body.innerHTML = readerHTML(); bindReader(); return; }
     bindGuides(body);
@@ -630,6 +640,7 @@
     $$(".filters [data-f]", body).forEach((b) => b.addEventListener("click", () => { state.filter = b.dataset.f; renderCoord(); refreshMap(); }));
     $$(".filters [data-tr]", body).forEach((b) => b.addEventListener("click", () => { state.trade = b.dataset.tr; renderCoord(); refreshMap(); }));
     $$("[data-cid]", body).forEach((b) => b.addEventListener("click", () => focusCommunity(b.dataset.cid)));
+    $$("[data-gotab]", body).forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.gotab; renderAll(); }));
     $$("[data-trip]", body).forEach((b) => b.addEventListener("click", () => {
       const ks = b.dataset.trip.split("+").map((k) => comById[k]); const pts = ks.map(ll).concat([HUBLL()]);
       map.fitBounds(pts.reduce((bb, p) => bb.extend(p), new maplibregl.LngLatBounds(pts[0], pts[0])), { padding: 80, maxZoom: 9, duration: reduce ? 0 : 1400 });
@@ -650,14 +661,14 @@
     const fb = (k, l) => `<button data-f="${k}" aria-pressed="${f === k}">${l}</button>`;
     const tb = (k, l) => `<button data-tr="${k}" aria-pressed="${state.trade === k}">${l}</button>`;
     return guide("coord", `<b>What you're looking at.</b> Each hexagon on the map is a community; the number is how many repairs are waiting. Green means a tradesperson goes this week, orange means no trip yet. A blue line is a shared trip: one person visits two nearby places on one trip. Tap a repair below to see why it sits where it does.`)
-      + decisionHTML()
+      + decisionHTML() + warnBanner()
       + (eventNow() ? `<div class="decision" style="border-color:var(--bad)"><span class="eyebrow" style="color:var(--bad)">${esc(EVENT_WORD[eventNow().type])} declared ${dateOf(eventNow().day)}</span><b>${esc(eventNow().communities.map((c) => comById[c].name).join(", "))}</b><p>Make safe within 48 hours, one team trip, surge crews from the panel. The plan is in Trips.</p></div>` : "")
       + `<div class="stats">${stats.map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("")}</div>`
       + `<div class="filters" style="padding:0 6px 6px">${tb("all", "All trades")}${Object.keys(TRADE).map((k) => tb(k, TRADE_SHORT[k])).join("")}</div>`
       + `<div class="filters" style="padding:0 6px 8px">${fb("remote", "Remote")}${fb("urgent", "Urgent")}${fb("town", "Town")}${fb("all", "All")}${comById[f] ? `<button data-f="all" aria-pressed="true" aria-label="Stop showing only ${esc(comById[f].name)}">${esc(comById[f].name)} ✕</button>` : ""}</div>`
       + `<p class="note" style="padding:0 8px 6px">Most urgent first. Where someone lives, how they told us and how much they said never change their place in line. A repair moves up as its time runs out.</p>`
       + list.slice(0, 120).map((r) => `<button class="row" data-id="${r.id}" aria-current="${state.job === r.id}"><span class="dot ${r.category}"></span>
-          <span class="t">${esc(H[r.hazard].label)}</span><span class="chips"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}${r.event ? `<span class="chip immediate">${esc(EVENT_WORD[r.event.type])}</span>` : ""}</span>
+          <span class="t">${esc(H[r.hazard].label)}</span><span class="chips"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}${tierChip(r)}${r.event ? `<span class="chip immediate">${esc(EVENT_WORD[r.event.type])}</span>` : ""}</span>
           <span class="s">${esc(r.place)} · ${TRADE_SHORT[r.trade]} · waiting ${days(r.wait)}${r.checks && r.checks.length ? " · checked by a person" : ""}</span></button>`).join("")
       + (list.length > 120 ? `<p class="note" style="padding:8px">Showing 120 of ${list.length}.</p>` : "");
   }
@@ -777,8 +788,8 @@
     const coms = RN.communities.filter((c) => c.hub === RN.hub).sort((a, b) => a.name.localeCompare(b.name));
     if (!e) return `<details class="card" id="evbox" style="margin:0 6px 10px"><summary style="cursor:pointer"><b>Flood, cyclone or fire?</b> Declare an event</summary>
       <form class="form" id="evf" style="margin-top:10px"><label class="field-label">What happened<select name="type">${Object.entries(EVENT_WORD).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
-        <fieldset><legend class="field-label">Communities hit</legend>${coms.map((c) => `<label class="tick"><input type="checkbox" name="c" value="${c.cid}"${(DZ.communities || []).includes(c.cid) ? " checked" : ""}> ${esc(c.name)}</label>`).join("")}</fieldset>
-        <label class="field-label">Note (optional)<input type="text" name="note" maxlength="300" placeholder="e.g. Victoria River over the Buntine Highway"></label>
+        <fieldset><legend class="field-label">Communities hit</legend>${coms.map((c) => `<label class="tick"><input type="checkbox" name="c" value="${c.cid}"${(WARN.prefill ? WARN.prefill.communities : DZ.communities || []).includes(c.cid) ? " checked" : ""}> ${esc(c.name)}</label>`).join("")}</fieldset>
+        <label class="field-label">Note (optional)<input type="text" name="note" maxlength="300" placeholder="e.g. Victoria River over the Buntine Highway" value="${esc(WARN.prefill ? WARN.prefill.note : "")}"></label>
         <button class="btn primary" type="submit">Declare and plan the response</button></form></details>`;
     const P = eventPlan(e); const Z = RN.disaster || [];
     const zr = (l) => Z.find((x) => x.label === l) || {};
@@ -803,15 +814,101 @@
       const ev = { type: f.type.value, communities: cs, day: today(), week: state.week, at: new Date().toISOString(), note: f.note.value.trim() || undefined };
       store("rn-event", ev);
       recordUpdate({ id: "EV-" + String(Date.now() % 1e6).padStart(6, "0"), trade: "general", place: cs.join(",") }, "declared", { event: ev.type, communities: cs, start_day: ev.day, note: ev.note }, "event");
+      WARN.prefill = null;
       toast(`${EVENT_WORD[ev.type]} declared. Jobs in those communities are tagged, and the response plan is below.`); renderAll();
     });
     const end = $("#evend", body);
     if (end) end.addEventListener("click", () => { const ev = store("rn-event"); if (ev) { ev.ended = new Date().toISOString(); store("rn-event", ev); } toast("Event ended."); renderAll(); });
   }
 
+  // ---------------------------------------------------------------- roads and weather now: prompts for the coordinator, never a change to the line
+  // api/warnings reads the NT Road Report (closures, flooding) and Bureau of Meteorology station observations (rain since
+  // 9 am, temperature), cached for 10 minutes. Offline or without the server, the saved snapshot is used and labelled.
+  const WARN = { data: null, loading: false, example: false };
+  const kmTo = (a, b, lat, lon) => { const R = 6371, r = Math.PI / 180, dl = (lat - a) * r, dn = (lon - b) * r;
+    const q = Math.sin(dl / 2) ** 2 + Math.cos(a * r) * Math.cos(lat * r) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(q)); };
+  async function loadWarnings() {
+    if (WARN.data || WARN.loading) return; WARN.loading = true;
+    try { const ctl = new AbortController(); setTimeout(() => ctl.abort(), 9000); const r = await fetch("api/warnings", { signal: ctl.signal }); if (!r.ok) throw new Error(r.status); WARN.data = await r.json(); }
+    catch (e) {
+      try { const s = await (await fetch("data/warnings_snapshot.json")).json();
+        WARN.data = { ...s, roads_source: "snapshot", weather_source: "snapshot", offline: true }; } catch (e2) { WARN.data = { failed: true }; }
+    }
+    WARN.loading = false;
+    if (state.role === "coord" && (state.tab === "trips" || state.tab === "queue")) renderCoord();
+  }
+  // a made-up day, clearly labelled: the January 2023 Victoria River flood pattern, plus a hot day at Ngukurr
+  function warnExample() {
+    const st = (w) => (WARN.data && WARN.data.stations || []).find((s) => s.wmo === w) || { wmo: w, station: "Station " + w, lat: 0, lon: 0 };
+    const vrd = st(94232), ng = st(94106);
+    return { example: true, roads: [{ road: "Buntine Highway", restriction: "Road Closed", type: "Flooding", where: "Victoria River crossing to Kalkaringi", comment: "Water over the road. Example only.", start: [-17.1, 130.8], end: [-17.5, 130.8], updated: "example" }],
+      weather: [{ ...vrd, time: "example", air_temp: 27, apparent_t: 31, rain_since_9am: 186 }, { ...ng, time: "example", air_temp: 39, apparent_t: 43, rain_since_9am: 0 }] };
+  }
+  const obsTime = (t) => (/^\d{12}/.test(String(t)) ? `${+String(t).slice(6, 8)} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][+String(t).slice(4, 6) - 1]}, ${String(t).slice(8, 10)}:${String(t).slice(10, 12)}` : String(t || ""));
+  const RAIN_MM = 50, HEAT_C = 38, ROAD_KM = 30, WX_KM = 80;
+  function warnPrompts(D) {
+    const coms = RN.communities.filter((c) => c.hub === RN.hub); const open = rows().filter((r) => !r.done);
+    const out = [];
+    (D.roads || []).forEach((x) => {
+      const near = coms.filter((c) => (c.closure && x.road && c.closure.toLowerCase().includes(x.road.toLowerCase().replace(/\s+(4wd|road|highway|hwy|track)$/i, "").trim()) && x.road.length > 3)
+        || [x.start, x.end].some((p) => Array.isArray(p) && kmTo(c.lat, c.lon, p[0], p[1]) <= ROAD_KM));
+      near.forEach((c) => {
+        const n = open.filter((r) => r.site === c.cid).length; const flood = /flood/i.test(`${x.type} ${x.restriction}`);
+        out.push({ kind: "road", c, flood, t: `${x.road}: ${x.restriction.toLowerCase()}${x.type ? ` (${x.type.toLowerCase()})` : ""} near ${c.name}.`,
+          p: `${n} repair${n === 1 ? "" : "s"} waiting there. ${c.airstrip ? "It has an airstrip: a charter can still go." : "No airstrip: trips by road wait until it opens."}${flood ? " If houses are flooding, declare a flood." : ""}` });
+      });
+    });
+    (D.weather || []).forEach((w) => {
+      const near = coms.filter((c) => kmTo(c.lat, c.lon, w.lat, w.lon) <= WX_KM);
+      if (w.rain_since_9am >= RAIN_MM && near.length) out.push({ kind: "rain", cs: near, flood: true, t: `${w.rain_since_9am} mm of rain since 9 am at ${w.station}.`, p: `Near ${near.map((c) => c.name).join(", ")}. Roads may cut and houses may flood. Declare a flood?` });
+      const hot = Math.max(w.apparent_t ?? -99, w.air_temp ?? -99);
+      if (hot >= HEAT_C && near.length) {
+        const t1 = open.filter((r) => near.some((c) => c.cid === r.site) && r.tier === 1 && LIFELINE.has(r.hazard));
+        out.push({ kind: "heat", cs: near, jobs: t1, t: `Feels like ${hot}°C at ${w.station}.`, p: t1.length ? `Tier 1 households near there without power, water or cooling: ${t1.length}. They are already Immediate; check they are made safe today.` : `No Tier 1 household near there is waiting on power, water or cooling.` });
+      }
+    });
+    return out;
+  }
+  function warnHTML() {
+    if (!WARN.data) { loadWarnings(); return `<div class="card" style="margin:0 6px 10px"><b>Roads and weather now</b><p class="note">Checking the NT Road Report and the Bureau of Meteorology…</p></div>`; }
+    if (WARN.data.failed) return `<div class="card" style="margin:0 6px 10px"><b>Roads and weather now</b><p class="note">Couldn't reach the road report or the weather, and no saved copy is here. Check roadreport.nt.gov.au and bom.gov.au.</p></div>`;
+    const D = WARN.example ? warnExample() : WARN.data; const P = warnPrompts(D);
+    const src = WARN.example ? `<span class="chip immediate">Example, not live</span>`
+      : `<span class="note">Roads: ${D.roads_source === "live" ? "live" : `saved ${esc(String(D.roads_saved || "").slice(0, 16))}`} · Weather: ${D.weather_source === "live" ? "live" : `saved ${esc(obsTime(D.weather_saved))}`}</span>`;
+    const coms = RN.communities.filter((c) => c.hub === RN.hub);
+    const wx = (D.weather || []).map((w) => { const near = coms.filter((c) => kmTo(c.lat, c.lon, w.lat, w.lon) <= WX_KM).map((c) => c.name);
+      return `<tr><td>${esc(w.station)}${w.saved ? " (saved)" : ""}<div class="note">${esc(near.slice(0, 3).join(", ") || "no community within 80 km")}</div></td><td>${w.rain_since_9am ?? "–"} mm</td><td>${w.air_temp ?? "–"}°C${w.apparent_t != null ? `, feels ${w.apparent_t}°C` : ""}</td><td class="note">${esc(obsTime(w.time))}</td></tr>`; }).join("");
+    return `<div class="card" id="warnbox" style="margin:0 6px 10px;display:grid;gap:8px">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap"><b>Roads and weather now</b>${src}</div>
+      ${P.length ? P.map((x, i) => `<div class="decision"${x.kind !== "heat" ? ' style="border-color:var(--warn, #ff9f0a)"' : ' style="border-color:var(--bad)"'}><span class="eyebrow">${x.kind === "road" ? "Road" : x.kind === "rain" ? "Heavy rain" : "Heat"}</span><b>${esc(x.t)}</b><p>${esc(x.p)}</p>
+          ${(x.jobs || []).slice(0, 6).map((r) => `<button class="btn small ghost" data-wjob="${r.id}">${esc(r.place)} · house ${r.house}: ${esc(H[r.hazard].label)}</button>`).join(" ")}
+          ${x.flood && !eventNow() ? `<button class="btn small" data-wflood="${i}">Declare a flood…</button>` : ""}</div>`).join("")
+        : `<p class="note">Nothing near your communities needs a decision: no closures within ${ROAD_KM} km or on their access roads, no rain over ${RAIN_MM} mm, no heat over ${HEAT_C}°C.</p>`}
+      <details><summary class="note" style="cursor:pointer">Stations (${(D.weather || []).length}) and closures across the NT (${(D.roads || []).length})</summary>
+        <table class="note" style="width:100%;margin-top:6px;border-collapse:collapse"><tr><th align="left">Station</th><th align="left">Rain since 9 am</th><th align="left">Temperature</th><th align="left">Read</th></tr>${wx}</table>
+        <ul class="note" style="padding-left:18px;margin:6px 0 0">${(D.roads || []).slice(0, 20).map((x) => `<li>${esc(x.road)}: ${esc(x.restriction)} (${esc(x.type)}), ${esc(x.where)}</li>`).join("")}</ul></details>
+      <p class="note">Prompts only: nothing here changes anyone's place in the line. You decide. Sources: NT Road Report (Northern Territory Government) and Bureau of Meteorology observations.
+        <button class="btn small ghost" id="wex">${WARN.example ? "Back to now" : "Show an example"}</button></p>
+    </div>`;
+  }
+  function bindWarn(body) {
+    const ex = $("#wex", body); if (ex) ex.addEventListener("click", () => { WARN.example = !WARN.example; renderCoord(); });
+    $$("[data-wjob]", body).forEach((b) => b.addEventListener("click", () => openJob(b.dataset.wjob)));
+    $$("[data-wflood]", body).forEach((b) => b.addEventListener("click", () => {
+      const D = WARN.example ? warnExample() : WARN.data; const x = warnPrompts(D)[+b.dataset.wflood];
+      WARN.prefill = { communities: x.cs ? x.cs.map((c) => c.cid) : [x.c.cid], note: x.t };
+      renderCoord(); const box = $("#evbox"); if (box) { box.open = true; box.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }); }
+    }));
+  }
+  function warnBanner() {
+    if (!WARN.data || WARN.data.failed || WARN.example) { if (!WARN.data) loadWarnings(); return ""; }
+    const n = warnPrompts(WARN.data).length;
+    return n ? `<div class="decision" style="margin:0 6px 10px"><span class="eyebrow">Roads and weather</span><b>${n} thing${n > 1 ? "s" : ""} to check before trips go</b><p>A road closure, heavy rain or heat near your communities. Nothing changes the line unless you decide. <button class="btn small ghost" data-gotab="trips">Open Trips</button></p></div>` : "";
+  }
+
   function tripsHTML() {
     const all = rows(); const F2 = fieldData();
-    let h = guide("trips", `<b>Shared trips.</b> When two communities are close, one tradesperson can visit both on the same trip instead of two separate trips. ReachNT finds the pairs with a hexagon map grid (Uber's H3): if their hexagons are no more than two apart, about 90 km, they can share. Tap a trip to see it on the map.`) + eventHTML() + costsHTML() + togetherHTML();
+    let h = guide("trips", `<b>Shared trips.</b> When two communities are close, one tradesperson can visit both on the same trip instead of two separate trips. ReachNT finds the pairs with a hexagon map grid (Uber's H3): if their hexagons are no more than two apart, about 90 km, they can share. Tap a trip to see it on the map.`) + warnHTML() + eventHTML() + costsHTML() + togetherHTML();
     Object.keys(TRADE).forEach((t) => {
       if (!F2[t]) return;
       const tj = all.filter((r) => r.trade === t); const groups = {};
@@ -914,7 +1011,7 @@
     const d = $("#detail"); const j = r.intake;
     d.innerHTML = `<button class="iconbtn closebtn" aria-label="Close">✕</button><div class="detail">
       <div><span class="eyebrow">${esc(r.place)} · ${TRADE[r.trade]}</span><h2 style="margin-top:4px">${esc(H[r.hazard].label)}</h2></div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip ${r.category}">${CAT[r.category]}</span><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip ${r.category}">${CAT[r.category]}</span><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}${tierChip(r)}
         ${r.needs_human ? '<span class="chip person">A person checked the report</span>' : ""}${r.run ? '<span class="chip hex">On a shared trip</span>' : ""}
         ${r.made_safe != null ? `<span class="chip booked">Made safe ${dateOf(r.made_safe)}</span>` : ""}${r.came_back != null ? `<span class="chip cut">Came back ${days(r.came_back)} after a fix</span>` : ""}
         ${r.merged_into ? `<span class="chip hex">Reported twice: joined to ${esc(r.merged_into)}</span>` : ""}</div>
@@ -951,6 +1048,7 @@
     const t = norm(text), hits = {}, mods = {};
     for (const [k, ps] of Object.entries(RX)) for (const p of ps) { const m = t.match(p); if (m) { hits[k] = m[0]; break; } }
     for (const [k, ps] of Object.entries(MX)) for (const p of ps) { const m = t.match(p); if (m) { mods[k] = m[0]; break; } }
+    if (mods.tier1) delete mods.vulnerable;
     const ks = Object.keys(hits).sort((a, b) => RANK[H[a].category] - RANK[H[b].category] || H[b].harm - H[a].harm);
     return { primary: ks[0] || null, all: ks, hits, mods };
   }
@@ -966,7 +1064,7 @@
   const INTERP = { none: "No interpreter needed", ais: "Aboriginal Interpreter Service", tis: "TIS National (other languages)", nrs: "National Relay Service", family: "Family or a friend helped" };
   const INTERP_WITH = { ais: "an Aboriginal Interpreter Service interpreter", tis: "a TIS National interpreter", nrs: "the National Relay Service", family: "help from family or a friend" };
   const Q = RN.taxonomy.intake_questions || [];
-  const VULN_Q = ["young_child", "elder", "health"];
+  const TIER1_Q = ["life_support", "baby_elder"], TIER2_Q = ["child_mobility"];
   const hashN = (t) => [...String(t)].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
   function recordOf(site, house) {   // a made-up tenancy record: household size and bedrooms (production: the Tenancy Management System)
     const h = hashN(site + "#" + house); const bedrooms = 2 + (h % 3); const c = comById[site];
@@ -981,15 +1079,18 @@
     return { open, recent: !!recent, history: mine.length ? mine[0].history || [] : [], cell: mine.length ? mine[0].cell : null };
   }
   function household(words, answers, record, recent) {   // intake.household(), line for line
-    const src = { vulnerable: [], crowded: [], repeat: [] };
-    if (VULN_Q.some((q) => answers[q] === "yes")) src.vulnerable.push("answer");
+    const src = { tier1: [], vulnerable: [], crowded: [], repeat: [] };
+    if (TIER1_Q.some((q) => answers[q] === "yes")) src.tier1.push("answer");
+    if (TIER2_Q.some((q) => answers[q] === "yes")) src.vulnerable.push("answer");
     const ppl = Number(answers.people) || record.people;
     if (ppl && record.bedrooms && ppl / record.bedrooms > RN.triage.crowded_people_per_bedroom) src.crowded.push(Number(answers.people) ? "answer" : "record");
     if (recent) src.repeat.push("history");
     if (answers.before === "yes") src.repeat.push("answer");
     Object.keys(src).forEach((k) => { if (words[k]) src[k].push("words"); });
     const unanswered = Q.map((q) => q.id).filter((q) => q !== "people" && (!answers[q] || answers[q] === "unknown"));
-    return { mods: Object.fromEntries(Object.entries(src).filter(([, v]) => v.length).map(([k]) => [k, 1])), src, unanswered };
+    const mods = Object.fromEntries(Object.entries(src).filter(([, v]) => v.length).map(([k]) => [k, 1]));
+    if (mods.tier1) { delete mods.vulnerable; delete src.vulnerable; }   // one tier per household: the highest counts
+    return { mods, src, unanswered };
   }
   const SRC_WORD = { answer: "an answer to the questions", record: "the tenancy record", history: "the house's job history", words: "the tenant's words" };
   function readerHTML(opts = {}) {
@@ -1022,14 +1123,16 @@
     const site = f.site.value, house = Math.max(1, Math.min(999, Number(f.house.value) || 1));
     const record = recordOf(site, house); const facts = houseFacts(site, house, hz);
     const hh = household(r.mods, answers, record, facts.recent);
+    const tier = tierOf(hh.mods), cat = hz ? catOf(hz, tier) : null;
     const reasons = [];
     if (!hz) reasons.push("We couldn't read the fault. Pick it above, or a person calls the tenant back to ask.");
     if (picked && picked !== r.primary) reasons.push("A person picked the fault, so it counts as checked by a person.");
-    if (hz && H[hz].category !== "immediate" && (r.mods.danger_words || answers.danger_now === "yes")) reasons.push(answers.danger_now === "yes" ? "They said someone is in danger now. A person calls today to check if it's dangerous." : `They said “${r.mods.danger_words}”. A person calls today to check it's safe.`);
-    if (hz && H[hz].category === "immediate" && r.mods.negation) reasons.push(`They also said “${r.mods.negation}”. It stays dangerous until a person has checked.`);
-    if (hz && H[hz].category === "immediate") reasons.push("Dangerous: confirmed by phone and made safe today by the maintenance officer.");
+    if (hz && cat === "immediate" && H[hz].category !== "immediate") reasons.push("Someone there needs power, cooling or medical supplies, or there is a baby or a frail elder, so losing this is treated as dangerous. A person calls today.");
+    if (hz && cat !== "immediate" && (r.mods.danger_words || answers.danger_now === "yes")) reasons.push(answers.danger_now === "yes" ? "They said someone is in danger now. A person calls today to check if it's dangerous." : `They said “${r.mods.danger_words}”. A person calls today to check it's safe.`);
+    if (hz && cat === "immediate" && r.mods.negation) reasons.push(`They also said “${r.mods.negation}”. It stays dangerous until a person has checked.`);
+    if (hz && cat === "immediate") reasons.push("Dangerous: confirmed by phone and made safe today by the maintenance officer.");
     const needs_human = !r.primary || (picked && picked !== r.primary) || reasons.some((x) => /calls today|stays dangerous/.test(x));
-    return { answers, r, hz, site, house, record, facts, hh, reasons, needs_human, back: Number(f.back.value) };
+    return { answers, r, hz, site, house, record, facts, hh, tier, cat, reasons, needs_human, back: Number(f.back.value) };
   }
   function bindReader(root = $("#coord-body"), opts = {}) {
     bindGuides(root);
@@ -1040,12 +1143,13 @@
       f.q_people.placeholder = record.people;
       if (!hz) { out.innerHTML = `<div class="card"><b>Not sure what this is</b><p class="note" style="margin-top:4px">Pick the fault below, or log it and a person calls the tenant back to ask.</p></div>`; add.disabled = true; return; }
       add.disabled = false;
-      const h = H[hz]; const sc = needScore(hz, (hh.mods.vulnerable ? RN.triage.vulnerable_points : 0) + (hh.mods.crowded ? RN.triage.crowded_points : 0), hh.mods.repeat ? RN.triage.repeat_points : 0, S.back);
-      const wordsOnly = needScore(hz, (r.mods.vulnerable ? RN.triage.vulnerable_points : 0) + (r.mods.crowded ? RN.triage.crowded_points : 0), r.mods.repeat ? RN.triage.repeat_points : 0, S.back);
-      const clock = h.category === "immediate" ? "Made safe today by the maintenance officer, then fixed within 2 business days" : h.category === "urgent" ? "Within 2 business days, in town or out bush (the official remote rule allows 5)" : "Within 10 business days, in town or out bush (the official remote rule allows 25)";
-      const who = { vulnerable: "Someone vulnerable lives there", crowded: "The house is crowded", repeat: "Reported before" };
+      const h = H[hz], cat = S.cat; const wt = tierOf(r.mods);
+      const sc = needScore(hz, tierPts(S.tier) + (hh.mods.crowded ? RN.triage.crowded_points : 0), hh.mods.repeat ? RN.triage.repeat_points : 0, S.back, 0, cat);
+      const wordsOnly = needScore(hz, tierPts(wt) + (r.mods.crowded ? RN.triage.crowded_points : 0), r.mods.repeat ? RN.triage.repeat_points : 0, S.back, 0, catOf(hz, wt));
+      const clock = cat === "immediate" ? "Made safe today by the maintenance officer, then fixed within 2 business days" : cat === "urgent" ? "Within 2 business days, in town or out bush (the official remote rule allows 5)" : "Within 10 business days, in town or out bush (the official remote rule allows 25)";
+      const who = { tier1: `Tier 1, life-preservation (+${tierPts(1)})`, vulnerable: `Tier 2, young children, pregnancy, illness or mobility (+${RN.triage.vulnerable_points})`, crowded: "The house is crowded", repeat: "Reported before" };
       out.innerHTML = `<div class="card" style="display:grid;gap:10px">
-        <div style="display:flex;gap:10px;align-items:center"><div class="avatar">${icon(h.trade, 22)}</div><div><b style="font-size:17px">${esc(h.label)}</b><div><span class="chip ${h.category}">${CAT[h.category]}</span></div></div></div>
+        <div style="display:flex;gap:10px;align-items:center"><div class="avatar">${icon(h.trade, 22)}</div><div><b style="font-size:17px">${esc(h.label)}</b><div><span class="chip ${cat}">${CAT[cat]}</span>${S.tier < 3 ? ` <span class="chip person">Tier ${S.tier}</span>` : ""}</div></div></div>
         ${r.all.length ? `<div class="note">Words it picked up: ${r.all.map((k) => `“<b style="color:var(--ink)">${esc(r.hits[k])}</b>” (${esc(H[k].label.toLowerCase())})`).join(", ")}</div>` : ""}
         <div><b>When it should be fixed</b><p class="note">${clock}. The clock started ${S.back ? dateOf(today() - S.back) : "today"}.</p></div>
         <div><b>Need ${sc.total} points</b><p class="note">${Object.keys(hh.mods).length ? Object.keys(hh.mods).map((k) => `${who[k]}: from ${hh.src[k].map((x) => SRC_WORD[x]).join(" and ")}.`).join(" ") : "Nothing about the household adds points yet."}
@@ -1063,7 +1167,7 @@
       const list = store("rn-intake") || []; const id = "N" + String(list.length + 1).padStart(4, "0");
       const c = comById[S.site]; const lat = c ? c.lat : hub.lat, lon = c ? c.lon : hub.lon;
       const ring = h3.gridDisk(h3.latLngToCell(lat, lon, 10), 2);
-      const ex = (S.hh.mods.vulnerable ? RN.triage.vulnerable_points : 0) + (S.hh.mods.crowded ? RN.triage.crowded_points : 0);
+      const ex = tierPts(S.tier) + (S.hh.mods.crowded ? RN.triage.crowded_points : 0);
       const j = { id, week: state.week, who: f.who.value, day: today() - S.back, site: S.site, place: c ? c.name : `${RN.hub} (town)`, house: S.house,
         cell: S.facts.cell || ring[S.house % ring.length], language: f.lang.value, interpreter: f.interp.value, text: f.text.value.trim(), hazard: S.hz,
         answers: S.answers, mods: S.hh.mods, sources: S.hh.src, exposure: ex, repeat: S.hh.mods.repeat ? RN.triage.repeat_points : 0,
@@ -1073,7 +1177,7 @@
       recordUpdate({ id, trade: H[S.hz].trade, place: j.place }, "new", { channel: j.who, words: j.text, language: j.language, interpreter: j.interpreter,
         answers: j.answers, hazard: j.hazard, first_contact_day: j.day, joined_to: j.joined_to }, "intake");
       if (j.joined_to) { toast(`Joined to job ${j.joined_to}: one visit fixes both.`); if (opts.onDone) return opts.onDone(j); state.tab = "queue"; state.filter = "all"; renderAll(); openJob(j.joined_to); return; }
-      toast(H[S.hz].category === "immediate" ? "Added. Dangerous: the maintenance officer is called to make it safe today." : "Added. It goes into next week's plan, with its clock already running.");
+      toast(S.cat === "immediate" ? "Added. Dangerous: the maintenance officer is called to make it safe today." : "Added. It goes into next week's plan, with its clock already running.");
       if (opts.onDone) return opts.onDone(j);
       state.tab = "queue"; state.filter = S.site === "TOWN" ? "town" : S.site; renderAll(); openJob(id);
     });
@@ -1270,7 +1374,7 @@
       return `<div class="job ${st ? "done" : ""}" data-id="${r.id}">
         <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h4>${stopNo[r.site] ? `<span class="stopno" title="Stop ${stopNo[r.site]} on the map">${stopNo[r.site]}</span>` : ""}${esc(H[r.hazard].label)}</h4><span class="chip ${r.category}">${CAT[r.category]}</span></div>
         <p class="quote" style="font-size:14px">“${esc(r.text)}”</p>
-        <div class="meta"><span>${esc(r.place)}</span><span>·</span><span>waiting ${days(r.wait)}</span><span>·</span><span>about ${H[r.hazard].hours} h</span>${r.vulnerable ? '<span class="chip person">vulnerable person lives here</span>' : ""}${nearby ? `<span class="chip hex">${nearby} hexagon${nearby > 1 ? "s" : ""} from your run</span>` : ""}</div>
+        <div class="meta"><span>${esc(r.place)}</span><span>·</span><span>waiting ${days(r.wait)}</span><span>·</span><span>about ${H[r.hazard].hours} h</span>${r.tier === 1 ? '<span class="chip person">Tier 1: needs power, cooling or medicine, a baby or frail elder</span>' : r.vulnerable ? '<span class="chip person">Tier 2: children, pregnancy, illness or mobility</span>' : ""}${nearby ? `<span class="chip hex">${nearby} hexagon${nearby > 1 ? "s" : ""} from your run</span>` : ""}</div>
         ${r.category === "immediate" ? `<p class="note" style="color:var(--bad)">Dangerous. ${r.made_safe != null ? `Made safe on ${dateOf(r.made_safe)} by the maintenance officer; check it is still safe before you start.` : "Check the maintenance officer made it safe before you start."}</p>` : ""}
         ${r.came_back != null ? `<p class="note"><span class="chip cut">Came back</span> The same fault was fixed here ${days(r.came_back)} before this report. Find out why the last fix didn't hold.</p>` : ""}
         ${r.merged_into ? `<p class="note"><span class="chip hex">Reported twice</span> Joined to job ${esc(r.merged_into)}: one visit fixes both.</p>` : ""}
@@ -1481,7 +1585,7 @@
       const cf = by(r, "confirm"), rv = by(r, "review"), wo = by(r, "escalate");
       return `<div class="job" data-id="${r.id}">
         <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h4>House ${r.house}: ${esc(H[r.hazard].label)}</h4><span class="chip ${r.category}">${CAT[r.category]}</span></div>
-        <div class="meta"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}<span>waiting ${days(r.wait)}</span>${r.event ? `<span class="chip immediate">${esc(EVENT_WORD[r.event.type])} area</span>` : ""}</div>
+        <div class="meta"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}${tierChip(r)}<span>waiting ${days(r.wait)}</span>${r.event ? `<span class="chip immediate">${esc(EVENT_WORD[r.event.type])} area</span>` : ""}</div>
         ${kind === "fixed" ? (cf ? `<p class="note">You recorded: <b style="color:var(--ink)">${esc(cf.status === "fixed" ? "the tenant says it's fixed" : "the tenant says it's still broken")}</b>${cf.status !== "fixed" ? `. Reopened with ${REWORK} extra points; the coordinator decides who goes back.` : "."}</p>`
             : `<p class="note">Booked this week. After the visit, ask the tenant: did it work?</p>
                <div class="acts" style="grid-template-columns:1fr 1fr"><button class="btn good" data-o="fixed">Tenant says fixed</button><button class="btn ghost" data-o="broken">Still broken</button></div>`) : ""}

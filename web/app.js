@@ -902,8 +902,10 @@
   }
   function warnBanner() {
     if (!WARN.data || WARN.data.failed || WARN.example) { if (!WARN.data) loadWarnings(); return ""; }
-    const n = warnPrompts(WARN.data).length;
-    return n ? `<div class="decision" style="margin:0 6px 10px"><span class="eyebrow">Roads and weather</span><b>${n} thing${n > 1 ? "s" : ""} to check before trips go</b><p>A road closure, heavy rain or heat near your communities. Nothing changes the line unless you decide. <button class="btn small ghost" data-gotab="trips">Open Trips</button></p></div>` : "";
+    const n = warnPrompts(WARN.data).length, D = WARN.data;
+    if (n) return `<div class="decision" style="margin:0 6px 10px"><span class="eyebrow">Roads and weather</span><b>${n} thing${n > 1 ? "s" : ""} to check before trips go</b><p>A road closure, heavy rain or heat near your communities. Nothing changes the line unless you decide. <button class="btn small ghost" data-gotab="trips">Open Trips</button></p></div>`;
+    const how = D.roads_source === "live" && D.weather_source === "live" ? "live" : "saved copy";
+    return `<div class="card" style="margin:0 6px 10px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span class="note"><b style="color:var(--ink)">Roads and weather</b> (NT Road Report, Bureau of Meteorology, ${how}): nothing near your communities right now.</span><button class="btn small ghost" data-gotab="trips">See in Trips</button></div>`;
   }
 
   function tripsHTML() {

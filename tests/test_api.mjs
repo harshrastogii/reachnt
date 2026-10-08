@@ -36,6 +36,33 @@ await check("a review needs a reason; a confirmation needs fixed or still broken
   assert.deepEqual(r.rejected, ["J07571:review", "J07574:confirm", "<script>:visit"]);
 });
 
+const intake = (extra = {}) => ({ id: "N0001", kind: "intake", status: "new", channel: "cho", words: "toilet broke pls come", language: "Kriol",
+  interpreter: "ais", hazard: "toilet_blocked", first_contact_day: 208, answers: { young_child: "yes", elder: "unknown", people: 9, before: "no" }, ...extra });
+await check("a new report needs the tenant's words, a known channel and only the standard questions", async () => {
+  const r = await call({ updates: [intake(), intake({ id: "N0002", words: " " }), intake({ id: "N0003", channel: "fax" }),
+    intake({ id: "N0004", answers: { english_level: "low" } }), intake({ id: "N0005", answers: { people: 99 } })] });
+  assert.deepEqual(r.rejected, ["N0002:intake", "N0003:intake", "N0004:intake", "N0005:intake"]);
+});
+const urg = (extra = {}) => ({ id: "J07600", kind: "urgency", status: "changed", from_hazard: "electrical_danger", to_hazard: "power_point",
+  from_category: "immediate", to_category: "urgent", source: "rhmo", reason: "Officer checked: no sparks, plug dead", ...extra });
+await check("lowering a dangerous repair needs someone who spoke to the tenant or saw it, and a reason", async () => {
+  const r = await call({ updates: [urg(), urg({ id: "J07601", source: "photo" }), urg({ id: "J07602", source: "review" }), urg({ id: "J07603", reason: "" }),
+    urg({ id: "J07604", from_hazard: "hot_water", from_category: "urgent", to_hazard: "electrical_danger", to_category: "immediate", source: "photo" })] });
+  assert.deepEqual(r.rejected, ["J07601:urgency", "J07602:urgency", "J07603:urgency"]);   // raising it on a photo is fine
+});
+await check("a check that keeps the fault must say confirmed, and a change must say changed", async () => {
+  const r = await call({ updates: [urg({ status: "confirmed" }), urg({ id: "J07605", status: "confirmed", to_hazard: "electrical_danger", to_category: "immediate" })] });
+  assert.deepEqual(r.rejected, ["J07600:urgency"]);
+});
+await check("who goes: the next trip, a named crew, or open to any trade; accept and it-got-worse are checked", async () => {
+  const r = await call({ updates: [
+    { id: "J07610", kind: "assign", status: "open", trade: "plumber" }, { id: "J07611", kind: "assign", status: "crew", trade: "plumber" },
+    { id: "J07612", kind: "assign", status: "crew", trade: "plumber", crew: "Katherine plumber crew B" }, { id: "J07613", kind: "assign", status: "open", trade: "astronaut" },
+    { id: "J07614", kind: "accept", status: "accepted", crew: "Katherine plumber crew A" }, { id: "J07615", kind: "escalate", status: "worse", from: "tenant" },
+    { id: "J07616", kind: "escalate", status: "worse", from: "neighbour" }] });
+  assert.deepEqual(r.rejected, ["J07611:assign", "J07613:assign", "J07616:escalate"]);
+});
+
 process.env.REQUIRE_SIGN_IN = "1";
 process.env.AUTH_SECRET = "test-secret-only-for-this-check";
 const S = process.env.AUTH_SECRET;
@@ -54,5 +81,22 @@ await check("a tenant can ask for a review of their own job but cannot mark a jo
 await check("a tradesperson can update jobs on their run only", async () => {
   const r = await call({ updates: [{ id: "J07567", status: "done" }, { id: "J09999", status: "done" }] }, bearer(sign({ role: "tradesperson", jobs: ["J07567"] }, S)));
   assert.deepEqual(r.rejected, ["J09999:visit"]);
+});
+await check("a coordinator can check urgency and reassign but cannot mark a job done", async () => {
+  const r = await call({ updates: [urg(), { id: "J07610", kind: "assign", status: "next", trade: "plumber" }, { id: "J07567", status: "done" }] },
+    bearer(sign({ role: "coordinator", jobs: [], hub: "Katherine" }, S)));
+  assert.deepEqual(r.rejected, ["J07567:visit"]);
+});
+await check("a tradesperson can accept only jobs offered to them, and a tenant can say it got worse only as the tenant", async () => {
+  const t = await call({ updates: [{ id: "J07614", kind: "accept", status: "accepted", crew: "A" }, { id: "J07699", kind: "accept", status: "accepted", crew: "A" }] },
+    bearer(sign({ role: "tradesperson", jobs: [], offers: ["J07614"] }, S)));
+  assert.deepEqual(t.rejected, ["J07699:accept"]);
+  const ten = await call({ updates: [{ id: "J07568", kind: "escalate", status: "worse", from: "tenant" }, { id: "J07568", kind: "escalate", status: "worse", from: "tradesperson" }] },
+    bearer(sign({ role: "tenant", jobs: ["J07568"] }, S)));
+  assert.equal(ten.received, 1);
+});
+await check("repairs-line staff can log a report but cannot reassign a job", async () => {
+  const r = await call({ updates: [intake(), { id: "J07610", kind: "assign", status: "next", trade: "plumber" }] }, bearer(sign({ role: "intake", jobs: [] }, S)));
+  assert.deepEqual(r.rejected, ["J07610:assign"]);
 });
 console.log(`${n} API checks passed`);

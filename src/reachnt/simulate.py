@@ -106,8 +106,12 @@ class SimResult:
 
 
 def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, seed: int | None = None,
-        snapshot_weeks: tuple[int, ...] = ()) -> SimResult:
+        snapshot_weeks: tuple[int, ...] = (), miss_share: float = 0.0) -> SimResult:
+    """miss_share: the share of booked visits that miss (no one home, can't get in, parts). A missed job is not closed:
+    it keeps its clock and its waiting time, logs "no_access", and goes back into next week's plan for whichever crew
+    of that trade goes (crews are pooled per hub and trade), where its shrinking time left raises its value."""
     P = params()
+    miss_rng = np.random.default_rng(P["seed"] + 99)    # its own stream, so miss_share=0 changes nothing else
     req = prepare_requests(seed=seed) if req is None else req
     com = geo.load_communities().set_index("cid", drop=False)
     crews = crew_sizes(req)
@@ -174,6 +178,7 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                                 runs[o.site] = (o, (pr.a, pr.b))
                 res = plan_week(trimmed, options, cap, policy.lam, runs=runs)
                 done = set(res.done)
+                missed = {jid for jid in sorted(done) if miss_rng.random() < miss_share} if miss_share else set()
                 if wk in snapshot_weeks:
                     vals = {d["job_id"]: d["value"] for d in plan_jobs}
                     for j in tj:
@@ -189,11 +194,13 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                 for j in tj:
                     jid = j["job_id"]
                     site = "TOWN" if j["town"] else j["site"]
-                    if jid in done:
+                    if jid in done and jid not in missed:
                         j["done_day"] = max(j["available_day"] + 1, day0 + 3)
                         j["done_mode"] = "town" if site == "TOWN" else res.trips[site].mode
                         continue
-                    if site != "TOWN" and not options[site].reachable:
+                    if jid in missed:
+                        code = "no_access"
+                    elif site != "TOWN" and not options[site].reachable:
                         code = "cut"
                     elif site != "TOWN" and site not in res.trips:
                         code = "crew_full" if full else "travel_cost"

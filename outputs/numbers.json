@@ -4605,5 +4605,81 @@
     "hit_limit_share": 0.005808585936297892
    }
   }
- }
+ },
+ "inclusion": {
+  "words": {
+   "gap_mean": 19.227961819202694,
+   "gap_max": 45,
+   "short_ranked_lower": 0.9657495788882651,
+   "queue_places_lost_pct": 13.803350177802734,
+   "short_points_missed": 19.05670971364402,
+   "vulnerable_recognised_short": 0.04077010192525481,
+   "vulnerable_recognised_full": 1.0
+  },
+  "intake": {
+   "gap_mean": 1.760247052217855,
+   "gap_max": 35,
+   "short_ranked_lower": 0.10836608646827625,
+   "queue_places_lost_pct": 1.227877596855699,
+   "short_points_missed": 1.128579449747333,
+   "vulnerable_recognised_short": 0.9150622876557192,
+   "vulnerable_recognised_full": 1.0
+  },
+  "n": 3000,
+  "households_with_something_to_say": 0.5936666666666667,
+  "answer_rate": 0.9,
+  "note": "Synthetic households. Answers are assumed true when given; unanswered questions earn no points."
+ },
+ "missed_visits": [
+  {
+   "key": "cheapest_1",
+   "share": 0.0,
+   "cost_per_job": 558.7486594547371,
+   "urgent_p90_remote": 63.0,
+   "urgent_p90_town": 3.0,
+   "harm_days_total": 226125.15,
+   "jobs_done": 36672
+  },
+  {
+   "key": "cheapest_1",
+   "share": 0.1,
+   "cost_per_job": 607.5475067084363,
+   "urgent_p90_remote": 76.60000000000036,
+   "urgent_p90_town": 6.0,
+   "harm_days_total": 268735.075,
+   "jobs_done": 36609,
+   "visits_missed": 3945,
+   "jobs_missed": 3595,
+   "missed_twice": 317,
+   "urgent_remote_missed": 783,
+   "urgent_remote_missed_p90": 126.0,
+   "urgent_remote_missed_median": 28.0,
+   "open_at_end": 162
+  },
+  {
+   "key": "guarantee_0.2_h3",
+   "share": 0.0,
+   "cost_per_job": 803.9805030286136,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days_total": 60996.524999999994,
+   "jobs_done": 37487
+  },
+  {
+   "key": "guarantee_0.2_h3",
+   "share": 0.1,
+   "cost_per_job": 861.8242675638071,
+   "urgent_p90_remote": 9.0,
+   "urgent_p90_town": 3.3000000000010914,
+   "harm_days_total": 91376.725,
+   "jobs_done": 37428,
+   "visits_missed": 4042,
+   "jobs_missed": 3641,
+   "missed_twice": 368,
+   "urgent_remote_missed": 842,
+   "urgent_remote_missed_p90": 20.0,
+   "urgent_remote_missed_median": 9.0,
+   "open_at_end": 11
+  }
+ ]
 }

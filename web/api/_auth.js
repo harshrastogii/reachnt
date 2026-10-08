@@ -1,9 +1,14 @@
 // Who may send what. Files starting with "_" are not routes on Vercel; this is imported by sync.js.
 //
 // A sign-in service (for example a tenant one-time code by SMS, or a tradesperson login) issues a short-lived
-// token signed with AUTH_SECRET (HS256 JWT) carrying: role, and the job ids that person may touch.
-//   tenant        -> their own jobs; may send "review" and "confirm"
-//   tradesperson  -> the jobs on their run this week; may send "visit"
+// token signed with AUTH_SECRET (HS256 JWT) carrying: role, the job ids that person may touch, and for a
+// tradesperson the open offers in their trade they may accept.
+//   tenant        -> their own jobs; may send "review", "confirm" and "escalate" (it got worse)
+//   tradesperson  -> the jobs on their run this week; may send "visit" and "escalate"; may "accept" jobs in `offers`
+//   coordinator   -> jobs in their hub (row-level security in docs/schema.sql scopes the hub); may send "urgency" and "assign",
+//                    and log a new report ("intake")
+//   intake        -> repairs-line staff and Community Housing Officers; may log a new report ("intake") and record an
+//                    urgency check after speaking to the tenant
 // With REQUIRE_SIGN_IN=1 set in Vercel, sync.js refuses anything without a valid token. Without it the portal runs
 // in demo mode (made-up data, no accounts). The sign-in service itself is not part of the prototype.
 import crypto from "node:crypto";
@@ -11,7 +16,12 @@ import crypto from "node:crypto";
 const b64url = (buf) => Buffer.from(buf).toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
 const fromB64url = (s) => Buffer.from(s.replace(/-/g, "+").replace(/_/g, "/"), "base64");
 
-export const ROLE_KINDS = { tenant: new Set(["review", "confirm"]), tradesperson: new Set(["visit"]) };
+export const ROLE_KINDS = {
+  tenant: new Set(["review", "confirm", "escalate"]),
+  tradesperson: new Set(["visit", "escalate", "accept"]),
+  coordinator: new Set(["urgency", "assign", "intake"]),
+  intake: new Set(["intake", "urgency"]),
+};
 
 export function sign(claims, secret, ttlSeconds = 8 * 3600) {
   const head = b64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
@@ -41,5 +51,10 @@ export function verify(token, secret) {
 // May this signed-in person send this update?
 export function allowed(claims, update) {
   const kind = update.kind || "visit";
-  return ROLE_KINDS[claims.role].has(kind) && claims.jobs.includes(update.id);
+  if (!ROLE_KINDS[claims.role].has(kind)) return false;
+  if (kind === "intake") return true;                                   // a new report has no job yet
+  if (claims.role === "coordinator" || claims.role === "intake") return true;   // hub scope: enforced by the database
+  if (kind === "accept") return Array.isArray(claims.offers) && claims.offers.includes(update.id);
+  if (kind === "escalate" && update.from !== claims.role) return false; // a tenant can't speak as the tradesperson
+  return claims.jobs.includes(update.id);
 }

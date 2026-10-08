@@ -1,6 +1,6 @@
 # ReachNT
 
-Repair triage for remote NT public housing. ReachNT ranks repairs by need, uses Uber's H3 hexagon grid to let one tradesperson serve neighbouring communities on one trip, prices the equity trade-off, asks a named person to sign it, and tells each tenant why their repair waited.
+Repair triage for remote NT public housing. ReachNT ranks repairs by need, uses Uber's H3 hexagon grid to let one tradesperson serve neighbouring communities on one trip, prices the equity trade-off, asks a named person to sign it, and tells each tenant why their repair waited. Its inclusive decision-making model keeps a tenant's place in line independent of when or how they reported, how much they said, their English, or whether they use an app (`docs/INCLUSIVE_DECISION_MODEL.md`).
 
 Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code Fair 2026, Artificial Intelligence Challenge: housing maintenance triage.
 
@@ -35,8 +35,40 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 
 - **Model on its own:** moderate on wording it never saw (ROC-AUC 0.84). Its confidence doesn't match its accuracy: when it said it was 90% sure or more, it was right 56% of the time, so tenants never see a confidence percentage.
 - **Whole system:** still catches 99% of dangerous reports, because it sends 40% of those reports to a person.
-- **Trip planner:** CP-SAT proved 99.4% of 25,996 weekly plans optimal. The median plan takes 4 ms.
+- **Trip planner:** CP-SAT proved 99.4% of 25,996 weekly plans optimal. The median plan takes 7 ms.
 - **Five random years:** ReachNT cut fault-days by 73%–75% against cheapest-first, for 42%–46% more per repair. Shared trips saved $66–73 per repair in every year.
+
+## Saying less costs no points; a missed visit keeps its clock (`docs/INCLUSIVE_DECISION_MODEL.md`)
+
+| Check (synthetic) | Before | Now |
+|---|---|---|
+| Same household told in a few words instead of in full: points lost | 19 on average (words only) | 1.8 (standard questions + tenancy record + job history) |
+| ...and ranked lower in the line | 97% | 11% |
+| Vulnerable households recognised from a few words | 4% | 92% |
+
+With 1 in 10 booked visits missing, ReachNT still fixed 9 in 10 of the *missed* urgent remote repairs within 20 days (cheapest-first: 126), because a missed job keeps its waiting time and gets the deadline boost.
+
+## How a repair request gets into ReachNT
+
+The tenant tells someone, and that person logs it in the **New report** tab. The coordinator doesn't upload requests; they look after the line, the trips and the checks.
+
+1. **Who logs it.** Whoever the tenant told:
+   - repairs-line staff (1800 104 076)
+   - the Community Housing Officer
+   - the maintenance officer
+   - a tradesperson on site
+   - the front counter
+   - the tenant themselves, in the app
+2. **What they record.**
+   - the tenant's words (or the interpreter's)
+   - the day the tenant *first* told anyone, which is when the clock starts
+   - the language and interpreter, only to book one next time
+   - the same standard questions every time
+3. **What fills itself in.** The tenancy record (household size and bedrooms) and the house's repair history (reported before, came back).
+4. **What the reader does.** It suggests the fault and category. A person checks anything unsure or possibly dangerous, and anyone can pick the fault themselves.
+5. **What happens next.** The report joins the line and next week's plan. A dangerous one is made safe the same day. A second report of a fault already open at that house joins the existing job.
+
+In this prototype, the year of requests behind the demo is synthetic (`synth.py` → `intake.py` → `simulate.py` → `export_web.py`). Reports logged in the portal are kept in the browser and sent to `/api/sync`, which validates them. In production they are rows in `ops.job` and `ops.intake_answer` (`docs/schema.sql`).
 
 ## Deliverables
 
@@ -44,8 +76,9 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 |---|---|
 | Report (PDF, A4, 8 body pages) | `docs/report/DataChallenge_Team AIC015_Report.pdf` (source `reachnt_report.md`, build `build_pdf.py`) |
 | Slide deck | `docs/deck/DataChallenge_Team AIC015_Slides.pptx` and `.pdf` (build `build_deck.js`); script with timings and Q&A prep `PITCH_SCRIPT.md` |
-| Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns |
+| Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns. Coordinators log new reports with the standard questions, check and change urgency at any time, and send a missed job to the next trip, a named crew or any contractor of that trade; tradespeople can take open jobs and say "worse than reported"; tenants can say "it got worse" |
 | Python solution | `src/reachnt/`, `run_all.py`, `notebooks/01_walkthrough.ipynb`, `tests/` |
+| Inclusive decision-making model | `docs/INCLUSIVE_DECISION_MODEL.md` |
 | Database design | `docs/DATABASE.md`, `docs/schema.sql` |
 | Validation checks and gaps | `docs/VALIDATION.md` (security, accessibility, map accuracy, reader stress tests, data and simulation integrity, each gap's status) |
 | Accountability for a pilot | `docs/AI_IMPACT_ASSESSMENT.md`, `web/privacy.html` (automated-decision notice and AI transparency statement), `docs/REAL_LANGUAGE_TEST_PROTOCOL.md` with `scripts/evaluate_real_reports.py` |
@@ -56,8 +89,9 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 ```bash
 pip install -r requirements.txt
 python run_all.py                     # every number, figure and the portal data (~15 min on 8 cores)
-pytest -q tests                       # 70 checks; node tests/test_api.mjs adds 10 for the server (both run by GitHub Actions on every push)
+pytest -q tests                       # 75 checks; node tests/test_api.mjs adds 17 for the server (both run by GitHub Actions on every push)
 python run_all.py --quality           # only the quality measures (ROC/PR-AUC, calibration, solver gap, 5 random years)
+python run_all.py --extras            # only the inclusion measure and the missed-visits experiment
 python -m http.server 8731 --directory web   # then open http://localhost:8731
 python docs/report/build_pdf.py
 ```
@@ -81,11 +115,11 @@ The planner is single-threaded with a fixed seed, so every run gives the same nu
 ## How it works
 
 1. **Read** (`intake.py`): phrase rules from `config/taxonomy.yaml` plus a TF-IDF / logistic regression model. Unsure, conflicting or possibly dangerous readings go to a person.
-2. **Rank by need only** (`urgency.py`): the NT category sets the clock; points for harm, Healthy Living Practice, vulnerable or crowded household, repeat report and waiting. A test fails if distance or cost appear.
+2. **Rank by need only** (`urgency.py`, `intake.household`): the NT category sets the clock; points for harm, Healthy Living Practice, vulnerable or crowded household, repeat report and waiting. Household points come from the standard questions, the tenancy record and the job history as well as the words, so saying less costs nothing. A test fails if distance, cost, channel, language or the like appear.
 3. **H3** (`geo.py`): communities get H3 cells at resolutions 3–7; houses are resolution-10 cells; communities whose resolution-4 cells are within 2 rings form run zones (68 pairs).
 4. **Plan trips** (`planner.py`): weekly, per hub and trade, OR-Tools CP-SAT chooses single trips and run zones under crew hours, road closures and airstrips.
 5. **Show the trade-off** (`simulate.py`, `experiments.py`): one year under 14 settings plus a sensitivity sweep.
-6. **Sign and explain** (`explain.py`, portal ledger): every week a job waits, the reason is logged; the tenant's answer is built from that log and the signed decision.
+6. **Sign and explain** (`explain.py`, portal ledger): every week a job waits, the reason is logged; the tenant's answer is built from that log and the signed decision. A person can check and change urgency at any time (never lowering danger without having spoken to the tenant or seen it), and a missed visit is reassigned without restarting its clock.
 7. **Check quality** (`evaluate.py`): ROC-AUC and PR-AUC for spotting danger, calibration, cross-validation, ranking agreement (Kendall's τ), CP-SAT optimality gaps, and the headline plans in five random years. Report Appendix G.
 
 ## Data and licences

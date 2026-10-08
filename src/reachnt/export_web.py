@@ -96,6 +96,12 @@ def build(N: dict) -> None:
     from .geo import house_cell
     centre = {r.cid: (at(r)["lat"], at(r)["lon"]) for r in com.itertuples()}
     centre.update({f"TOWN-{h}": (v["lat"], v["lon"]) for h, v in P["hubs"].items()})
+    # Example crews for the demo hub, sized as in the simulation (simulate.crew_sizes). Names are made up.
+    from .simulate import crew_sizes, prepare_requests
+    sizes = crew_sizes(prepare_requests())
+    word = {"aircon": "air-con", "general": "maintenance", "pest": "pest control"}
+    crews = {t: [f"{DEMO_HUB} {word.get(t, t)} crew {chr(65 + i)}" for i in range(n)]
+             for (h, t), n in sorted(sizes.items()) if h == DEMO_HUB}
     demo, year = {}, {}
     for k in DEMO_POLICIES:
         jobs = _jobs(k)
@@ -177,6 +183,8 @@ def build(N: dict) -> None:
         notice=N["synthetic_notice"],
         hub=DEMO_HUB,
         taxonomy=taxonomy(), triage=P["triage"], clocks=P["clocks"], h3=Hc,
+        planning={k: P["planning"][k] for k in ("due_soon_days", "deadline_bonus", "floor_bonus", "ageing_points_per_day")},
+        crews=crews,
         hubs=hubs, communities=cdict,
         pairs=pair_rows,
         policies={k: v for k, v in N["policies"].items()},

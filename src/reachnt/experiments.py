@@ -89,16 +89,27 @@ def _save(p: simulate.Policy, r: simulate.SimResult) -> None:
 
 def _one(args) -> dict:
     """Run one setting in its own process. overrides: {(section, key): value}; seed: request-stream seed."""
-    p, overrides, seed, save = args
+    p, overrides, seed, save, *rest = args
+    miss = rest[0] if rest else 0.0
     from . import config
     P = config.params()
     for (a, b), v in (overrides or {}).items():
         P[a][b] = v
     t = time.time()
-    r = simulate.run(p, simulate.prepare_requests(seed=seed), snapshot_weeks=SNAPSHOT_WEEKS if save else ())
+    r = simulate.run(p, simulate.prepare_requests(seed=seed), snapshot_weeks=SNAPSHOT_WEEKS if save else (), miss_share=miss)
     if save:
         _save(p, r)
     s = simulate.summarise(r)
+    if miss:
+        j = r.jobs[r.jobs.week < params()["demand"]["weeks"]]
+        hit = j[j.reason_counts.map(lambda c: c.get("no_access", 0) > 0)]
+        u = hit[hit.category.isin(["urgent", "immediate"]) & ~hit.town]
+        s["missed"] = dict(share=miss, visits_missed=int(sum(c.get("no_access", 0) for c in j.reason_counts)), jobs_missed=int(len(hit)),
+                           missed_twice=int((hit.reason_counts.map(lambda c: c["no_access"]) > 1).sum()),
+                           urgent_remote_missed=int(len(u)),
+                           urgent_remote_missed_p90=float(np.percentile(u.wait_days, 90)) if len(u) else None,
+                           urgent_remote_missed_median=float(u.wait_days.median()) if len(u) else None,
+                           open_at_end=int(hit.open_at_end.sum()))
     s["key"] = key(p)
     s["seconds"] = time.time() - t
     return s
@@ -117,6 +128,23 @@ def run_policies(req: pd.DataFrame) -> tuple[list[dict], dict]:
         print(f"  {p.label:52s} ${s['cost_per_job']:7.0f}/job  urgent P90 remote {s['urgent_p90_remote']:5.1f} d  "
               f"harm-days {s['harm_days_total']:9.0f}  ({s['seconds']:.0f}s)")
     return summaries, {}
+
+
+def missed_visits() -> list[dict]:
+    """What if 1 in 10 booked visits miss? The missed job keeps its clock, goes back into next week's plan for any crew of
+    its trade, and its value rises as its time runs out. Headline settings only; the headline numbers are not changed."""
+    share = params()["missed_visits"]["share"]
+    heads = [simulate.Policy("cheapest", 1.0), simulate.Policy("guarantee", 0.2, runs=True)]
+    # each setting is run with and without misses on the same machine: the solver's 2-second limit makes results vary
+    # slightly with CPU speed, so the comparison is like for like
+    tasks = [(h, None, None, False, m) for h in heads for m in (0.0, share)]
+    res = _pool(tasks)
+    rows = []
+    for (h, *_rest, m), s in zip(tasks, res):
+        rows.append(dict(key=key(h), share=m, cost_per_job=s["cost_per_job"], urgent_p90_remote=s["urgent_p90_remote"],
+                         urgent_p90_town=s["urgent_p90_town"], harm_days_total=s["harm_days_total"], jobs_done=s["jobs_done"],
+                         **{k: v for k, v in s.get("missed", {}).items() if k != "share"}))
+    return rows
 
 
 def sensitivity(base_req: pd.DataFrame) -> list[dict]:

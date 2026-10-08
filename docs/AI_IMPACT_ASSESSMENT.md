@@ -38,6 +38,8 @@ The benefit is that the trade-off becomes visible, priced and signed, rather tha
 | Distance or cost pushes remote tenants back | The need score never uses location or cost (a unit test fails if they appear). Cost can only change *which week a trip goes*, under a cost weight a named person signs, and the tenant is told when it does. | Report sections 2.3 and 3.2; `tests/test_core.py` |
 | The reader understands some groups' words worse | Doubtful reports go to a person. Per-language testing on real reports is required before use, and a weekly audit continues after it. | `docs/REAL_LANGUAGE_TEST_PROTOCOL.md`; Checks tab |
 | Some communities wait longer | Waits are reported by remoteness band, and per community over the whole year. | Report Figure 3; the portal's year view |
+| Tenants who say less, speak little English, use an interpreter or don't use the app get fewer points or a later place | The household part of the score comes from the same standard questions on every channel, the tenancy record and the job history, not only the tenant's words; an unanswered question never removes points. The clock starts at first contact with anyone. Channel, language and timing are never inputs (a unit test fails if they appear). | `docs/INCLUSIVE_DECISION_MODEL.md`; `evaluate.inclusion()`: points lost by a short telling fell from 19 to 1.8 |
+| A missed visit drops a job to the back | The job keeps its waiting time and gets the deadline boost; the coordinator sends it to the next trip, a named crew or any contractor of that trade | `experiments.missed_visits()`: missed urgent remote repairs fixed within 20 days (9 in 10) under ReachNT, 126 under cheapest-first |
 
 ## 5. Reliability and safety
 
@@ -81,6 +83,7 @@ The rules are public (`config/taxonomy.yaml`, `config/params.yaml`). The plain-l
 - **Ask for a review:** any tenant can, in the app or by phone. A person answers within 10 working days, recorded in `ops.review_request`.
 - **Other routes stay open:** an interpreter on request, NTCAT emergency repair orders, the NT Ombudsman and the Information Commissioner.
 - **Repairs that didn't work:** a tenant can say so, which reopens the job as a repeat.
+- **It got worse:** a tenant or tradesperson can say so by phone, through the housing officer or in the app; a person calls back the same day and records an urgency check (`ops.escalation`, `ops.urgency_check`).
 
 ## 9. Human oversight and accountability
 
@@ -90,6 +93,8 @@ The rules are public (`config/taxonomy.yaml`, `config/params.yaml`). The plain-l
   - every report the reader can't read with confidence;
   - 1 in 20 of the rest, each week (`ops.reader_audit`).
 - **Closing jobs:** a "no one home" visit never closes a job; it needs evidence, and the tenant is told.
+- **Urgency checks:** a person can raise or confirm urgency at any time from a call, a visit, a photo or a review; lowering a dangerous repair needs someone who spoke to the tenant or saw it, plus a reason the tenant can read. The reader can never lower danger. Enforced in the portal, the server and a database CHECK constraint (`ops.urgency_check`).
+- **Who goes after a missed visit:** the coordinator decides (next trip, a named crew, or open to any contractor of that trade, first to accept), recorded in `ops.job_offer`.
 - **Turning it off:** the coordinator can stop using the plan at any time and plan by hand. The tenant answers still work from the logged reasons.
 
 ## 10. Conditions before a pilot

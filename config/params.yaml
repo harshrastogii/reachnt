@@ -122,3 +122,8 @@ triage:
   vulnerable_points: 25
   crowded_points: 10
   repeat_points: 10
+  crowded_people_per_bedroom: 2  # ASSUMPTION: more than 2 people per bedroom counts as crowded (open to co-design)
+  intake_answer_rate: 0.9        # ASSUMPTION for evaluate.inclusion(): share of standard questions answered on first contact
+
+missed_visits:                   # experiments.missed_visits(): visits that miss (no one home, can't get in, parts)
+  share: 0.1                     # ASSUMPTION: 1 in 10 booked visits miss; the job keeps its clock and is re-planned

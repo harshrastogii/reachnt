@@ -156,3 +156,42 @@ def read(text: str, clf: Classifier | None) -> Reading:
         reasons.append("Immediate jobs are confirmed by phone and made safe by the local Housing Maintenance Officer.")
     hazards = sorted(set(hits) | ({primary} if primary else set()), key=lambda k: (CAT_RANK[H[k]["category"]], -H[k]["harm"]))
     return Reading(text, primary, hazards, hits, mh, mc, mods, source, needs_human, reasons)
+
+
+# ------------------------------------------------------------------ the standard questions
+# The tenant's words alone reward people who say more: "my nana lives here, 9 of us, third time I rang" earns 45 points
+# that "toilet broke pls come" does not, for the same household. So the household side of the score comes from the
+# same short questions asked on every channel, the tenancy record and the house's job history, as well as the words.
+# Any source saying yes counts. An unanswered question never removes points; it asks for a call-back.
+VULNERABLE_QUESTIONS = ("young_child", "elder", "health")
+
+
+def household(words: dict | None = None, answers: dict | None = None, record: dict | None = None,
+              history: dict | None = None) -> tuple[dict, dict, list[str]]:
+    """Household modifiers for urgency.score, with where each one came from.
+
+    words    modifier_hits() of the report text
+    answers  question id -> "yes" | "no" | "unknown" (or a number for "people")
+    record   the tenancy record: {"people": int, "bedrooms": int}
+    history  the house's job history: {"same_fault_open_or_recent": bool}
+    Returns (modifiers, sources, unanswered question ids).
+    """
+    words, answers, record, history = words or {}, answers or {}, record or {}, history or {}
+    T = params()["triage"]
+    src: dict[str, list[str]] = {"vulnerable": [], "crowded": [], "repeat": []}
+    if any(answers.get(q) == "yes" for q in VULNERABLE_QUESTIONS):
+        src["vulnerable"].append("answer")
+    people = answers.get("people") if isinstance(answers.get("people"), (int, float)) else record.get("people")
+    if people and record.get("bedrooms") and people / record["bedrooms"] > T["crowded_people_per_bedroom"]:
+        src["crowded"].append("answer" if isinstance(answers.get("people"), (int, float)) else "record")
+    if history.get("same_fault_open_or_recent"):
+        src["repeat"].append("history")
+    if answers.get("before") == "yes":
+        src["repeat"].append("answer")
+    for k in src:
+        if k in words:
+            src[k].append("words")
+    asked = [q["id"] for q in taxonomy().get("intake_questions", [])]
+    unanswered = [q for q in asked if answers.get(q) in (None, "unknown") and not (q == "people" and record.get("people"))]
+    mods = {k: 1 for k, v in src.items() if v}
+    return mods, {k: v for k, v in src.items() if v}, unanswered

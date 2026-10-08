@@ -1650,7 +1650,7 @@
     $("#tplace", el).addEventListener("change", (e) => { state.place = e.target.value; state.tjob = null; renderTenant(); tenantMap(); });
     $("#tjob", el).addEventListener("change", (e) => { state.tjob = e.target.value; renderTenant(); tenantMap(); });
     $("#interp", el).addEventListener("click", () => {
-      recordUpdate(r, "requested", { language: (r.intake && r.intake.language) || "", interpreter: (r.intake && r.intake.interpreter) || "ais", note: "Tenant asked in the app" }, "interpreter");
+      recordUpdate(r, "requested", { language: (r.intake && r.intake.language) || "Not known yet", interpreter: (r.intake && r.intake.interpreter) || "ais", note: "Tenant asked in the app" }, "interpreter");
       toast("Noted. A Community Housing Officer will call you back with an interpreter."); renderTenant();
     });
     $("#worse", el).addEventListener("click", () => {
@@ -1734,7 +1734,7 @@
         if (o === "worse") { recordUpdate(r, "worse", { from: "cho" }, "escalate"); toast("The coordinator is told and calls back today."); renderOfficer(); }
         if (o === "saw") show("osaw");
         if (o === "review") show("oreview");
-        if (o === "interp") { recordUpdate(r, "requested", { via: "cho", language: (r.intake && r.intake.language) || "", interpreter: (r.intake && r.intake.interpreter) || "ais" }, "interpreter"); toast("The coordinator books an interpreter for the call-back."); renderOfficer(); }
+        if (o === "interp") { recordUpdate(r, "requested", { via: "cho", language: (r.intake && r.intake.language) || "Not known yet", interpreter: (r.intake && r.intake.interpreter) || "ais" }, "interpreter"); toast("The coordinator books an interpreter for the call-back."); renderOfficer(); }
         if (o !== "saw" && o !== "review" && o !== "broken") { state.place = r.place; state.tjob = r.id; }   // the Tenant view opens this repair
       }));
       const fb = $(".obroken", j), fs = $(".osaw", j), fr = $(".oreview", j);

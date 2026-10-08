@@ -1,5 +1,8 @@
 {
   "cleanUrls": true,
+  "regions": [
+    "syd1"
+  ],
   "headers": [
     {
       "source": "/sw.js",

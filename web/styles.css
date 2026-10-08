@@ -501,3 +501,8 @@ a.btn { display: inline-grid; place-items: center; text-align: center; text-deco
   #metric .thumb { display: none; }
   #metric button[aria-pressed="true"] { background: var(--glass-strong); }
 }
+
+/* ReachNT mark (brand kit v1.0): one colour, Sky on dark, the deeper blue on light */
+.mark { color: #0e8fb8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mark { color: #6ec1e8; } }
+:root[data-theme="dark"] .mark { color: #6ec1e8; }

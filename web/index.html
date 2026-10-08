@@ -7,23 +7,22 @@
 <meta name="theme-color" content="#0d1418">
 <meta name="description" content="ReachNT: remote NT repair triage. Urgent repairs first, shared trips, and a reason for every wait.">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
-<link rel="stylesheet" href="styles.css?v=47">
+<link rel="stylesheet" href="styles.css?v=48">
 </head>
 <body>
-<div id="splash" class="glass"><svg width="34" height="34" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/></svg><b>ReachNT</b><span>Loading this week's repairs…</span></div>
+<div id="splash" class="glass"><svg class="mark" width="40" height="40" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><line x1="10.5" y1="14" x2="17.5" y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10.5" cy="14" r="1.7" fill="currentColor"/><circle cx="17.5" cy="14" r="1.7" fill="currentColor"/></svg><b>ReachNT</b><span>Loading this week's repairs…</span></div>
 <div id="map" role="region" aria-label="Map of remote communities and this week's trips"></div>
 
 <header class="topbar glass">
   <div class="brand">
-    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-      <path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M14 8.6 18.7 11.3v5.4L14 19.4l-4.7-2.7v-5.4Z" fill="currentColor" opacity=".85"/>
-    </svg>
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 2.5 24 8.25v11.5L14 25.5 4 19.75V8.25Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="10.5" y1="14" x2="17.5" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.5" cy="14" r="1.9" fill="currentColor"/><circle cx="17.5" cy="14" r="1.9" fill="currentColor"/></svg>
     <b>ReachNT</b><small id="hubname" title="Tradespeople start their trips from Katherine and serve 16 remote communities across the Big Rivers region, up to 6 hours away by road. ReachNT plans for five hubs; the demo shows this one.">Katherine hub · 16 communities</small>
   </div>
   <div class="seg" id="role" role="group" aria-label="Who is using it">
@@ -114,7 +113,7 @@
 <!-- libraries are served from this site (vendor/), not a public CDN: no third party can change the code we run -->
 <script src="vendor/maplibre-gl.js"></script>
 <script src="vendor/h3-js.umd.js"></script>
-<script src="data/app.js?v=47"></script>
-<script src="app.js?v=47"></script>
+<script src="data/app.js?v=48"></script>
+<script src="app.js?v=48"></script>
 </body>
 </html>

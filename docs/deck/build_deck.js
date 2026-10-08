@@ -1,6 +1,7 @@
 // ReachNT pitch deck: 10-minute pitch + 5-minute Q&A, CDU IT Code Fair 2026, Artificial Intelligence Challenge.
 // Every number comes from outputs/numbers.json, the same file the report and the portal read.
 //   NODE_PATH=~/.cache/cq-deck/node_modules PPTX_SKILL=<pptx skill dir> node docs/deck/build_deck.js
+//   python docs/deck/compress_media.py "docs/deck/DataChallenge_Team AIC015_Slides.pptx"   (shrinks the screenshots)
 // Speaker notes carry the script; docs/deck/PITCH_SCRIPT.md has the same script with timings and Q&A prep.
 const fs = require("fs");
 const path = require("path");

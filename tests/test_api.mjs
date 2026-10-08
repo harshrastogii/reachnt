@@ -1,8 +1,11 @@
 // Checks for the portal's server function (web/api/sync.js): input validation, no-access evidence, and sign-in rules.
 //   node tests/test_api.mjs
 import assert from "node:assert/strict";
-import handler from "../web/api/sync.js";
-import { sign } from "../web/api/_auth.js";
+import fs from "node:fs";
+// the repository keeps the portal in web/; the submission zip keeps it in 3_Interactive_Prototype/web/
+const API = ["../web/api/", "../../3_Interactive_Prototype/web/api/"].map((p) => new URL(p, import.meta.url)).find((u) => fs.existsSync(u));
+const { default: handler } = await import(new URL("sync.js", API));
+const { sign } = await import(new URL("_auth.js", API));
 
 const call = (body, headers = {}, method = "POST") => new Promise((done) => {
   const res = { code: 200, status(c) { this.code = c; return this; }, json(j) { done({ code: this.code, ...j }); } };

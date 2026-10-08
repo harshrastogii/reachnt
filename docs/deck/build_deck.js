@@ -196,7 +196,7 @@ text(s, "Anyone in danger now? Needs power, cooling or medicine; a baby under 1 
   { x: 3.8, y: 5.1, w: 4.3, h: 1.4, fontSize: 12.5, color: HEX.ink2, objectName: "ask-b" });
 const fair = [[`${Math.round(IN.words.gap_mean)} → ${Math.round(IN.intake.gap_mean)}`, "points a household lost for saying less (average)", HEX.good],
               [`${pct(IN.words.short_ranked_lower)} → ${pct(IN.intake.short_ranked_lower)}`, "of short reports ranked below the same household told in full", HEX.hex],
-              [`${pct(IN.words.vulnerable_recognised_short)} → ${pct(IN.intake.vulnerable_recognised_short)}`, "of vulnerable households recognised from a few words", HEX.violet]];
+              [`${pct(IN.words.vulnerable_recognised_short)} → ${pct(IN.intake.vulnerable_recognised_short)}`, "of Tier 1 or 2 households recognised from a few words", HEX.violet]];
 fair.forEach(([n, l, col], i) => {
   const y = 1.5 + i * 1.62;
   text(s, n, { x: 8.7, y, w: 4.0, h: 0.65, fontSize: 36, bold: true, fontFace: "Arial", color: col, objectName: `fair-n-${i}` });

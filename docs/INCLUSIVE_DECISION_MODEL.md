@@ -131,20 +131,20 @@ Nothing here changes anyone's place in line. The coordinator decides, and a decl
 
 | | Words only (before) | With the standard questions (now) |
 |---|---|---|
-| Points lost by the short telling (households with something to tell) | 19 on average, up to 45 | 1.8 on average |
-| Short telling ranked lower than the full one | 97% | 11% |
-| Places lost in a shared queue | 14% of the queue | 1.2% |
-| Vulnerable households recognised from a short telling | 4% | 92% |
+| Points lost by the short telling (households with something to tell) | 43 on average | 5 on average |
+| Short telling ranked lower than the full one | 97% | 12% |
+| Places lost in a shared queue | 14% of the queue | 1.4% |
+| Tier 1 or Tier 2 households recognised from a short telling | 4% | 91% |
 
-What's left comes from questions left unanswered (we assume 1 in 10). Each one triggers a call-back.
+What's left comes from questions left unanswered (we assume 1 in 10). The average is higher than before tiers because a Tier 1 household that is never asked can also miss being raised to Immediate when it loses power, water or cooling. That is why every unanswered question triggers a call-back, the same day for a lifeline fault.
 
 **Missed visits** (`experiments.missed_visits()`, one synthetic year, 1 in 10 booked visits missing; each plan is compared with itself without misses):
 
 | | Cheapest first | ReachNT |
 |---|---|---|
-| 9 in 10 urgent remote repairs fixed within | 63 → 77 days | 3 → 9 days |
-| 9 in 10 *missed* urgent remote repairs fixed within | 126 days | 20 days |
-| Cost per repair | $559 → $608 | $804 → $862 |
+| 9 in 10 urgent remote repairs fixed within | 62 → 74 days | 3 → 9 days |
+| 9 in 10 *missed* urgent remote repairs fixed within | 126 days | 17 days |
+| Cost per repair | $559 → $608 | $816 → $873 |
 
 Under ReachNT a missed urgent job keeps its waiting time and gets the deadline boost, so it goes on the next trip out. Under cheapest-first it waits for a cheap trip.
 

@@ -20,12 +20,12 @@
  },
  "requests": 37508,
  "requests_by_category": {
-  "routine": 21443,
-  "urgent": 13663,
-  "immediate": 2402
+  "routine": 19785,
+  "urgent": 13417,
+  "immediate": 4306
  },
  "read_to_person_share": 0.2103551242401621,
- "read_misread_unflagged_share": 0.008584835235149834,
+ "read_misread_unflagged_share": 0.008904766983043617,
  "crews_total": 73,
  "reader": {
   "seen": {
@@ -113,23 +113,23 @@
    "policy": "cheapest",
    "lam": 1.0,
    "label": "Cheapest jobs first",
-   "total_cost": 20514810.03046504,
-   "cost_travel": 7614135.03046504,
-   "cost_per_job": 559.1847256648142,
-   "jobs_done": 36687,
-   "open_at_end": 821,
+   "total_cost": 20490430.83952412,
+   "cost_travel": 7597575.839524119,
+   "cost_per_job": 558.7486594547371,
+   "jobs_done": 36672,
+   "open_at_end": 836,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 62.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 6.0,
-   "overdue_equal_town": 0.204,
-   "overdue_equal_remote": 0.6109748978400467,
-   "overdue_official_remote": 0.4507880910683012,
-   "harm_days_total": 225766.65,
-   "air_trips": 587,
-   "trips": 4357,
+   "overdue_equal_town": 0.20343285386196058,
+   "overdue_equal_remote": 0.6081481481481481,
+   "overdue_official_remote": 0.4470899470899471,
+   "harm_days_total": 231877.05,
+   "air_trips": 585,
+   "trips": 4355,
    "gap_p90": 20.666666666666668,
-   "duplicates_merged": 402,
+   "duplicates_merged": 407,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -138,85 +138,88 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 1.0,
-     "overdue_equal": 0.204,
-     "harm_days": 14306.875,
+     "overdue_equal": 0.20343285386196058,
+     "harm_days": 14748.075,
      "open_at_end": 0
     },
     {
      "band": "Near town (road)",
      "jobs": 3352,
      "urgent_median": 2.0,
-     "urgent_p90": 7.0,
+     "urgent_p90": 6.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.2807505211952745,
-     "harm_days": 4719.699999999999,
+     "overdue_equal": 0.2781954887218045,
+     "harm_days": 4823.15,
      "open_at_end": 6
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
-     "urgent_median": 9.0,
-     "urgent_p90": 70.0,
+     "urgent_median": 10.0,
+     "urgent_p90": 69.0,
      "routine_median": 8.0,
-     "overdue_equal": 0.7093117408906883,
-     "harm_days": 36085.55,
+     "overdue_equal": 0.7178729689807977,
+     "harm_days": 37109.95,
      "open_at_end": 152
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
-     "urgent_median": 22.0,
-     "urgent_p90": 73.6,
+     "urgent_median": 23.0,
+     "urgent_p90": 75.30000000000001,
      "routine_median": 23.0,
-     "overdue_equal": 0.8842105263157894,
-     "harm_days": 11297.425,
+     "overdue_equal": 0.8805031446540881,
+     "harm_days": 11651.175000000001,
      "open_at_end": 56
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 7.0,
-     "urgent_p90": 68.59999999999991,
+     "urgent_p90": 69.0,
      "routine_median": 7.0,
-     "overdue_equal": 0.6373722627737226,
-     "harm_days": 94984.025,
-     "open_at_end": 276
+     "overdue_equal": 0.6348657985649747,
+     "harm_days": 97692.375,
+     "open_at_end": 285
     },
     {
      "band": "Island (fly-in)",
      "jobs": 5236,
      "urgent_median": 8.0,
-     "urgent_p90": 73.0,
+     "urgent_p90": 71.0,
      "routine_median": 9.0,
-     "overdue_equal": 0.6960110041265475,
-     "harm_days": 64373.075,
-     "open_at_end": 331
+     "overdue_equal": 0.6870607689127739,
+     "harm_days": 65852.325,
+     "open_at_end": 337
     }
    ],
+   "joint_saving": 1656285.1255405324,
+   "joint_trips": 1153,
+   "cost_per_job_joint": 513.5838163717165,
    "key": "cheapest_1",
-   "seconds": 37.509191274642944
+   "seconds": 51.39606428146362
   },
   "floor_1": {
    "policy": "floor",
    "lam": 1.0,
    "label": "Cheapest first + urgent guarantee",
-   "total_cost": 28202977.325284142,
-   "cost_travel": 14983857.325284142,
-   "cost_per_job": 759.267124115874,
-   "jobs_done": 37145,
-   "open_at_end": 363,
+   "total_cost": 29023596.426210396,
+   "cost_travel": 15778866.426210396,
+   "cost_per_job": 780.497940789824,
+   "jobs_done": 37186,
+   "open_at_end": 322,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 7.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20213333333333333,
-   "overdue_equal_remote": 0.30356100408639813,
-   "overdue_official_remote": 0.09678925861062464,
-   "harm_days_total": 87930.775,
-   "air_trips": 1533,
-   "trips": 6260,
+   "overdue_equal_town": 0.20186147709416172,
+   "overdue_equal_remote": 0.29873015873015873,
+   "overdue_official_remote": 0.09375661375661376,
+   "harm_days_total": 87447.22499999999,
+   "air_trips": 1635,
+   "trips": 6447,
    "gap_p90": 2.3333333333333335,
-   "duplicates_merged": 397,
+   "duplicates_merged": 370,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -225,8 +228,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.20213333333333333,
-     "harm_days": 18671.35,
+     "overdue_equal": 0.20186147709416172,
+     "harm_days": 19126.725,
      "open_at_end": 0
     },
     {
@@ -235,8 +238,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.19666435024322446,
-     "harm_days": 3942.4750000000004,
+     "overdue_equal": 0.19486215538847118,
+     "harm_days": 4011.875,
      "open_at_end": 7
     },
     {
@@ -244,30 +247,30 @@
      "jobs": 2925,
      "urgent_median": 2.0,
      "urgent_p90": 14.0,
-     "routine_median": 16.0,
-     "overdue_equal": 0.3862348178137652,
-     "harm_days": 17723.525,
-     "open_at_end": 87
+     "routine_median": 21.0,
+     "overdue_equal": 0.38774002954209746,
+     "harm_days": 18433.35,
+     "open_at_end": 85
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
      "urgent_median": 3.0,
      "urgent_p90": 16.0,
-     "routine_median": 28.5,
-     "overdue_equal": 0.5789473684210527,
-     "harm_days": 4716.699999999999,
-     "open_at_end": 29
+     "routine_median": 31.0,
+     "overdue_equal": 0.5534591194968553,
+     "harm_days": 4908.5,
+     "open_at_end": 18
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 2.0,
      "urgent_p90": 9.0,
-     "routine_median": 7.0,
-     "overdue_equal": 0.3278832116788321,
-     "harm_days": 30180.35,
-     "open_at_end": 138
+     "routine_median": 6.0,
+     "overdue_equal": 0.32022322614934895,
+     "harm_days": 29382.35,
+     "open_at_end": 132
     },
     {
      "band": "Island (fly-in)",
@@ -275,35 +278,38 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 6.0,
-     "overdue_equal": 0.2530949105914718,
-     "harm_days": 12696.375,
-     "open_at_end": 102
+     "overdue_equal": 0.25051674245556016,
+     "harm_days": 11584.425,
+     "open_at_end": 80
     }
    ],
+   "joint_saving": 5788809.183438393,
+   "joint_trips": 1742,
+   "cost_per_job_joint": 624.8262045601033,
    "key": "floor_1",
-   "seconds": 36.33595323562622
+   "seconds": 54.467538356781006
   },
   "official_0.2": {
    "policy": "official",
    "lam": 0.2,
    "label": "Need first, official remote allowance",
-   "total_cost": 28267743.551895667,
-   "cost_travel": 14905913.551895667,
-   "cost_per_job": 754.0075634007914,
-   "jobs_done": 37490,
-   "open_at_end": 18,
+   "total_cost": 29010390.372218657,
+   "cost_travel": 15634410.372218657,
+   "cost_per_job": 773.7342073990147,
+   "jobs_done": 37494,
+   "open_at_end": 14,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 10.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20426666666666668,
-   "overdue_equal_remote": 0.3529480443666083,
-   "overdue_official_remote": 0.1524810274372446,
-   "harm_days_total": 77994.42499999999,
-   "air_trips": 1469,
-   "trips": 6224,
+   "overdue_equal_town": 0.20355372899794513,
+   "overdue_equal_remote": 0.3470899470899471,
+   "overdue_official_remote": 0.14592592592592593,
+   "harm_days_total": 78574.57499999998,
+   "air_trips": 1569,
+   "trips": 6428,
    "gap_p90": 3.3333333333333335,
-   "duplicates_merged": 345,
+   "duplicates_merged": 317,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -312,8 +318,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.20426666666666668,
-     "harm_days": 15178.05,
+     "overdue_equal": 0.20355372899794513,
+     "harm_days": 15738.274999999998,
      "open_at_end": 0
     },
     {
@@ -322,38 +328,38 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.21403752605976373,
-     "harm_days": 5037.700000000001,
+     "overdue_equal": 0.21428571428571427,
+     "harm_days": 5276.95,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 2.0,
-     "urgent_p90": 21.600000000000136,
-     "routine_median": 27.0,
-     "overdue_equal": 0.4939271255060729,
-     "harm_days": 14818.274999999998,
+     "urgent_p90": 21.0,
+     "routine_median": 28.0,
+     "overdue_equal": 0.48522895125553916,
+     "harm_days": 15454.65,
      "open_at_end": 0
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
-     "urgent_median": 6.0,
-     "urgent_p90": 28.599999999999994,
+     "urgent_median": 7.0,
+     "urgent_p90": 29.0,
      "routine_median": 28.0,
-     "overdue_equal": 0.6631578947368421,
-     "harm_days": 4610.299999999999,
-     "open_at_end": 4
+     "overdue_equal": 0.6729559748427673,
+     "harm_days": 4589.925,
+     "open_at_end": 2
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 2.0,
-     "urgent_p90": 15.0,
+     "urgent_p90": 14.0,
      "routine_median": 9.0,
-     "overdue_equal": 0.36817518248175185,
-     "harm_days": 26670.975,
+     "overdue_equal": 0.36088227478076,
+     "harm_days": 26518.100000000002,
      "open_at_end": 0
     },
     {
@@ -361,36 +367,39 @@
      "jobs": 5236,
      "urgent_median": 2.0,
      "urgent_p90": 6.0,
-     "routine_median": 9.0,
-     "overdue_equal": 0.30032095369096745,
-     "harm_days": 11679.125,
-     "open_at_end": 14
+     "routine_median": 7.0,
+     "overdue_equal": 0.2930963207937164,
+     "harm_days": 10996.675,
+     "open_at_end": 12
     }
    ],
+   "joint_saving": 5438600.954816654,
+   "joint_trips": 1785,
+   "cost_per_job_joint": 628.681640193151,
    "key": "official_0.2",
-   "seconds": 22.71949791908264
+   "seconds": 36.41561770439148
   },
   "guarantee_0.2": {
    "policy": "guarantee",
    "lam": 0.2,
    "label": "Need first + urgent guarantee (ReachNT default)",
-   "total_cost": 32839403.771987863,
-   "cost_travel": 19468753.771987863,
-   "cost_per_job": 876.3250192663677,
-   "jobs_done": 37474,
-   "open_at_end": 34,
+   "total_cost": 33479157.819261394,
+   "cost_travel": 20108312.819261394,
+   "cost_per_job": 893.3254481218186,
+   "jobs_done": 37477,
+   "open_at_end": 31,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 3.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20253333333333334,
-   "overdue_equal_remote": 0.2849970811441915,
-   "overdue_official_remote": 0.07892586106246352,
-   "harm_days_total": 74307.45,
-   "air_trips": 1984,
-   "trips": 7435,
+   "overdue_equal_town": 0.2022241025021153,
+   "overdue_equal_remote": 0.27756613756613757,
+   "overdue_official_remote": 0.07291005291005291,
+   "harm_days_total": 76377.5,
+   "air_trips": 2065,
+   "trips": 7566,
    "gap_p90": 1.0,
-   "duplicates_merged": 318,
+   "duplicates_merged": 323,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -399,8 +408,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.20253333333333334,
-     "harm_days": 22095.65,
+     "overdue_equal": 0.2022241025021153,
+     "harm_days": 22857.6,
      "open_at_end": 0
     },
     {
@@ -408,30 +417,30 @@
      "jobs": 3352,
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.19527449617790132,
-     "harm_days": 6369.4,
+     "routine_median": 6.0,
+     "overdue_equal": 0.19611528822055138,
+     "harm_days": 6578.8,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 2.0,
-     "urgent_p90": 14.0,
-     "routine_median": 10.0,
-     "overdue_equal": 0.38785425101214577,
-     "harm_days": 13993.025,
-     "open_at_end": 5
+     "urgent_p90": 13.0,
+     "routine_median": 15.0,
+     "overdue_equal": 0.3744460856720827,
+     "harm_days": 14819.575,
+     "open_at_end": 7
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
      "urgent_median": 3.0,
-     "urgent_p90": 17.0,
-     "routine_median": 17.0,
-     "overdue_equal": 0.5543859649122806,
-     "harm_days": 3671.125,
-     "open_at_end": 1
+     "urgent_p90": 16.0,
+     "routine_median": 21.0,
+     "overdue_equal": 0.5157232704402516,
+     "harm_days": 3802.95,
+     "open_at_end": 0
     },
     {
      "band": "Remote, cut in the wet",
@@ -439,8 +448,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 7.0,
      "routine_median": 6.0,
-     "overdue_equal": 0.30452554744525545,
-     "harm_days": 20928.6,
+     "overdue_equal": 0.2960403933032155,
+     "harm_days": 21185.15,
      "open_at_end": 16
     },
     {
@@ -449,35 +458,38 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.2200825309491059,
-     "harm_days": 7249.65,
-     "open_at_end": 12
+     "overdue_equal": 0.2170318313352625,
+     "harm_days": 7133.424999999999,
+     "open_at_end": 8
     }
    ],
+   "joint_saving": 8271152.620633496,
+   "joint_trips": 2034,
+   "cost_per_job_joint": 672.6260159198414,
    "key": "guarantee_0.2",
-   "seconds": 39.09574818611145
+   "seconds": 57.541218996047974
   },
   "guarantee_0.5": {
    "policy": "guarantee",
    "lam": 0.5,
    "label": "Need first + urgent guarantee, tighter budget",
-   "total_cost": 30312962.04179108,
-   "cost_travel": 17058712.04179108,
-   "cost_per_job": 811.78763401599,
-   "jobs_done": 37341,
-   "open_at_end": 167,
+   "total_cost": 31056551.06721054,
+   "cost_travel": 17781921.06721054,
+   "cost_per_job": 831.3448903073197,
+   "jobs_done": 37357,
+   "open_at_end": 151,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 3.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20226666666666668,
-   "overdue_equal_remote": 0.28429655575014595,
-   "overdue_official_remote": 0.07764156450671336,
-   "harm_days_total": 91311.475,
-   "air_trips": 1746,
-   "trips": 6664,
+   "overdue_equal_town": 0.20319110358999154,
+   "overdue_equal_remote": 0.27925925925925926,
+   "overdue_official_remote": 0.07269841269841269,
+   "harm_days_total": 91619.875,
+   "air_trips": 1840,
+   "trips": 6819,
    "gap_p90": 1.0,
-   "duplicates_merged": 500,
+   "duplicates_merged": 465,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -486,8 +498,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 6.0,
-     "overdue_equal": 0.20226666666666668,
-     "harm_days": 26563.800000000003,
+     "overdue_equal": 0.20319110358999154,
+     "harm_days": 26517.149999999998,
      "open_at_end": 0
     },
     {
@@ -496,29 +508,29 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 7.0,
-     "overdue_equal": 0.19457956914523974,
-     "harm_days": 6881.25,
+     "overdue_equal": 0.19736842105263158,
+     "harm_days": 7019.549999999999,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 2.0,
-     "urgent_p90": 14.0,
-     "routine_median": 21.0,
-     "overdue_equal": 0.37894736842105264,
-     "harm_days": 15586.124999999998,
-     "open_at_end": 38
+     "urgent_p90": 13.700000000000045,
+     "routine_median": 28.0,
+     "overdue_equal": 0.37370753323485967,
+     "harm_days": 16763.25,
+     "open_at_end": 37
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
      "urgent_median": 3.0,
-     "urgent_p90": 18.799999999999983,
-     "routine_median": 29.0,
-     "overdue_equal": 0.5578947368421052,
-     "harm_days": 4276.15,
-     "open_at_end": 8
+     "urgent_p90": 16.30000000000001,
+     "routine_median": 31.0,
+     "overdue_equal": 0.5188679245283019,
+     "harm_days": 4413.125,
+     "open_at_end": 14
     },
     {
      "band": "Remote, cut in the wet",
@@ -526,9 +538,9 @@
      "urgent_median": 2.0,
      "urgent_p90": 7.0,
      "routine_median": 10.0,
-     "overdue_equal": 0.3054014598540146,
-     "harm_days": 26463.75,
-     "open_at_end": 49
+     "overdue_equal": 0.29816635663034813,
+     "harm_days": 26124.899999999998,
+     "open_at_end": 48
     },
     {
      "band": "Island (fly-in)",
@@ -536,35 +548,38 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 9.0,
-     "overdue_equal": 0.2209995414947272,
-     "harm_days": 11540.4,
-     "open_at_end": 72
+     "overdue_equal": 0.21951219512195122,
+     "harm_days": 10781.900000000001,
+     "open_at_end": 52
     }
    ],
+   "joint_saving": 7025352.148909794,
+   "joint_trips": 1841,
+   "cost_per_job_joint": 643.2850314077883,
    "key": "guarantee_0.5",
-   "seconds": 33.069759130477905
+   "seconds": 53.70040702819824
   },
   "guarantee_0.2_h3": {
    "policy": "guarantee",
    "lam": 0.2,
    "label": "ReachNT: need first + urgent guarantee + H3 run zones",
-   "total_cost": 30118268.67580789,
-   "cost_travel": 16543408.67580789,
-   "cost_per_job": 803.4323545711284,
-   "jobs_done": 37487,
-   "open_at_end": 21,
+   "total_cost": 30597014.19789543,
+   "cost_travel": 17023344.19789543,
+   "cost_per_job": 816.1815567086916,
+   "jobs_done": 37488,
+   "open_at_end": 20,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 3.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20253333333333334,
-   "overdue_equal_remote": 0.2621132516053707,
-   "overdue_official_remote": 0.052772913018096904,
-   "harm_days_total": 61037.825,
-   "air_trips": 2335,
-   "trips": 8195,
+   "overdue_equal_town": 0.20234497763809983,
+   "overdue_equal_remote": 0.25671957671957674,
+   "overdue_official_remote": 0.0491005291005291,
+   "harm_days_total": 63111.049999999996,
+   "air_trips": 2405,
+   "trips": 8281,
    "gap_p90": 1.0,
-   "duplicates_merged": 250,
+   "duplicates_merged": 266,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -573,8 +588,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.20253333333333334,
-     "harm_days": 20601.675,
+     "overdue_equal": 0.20234497763809983,
+     "harm_days": 21236.25,
      "open_at_end": 0
     },
     {
@@ -583,19 +598,19 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.18971507991660877,
-     "harm_days": 5061.075000000001,
+     "overdue_equal": 0.18984962406015038,
+     "harm_days": 5218.299999999999,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 2.0,
-     "urgent_p90": 9.0,
-     "routine_median": 9.0,
-     "overdue_equal": 0.32469635627530363,
-     "harm_days": 10589.5,
-     "open_at_end": 6
+     "urgent_p90": 8.700000000000045,
+     "routine_median": 10.0,
+     "overdue_equal": 0.3227474150664697,
+     "harm_days": 11610.4,
+     "open_at_end": 4
     },
     {
      "band": "Very remote (road)",
@@ -603,8 +618,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 14.0,
      "routine_median": 16.0,
-     "overdue_equal": 0.4982456140350877,
-     "harm_days": 3062.2250000000004,
+     "overdue_equal": 0.46540880503144655,
+     "harm_days": 3098.7999999999997,
      "open_at_end": 2
     },
     {
@@ -613,9 +628,9 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.2776642335766423,
-     "harm_days": 15978.35,
-     "open_at_end": 4
+     "overdue_equal": 0.2697315971299495,
+     "harm_days": 16197.824999999999,
+     "open_at_end": 7
     },
     {
      "band": "Island (fly-in)",
@@ -623,35 +638,38 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.21916552040348464,
-     "harm_days": 5745.0,
-     "open_at_end": 9
+     "overdue_equal": 0.21620504340636626,
+     "harm_days": 5749.475,
+     "open_at_end": 7
     }
    ],
+   "joint_saving": 5223614.985414358,
+   "joint_trips": 1490,
+   "cost_per_job_joint": 676.8405679812493,
    "key": "guarantee_0.2_h3",
-   "seconds": 70.54034900665283
+   "seconds": 100.93491077423096
   },
   "guarantee_0.5_h3": {
    "policy": "guarantee",
    "lam": 0.5,
    "label": "ReachNT, tighter budget (H3 run zones)",
-   "total_cost": 28109943.763377212,
-   "cost_travel": 14640263.763377214,
-   "cost_per_job": 751.4219509577164,
-   "jobs_done": 37409,
-   "open_at_end": 99,
+   "total_cost": 28695450.88164318,
+   "cost_travel": 15212520.88164318,
+   "cost_per_job": 767.1759940552663,
+   "jobs_done": 37404,
+   "open_at_end": 104,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 3.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20213333333333333,
-   "overdue_equal_remote": 0.2632807939287799,
-   "overdue_official_remote": 0.053239929947460594,
-   "harm_days_total": 76287.17499999999,
-   "air_trips": 2063,
-   "trips": 7565,
+   "overdue_equal_town": 0.20343285386196058,
+   "overdue_equal_remote": 0.25851851851851854,
+   "overdue_official_remote": 0.05142857142857143,
+   "harm_days_total": 76499.75,
+   "air_trips": 2152,
+   "trips": 7676,
    "gap_p90": 1.0,
-   "duplicates_merged": 438,
+   "duplicates_merged": 399,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -660,8 +678,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 6.0,
-     "overdue_equal": 0.20213333333333333,
-     "harm_days": 24820.85,
+     "overdue_equal": 0.20343285386196058,
+     "harm_days": 24828.975,
      "open_at_end": 0
     },
     {
@@ -670,8 +688,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 7.0,
-     "overdue_equal": 0.1890201528839472,
-     "harm_days": 5593.675,
+     "overdue_equal": 0.19047619047619047,
+     "harm_days": 5711.599999999999,
      "open_at_end": 0
     },
     {
@@ -679,20 +697,20 @@
      "jobs": 2925,
      "urgent_median": 2.0,
      "urgent_p90": 8.0,
-     "routine_median": 15.0,
-     "overdue_equal": 0.3230769230769231,
-     "harm_days": 11853.574999999999,
-     "open_at_end": 19
+     "routine_median": 20.0,
+     "overdue_equal": 0.31314623338257014,
+     "harm_days": 12421.599999999999,
+     "open_at_end": 23
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
-     "urgent_median": 3.0,
-     "urgent_p90": 14.0,
-     "routine_median": 28.0,
-     "overdue_equal": 0.5298245614035088,
-     "harm_days": 3624.0249999999996,
-     "open_at_end": 6
+     "urgent_median": 2.0,
+     "urgent_p90": 14.300000000000011,
+     "routine_median": 31.0,
+     "overdue_equal": 0.49056603773584906,
+     "harm_days": 3822.875,
+     "open_at_end": 11
     },
     {
      "band": "Remote, cut in the wet",
@@ -700,9 +718,9 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 9.0,
-     "overdue_equal": 0.27883211678832115,
-     "harm_days": 21293.25,
-     "open_at_end": 35
+     "overdue_equal": 0.27478076003188945,
+     "harm_days": 21193.449999999997,
+     "open_at_end": 31
     },
     {
      "band": "Island (fly-in)",
@@ -710,35 +728,38 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 8.0,
-     "overdue_equal": 0.21916552040348464,
-     "harm_days": 9101.8,
+     "overdue_equal": 0.2170318313352625,
+     "harm_days": 8521.25,
      "open_at_end": 39
     }
    ],
+   "joint_saving": 4314928.328933854,
+   "joint_trips": 1326,
+   "cost_per_job_joint": 651.8159168193062,
    "key": "guarantee_0.5_h3",
-   "seconds": 59.16853594779968
+   "seconds": 81.27242422103882
   },
   "cheapest_1_h3": {
    "policy": "cheapest",
    "lam": 1.0,
    "label": "Cheapest jobs first + H3 run zones",
-   "total_cost": 20645620.954124562,
-   "cost_travel": 7386385.954124562,
-   "cost_per_job": 557.8992853624969,
-   "jobs_done": 37006,
-   "open_at_end": 502,
+   "total_cost": 20649308.352645867,
+   "cost_travel": 7393403.352645867,
+   "cost_per_job": 558.1950193995044,
+   "jobs_done": 36993,
+   "open_at_end": 515,
    "urgent_p90_town": 3.0,
-   "urgent_p90_remote": 43.0,
+   "urgent_p90_remote": 42.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 3.0,
-   "overdue_equal_town": 0.20426666666666668,
-   "overdue_equal_remote": 0.5490951546993579,
-   "overdue_official_remote": 0.372913018096906,
-   "harm_days_total": 178505.225,
-   "air_trips": 911,
-   "trips": 5571,
-   "gap_p90": 14.333333333333334,
-   "duplicates_merged": 302,
+   "overdue_equal_town": 0.20367460413392965,
+   "overdue_equal_remote": 0.545079365079365,
+   "overdue_official_remote": 0.36772486772486773,
+   "harm_days_total": 183445.775,
+   "air_trips": 913,
+   "trips": 5575,
+   "gap_p90": 14.0,
+   "duplicates_merged": 295,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -747,8 +768,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 1.0,
-     "overdue_equal": 0.20426666666666668,
-     "harm_days": 14319.55,
+     "overdue_equal": 0.20367460413392965,
+     "harm_days": 14768.849999999999,
      "open_at_end": 0
     },
     {
@@ -757,8 +778,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.24600416956219598,
-     "harm_days": 3883.15,
+     "overdue_equal": 0.24686716791979949,
+     "harm_days": 4024.8999999999996,
      "open_at_end": 3
     },
     {
@@ -766,66 +787,69 @@
      "jobs": 2925,
      "urgent_median": 6.0,
      "urgent_p90": 41.0,
-     "routine_median": 6.0,
-     "overdue_equal": 0.620242914979757,
-     "harm_days": 24930.35,
-     "open_at_end": 89
+     "routine_median": 3.0,
+     "overdue_equal": 0.6181683899556869,
+     "harm_days": 25507.7,
+     "open_at_end": 87
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
-     "urgent_median": 23.0,
-     "urgent_p90": 77.0,
+     "urgent_median": 23.5,
+     "urgent_p90": 79.0,
      "routine_median": 24.0,
-     "overdue_equal": 0.8666666666666667,
-     "harm_days": 11557.925,
-     "open_at_end": 49
+     "overdue_equal": 0.8647798742138365,
+     "harm_days": 12095.625,
+     "open_at_end": 50
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 3.0,
-     "urgent_p90": 61.0,
+     "urgent_p90": 59.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.5818978102189781,
-     "harm_days": 82898.25,
-     "open_at_end": 201
+     "overdue_equal": 0.5793250066436354,
+     "harm_days": 85282.375,
+     "open_at_end": 208
     },
     {
      "band": "Island (fly-in)",
      "jobs": 5236,
      "urgent_median": 6.0,
-     "urgent_p90": 43.0,
+     "urgent_p90": 38.0,
      "routine_median": 6.0,
-     "overdue_equal": 0.6157725813846859,
-     "harm_days": 40916.0,
-     "open_at_end": 160
+     "overdue_equal": 0.6056221579164944,
+     "harm_days": 41766.325,
+     "open_at_end": 167
     }
    ],
+   "joint_saving": 1360098.1188015488,
+   "joint_trips": 872,
+   "cost_per_job_joint": 521.4286549845732,
    "key": "cheapest_1_h3",
-   "seconds": 42.02402472496033
+   "seconds": 58.80651521682739
   },
   "need_0.8": {
    "policy": "need",
    "lam": 0.8,
    "label": "Need first, cost-aware (lam 0.8)",
-   "total_cost": 21092064.90368817,
-   "cost_travel": 7988154.90368817,
-   "cost_per_job": 568.1823421067876,
-   "jobs_done": 37122,
-   "open_at_end": 386,
+   "total_cost": 21495257.255768653,
+   "cost_travel": 8357262.255768653,
+   "cost_per_job": 578.7629848079874,
+   "jobs_done": 37140,
+   "open_at_end": 368,
    "urgent_p90_town": 3.0,
-   "urgent_p90_remote": 35.0,
+   "urgent_p90_remote": 34.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 3.0,
-   "overdue_equal_town": 0.2044,
-   "overdue_equal_remote": 0.5408056042031524,
-   "overdue_official_remote": 0.3666082895504962,
-   "harm_days_total": 160940.34999999998,
-   "air_trips": 627,
-   "trips": 4336,
-   "gap_p90": 11.666666666666666,
-   "duplicates_merged": 620,
+   "overdue_equal_town": 0.2039163544058987,
+   "overdue_equal_remote": 0.5288888888888889,
+   "overdue_official_remote": 0.35735449735449737,
+   "harm_days_total": 156252.95,
+   "air_trips": 664,
+   "trips": 4480,
+   "gap_p90": 11.333333333333334,
+   "duplicates_merged": 554,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -834,8 +858,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 7.0,
-     "overdue_equal": 0.2044,
-     "harm_days": 21302.6,
+     "overdue_equal": 0.2039163544058987,
+     "harm_days": 21006.4,
      "open_at_end": 0
     },
     {
@@ -844,75 +868,78 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 8.0,
-     "overdue_equal": 0.23419041000694926,
-     "harm_days": 5455.525,
-     "open_at_end": 10
+     "overdue_equal": 0.224937343358396,
+     "harm_days": 5404.950000000001,
+     "open_at_end": 12
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 6.0,
-     "urgent_p90": 38.0,
-     "routine_median": 23.0,
-     "overdue_equal": 0.6218623481781377,
-     "harm_days": 22583.2,
-     "open_at_end": 72
+     "urgent_p90": 36.0,
+     "routine_median": 22.0,
+     "overdue_equal": 0.6100443131462334,
+     "harm_days": 22434.575,
+     "open_at_end": 77
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
      "urgent_median": 15.0,
-     "urgent_p90": 57.0,
-     "routine_median": 36.0,
-     "overdue_equal": 0.7859649122807018,
-     "harm_days": 7570.575000000001,
-     "open_at_end": 18
+     "urgent_p90": 56.0,
+     "routine_median": 34.0,
+     "overdue_equal": 0.7547169811320755,
+     "harm_days": 7697.025,
+     "open_at_end": 17
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 3.0,
-     "urgent_p90": 37.0,
-     "routine_median": 17.0,
-     "overdue_equal": 0.5646715328467153,
-     "harm_days": 62689.925,
-     "open_at_end": 120
+     "urgent_p90": 36.0,
+     "routine_median": 16.0,
+     "overdue_equal": 0.5546106829657188,
+     "harm_days": 59846.87499999999,
+     "open_at_end": 114
     },
     {
      "band": "Island (fly-in)",
      "jobs": 5236,
      "urgent_median": 6.0,
-     "urgent_p90": 41.0,
-     "routine_median": 21.0,
-     "overdue_equal": 0.6276937184777625,
-     "harm_days": 41338.525,
-     "open_at_end": 166
+     "urgent_p90": 38.0,
+     "routine_median": 17.0,
+     "overdue_equal": 0.6143034311699049,
+     "harm_days": 39863.125,
+     "open_at_end": 148
     }
    ],
+   "joint_saving": 1681194.9694468174,
+   "joint_trips": 1161,
+   "cost_per_job_joint": 533.4965612903025,
    "key": "need_0.8",
-   "seconds": 27.707683086395264
+   "seconds": 36.36645555496216
   },
   "need_0.4": {
    "policy": "need",
    "lam": 0.4,
    "label": "Need first (lam 0.4)",
-   "total_cost": 26312147.49366238,
-   "cost_travel": 12989112.49366238,
-   "cost_per_job": 703.458119283028,
-   "jobs_done": 37404,
-   "open_at_end": 104,
+   "total_cost": 26726202.095618226,
+   "cost_travel": 13388397.095618226,
+   "cost_per_job": 714.4706096617806,
+   "jobs_done": 37407,
+   "open_at_end": 101,
    "urgent_p90_town": 3.0,
-   "urgent_p90_remote": 17.0,
+   "urgent_p90_remote": 16.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20333333333333334,
-   "overdue_equal_remote": 0.41599532983070636,
-   "overdue_official_remote": 0.22089900758902511,
-   "harm_days_total": 89499.6,
-   "air_trips": 1193,
-   "trips": 6043,
-   "gap_p90": 5.666666666666667,
-   "duplicates_merged": 365,
+   "overdue_equal_town": 0.20319110358999154,
+   "overdue_equal_remote": 0.404973544973545,
+   "overdue_official_remote": 0.20687830687830688,
+   "harm_days_total": 89317.075,
+   "air_trips": 1248,
+   "trips": 6148,
+   "gap_p90": 5.333333333333333,
+   "duplicates_merged": 332,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -921,8 +948,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.20333333333333334,
-     "harm_days": 17530.7,
+     "overdue_equal": 0.20319110358999154,
+     "harm_days": 17892.800000000003,
      "open_at_end": 0
     },
     {
@@ -931,162 +958,78 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 6.0,
-     "overdue_equal": 0.22446143154968728,
-     "harm_days": 4151.75,
+     "overdue_equal": 0.2224310776942356,
+     "harm_days": 4206.15,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 3.0,
-     "urgent_p90": 23.600000000000136,
-     "routine_median": 10.0,
-     "overdue_equal": 0.5327935222672064,
-     "harm_days": 13964.525000000001,
-     "open_at_end": 16
+     "urgent_p90": 21.700000000000045,
+     "routine_median": 13.0,
+     "overdue_equal": 0.5110782865583456,
+     "harm_days": 13808.599999999999,
+     "open_at_end": 14
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
-     "urgent_median": 9.0,
-     "urgent_p90": 36.0,
-     "routine_median": 20.0,
-     "overdue_equal": 0.712280701754386,
-     "harm_days": 4953.85,
-     "open_at_end": 12
+     "urgent_median": 8.0,
+     "urgent_p90": 35.0,
+     "routine_median": 17.0,
+     "overdue_equal": 0.7169811320754716,
+     "harm_days": 4883.475,
+     "open_at_end": 11
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 2.0,
-     "urgent_p90": 20.0,
+     "urgent_p90": 19.400000000000546,
      "routine_median": 8.0,
-     "overdue_equal": 0.4303649635036496,
-     "harm_days": 31932.85,
+     "overdue_equal": 0.418549030029232,
+     "harm_days": 31829.5,
      "open_at_end": 29
     },
     {
      "band": "Island (fly-in)",
      "jobs": 5236,
      "urgent_median": 2.0,
-     "urgent_p90": 15.0,
+     "urgent_p90": 14.0,
      "routine_median": 8.0,
-     "overdue_equal": 0.4149472718936268,
-     "harm_days": 16965.925,
+     "overdue_equal": 0.4038859032658123,
+     "harm_days": 16696.55,
      "open_at_end": 47
     }
    ],
+   "joint_saving": 4047065.541220353,
+   "joint_trips": 1674,
+   "cost_per_job_joint": 606.2805505493055,
    "key": "need_0.4",
-   "seconds": 20.189878940582275
+   "seconds": 25.797451496124268
   },
   "need_0.2": {
    "policy": "need",
    "lam": 0.2,
    "label": "Need first (lam 0.2)",
-   "total_cost": 30231512.434409637,
-   "cost_travel": 16830162.434409637,
-   "cost_per_job": 806.4317230689724,
-   "jobs_done": 37488,
-   "open_at_end": 20,
-   "urgent_p90_town": 3.0,
-   "urgent_p90_remote": 13.0,
-   "urgent_median_town": 2.0,
-   "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20413333333333333,
-   "overdue_equal_remote": 0.35528312901342674,
-   "overdue_official_remote": 0.1571511967308815,
-   "harm_days_total": 67067.42499999999,
-   "air_trips": 1698,
-   "trips": 6974,
-   "gap_p90": 4.333333333333333,
-   "duplicates_merged": 246,
-   "immediate_made_safe_within_1_day": 1.0,
-   "bands": [
-    {
-     "band": "Town",
-     "jobs": 17431,
-     "urgent_median": 2.0,
-     "urgent_p90": 3.0,
-     "routine_median": 2.0,
-     "overdue_equal": 0.20413333333333333,
-     "harm_days": 15409.95,
-     "open_at_end": 0
-    },
-    {
-     "band": "Near town (road)",
-     "jobs": 3352,
-     "urgent_median": 2.0,
-     "urgent_p90": 3.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.22237665045170257,
-     "harm_days": 3886.3,
-     "open_at_end": 0
-    },
-    {
-     "band": "Remote (road)",
-     "jobs": 2925,
-     "urgent_median": 3.0,
-     "urgent_p90": 22.0,
-     "routine_median": 8.0,
-     "overdue_equal": 0.5068825910931174,
-     "harm_days": 12054.400000000001,
-     "open_at_end": 0
-    },
-    {
-     "band": "Very remote (road)",
-     "jobs": 673,
-     "urgent_median": 8.0,
-     "urgent_p90": 32.79999999999998,
-     "routine_median": 13.0,
-     "overdue_equal": 0.6947368421052632,
-     "harm_days": 4071.25,
-     "open_at_end": 1
-    },
-    {
-     "band": "Remote, cut in the wet",
-     "jobs": 7891,
-     "urgent_median": 2.0,
-     "urgent_p90": 15.0,
-     "routine_median": 6.0,
-     "overdue_equal": 0.36875912408759126,
-     "harm_days": 22637.674999999996,
-     "open_at_end": 0
-    },
-    {
-     "band": "Island (fly-in)",
-     "jobs": 5236,
-     "urgent_median": 2.0,
-     "urgent_p90": 3.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.29160935350756534,
-     "harm_days": 9007.85,
-     "open_at_end": 19
-    }
-   ],
-   "key": "need_0.2",
-   "seconds": 20.539281845092773
-  },
-  "need_0.1": {
-   "policy": "need",
-   "lam": 0.1,
-   "label": "Need first (lam 0.1)",
-   "total_cost": 33604835.03464477,
-   "cost_travel": 20186800.03464477,
-   "cost_per_job": 896.0094663283501,
-   "jobs_done": 37505,
-   "open_at_end": 3,
+   "total_cost": 30764131.691811953,
+   "cost_travel": 17354716.691811953,
+   "cost_per_job": 820.5300107169859,
+   "jobs_done": 37493,
+   "open_at_end": 15,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 10.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20426666666666668,
-   "overdue_equal_remote": 0.3352014010507881,
-   "overdue_official_remote": 0.13146526561587857,
-   "harm_days_total": 61413.025,
-   "air_trips": 2151,
-   "trips": 7617,
+   "overdue_equal_town": 0.2039163544058987,
+   "overdue_equal_remote": 0.3486772486772487,
+   "overdue_official_remote": 0.14984126984126983,
+   "harm_days_total": 68611.5,
+   "air_trips": 1770,
+   "trips": 7095,
    "gap_p90": 3.3333333333333335,
-   "duplicates_merged": 220,
+   "duplicates_merged": 232,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -1095,8 +1038,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.20426666666666668,
-     "harm_days": 15496.3,
+     "overdue_equal": 0.2039163544058987,
+     "harm_days": 15919.4,
      "open_at_end": 0
     },
     {
@@ -1105,105 +1048,18 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.2334954829742877,
-     "harm_days": 4180.9,
+     "overdue_equal": 0.21804511278195488,
+     "harm_days": 4106.975,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
-     "urgent_median": 3.0,
+     "urgent_median": 2.0,
      "urgent_p90": 22.0,
-     "routine_median": 8.0,
-     "overdue_equal": 0.5125506072874494,
-     "harm_days": 11963.9,
-     "open_at_end": 0
-    },
-    {
-     "band": "Very remote (road)",
-     "jobs": 673,
-     "urgent_median": 7.0,
-     "urgent_p90": 32.79999999999998,
      "routine_median": 9.0,
-     "overdue_equal": 0.6666666666666666,
-     "harm_days": 3959.8999999999996,
-     "open_at_end": 0
-    },
-    {
-     "band": "Remote, cut in the wet",
-     "jobs": 7891,
-     "urgent_median": 2.0,
-     "urgent_p90": 13.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.3521167883211679,
-     "harm_days": 19815.1,
-     "open_at_end": 0
-    },
-    {
-     "band": "Island (fly-in)",
-     "jobs": 5236,
-     "urgent_median": 2.0,
-     "urgent_p90": 3.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.23200366804218248,
-     "harm_days": 5996.925,
-     "open_at_end": 3
-    }
-   ],
-   "key": "need_0.1",
-   "seconds": 19.786957025527954
-  },
-  "need_0.05": {
-   "policy": "need",
-   "lam": 0.05,
-   "label": "Need first (lam 0.05)",
-   "total_cost": 35749048.633884005,
-   "cost_travel": 22328098.633884005,
-   "cost_per_job": 953.1046345815295,
-   "jobs_done": 37508,
-   "open_at_end": 0,
-   "urgent_p90_town": 3.0,
-   "urgent_p90_remote": 10.0,
-   "urgent_median_town": 2.0,
-   "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.2052,
-   "overdue_equal_remote": 0.33345008756567424,
-   "overdue_official_remote": 0.13088149445417396,
-   "harm_days_total": 59566.75,
-   "air_trips": 2437,
-   "trips": 8009,
-   "gap_p90": 3.3333333333333335,
-   "duplicates_merged": 217,
-   "immediate_made_safe_within_1_day": 1.0,
-   "bands": [
-    {
-     "band": "Town",
-     "jobs": 17431,
-     "urgent_median": 2.0,
-     "urgent_p90": 3.0,
-     "routine_median": 2.0,
-     "overdue_equal": 0.2052,
-     "harm_days": 15580.824999999999,
-     "open_at_end": 0
-    },
-    {
-     "band": "Near town (road)",
-     "jobs": 3352,
-     "urgent_median": 2.0,
-     "urgent_p90": 3.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.2334954829742877,
-     "harm_days": 4153.15,
-     "open_at_end": 0
-    },
-    {
-     "band": "Remote (road)",
-     "jobs": 2925,
-     "urgent_median": 3.0,
-     "urgent_p90": 22.0,
-     "routine_median": 8.0,
-     "overdue_equal": 0.5198380566801619,
-     "harm_days": 11849.45,
+     "overdue_equal": 0.49556868537666177,
+     "harm_days": 12626.25,
      "open_at_end": 0
     },
     {
@@ -1211,19 +1067,19 @@
      "jobs": 673,
      "urgent_median": 7.0,
      "urgent_p90": 31.0,
-     "routine_median": 9.5,
-     "overdue_equal": 0.6631578947368421,
-     "harm_days": 4028.575,
-     "open_at_end": 0
+     "routine_median": 13.0,
+     "overdue_equal": 0.6666666666666666,
+     "harm_days": 4090.6250000000005,
+     "open_at_end": 2
     },
     {
      "band": "Remote, cut in the wet",
      "jobs": 7891,
      "urgent_median": 2.0,
-     "urgent_p90": 10.0,
-     "routine_median": 3.0,
-     "overdue_equal": 0.3454014598540146,
-     "harm_days": 18596.7,
+     "urgent_p90": 14.0,
+     "routine_median": 6.0,
+     "overdue_equal": 0.36646292851448314,
+     "harm_days": 23010.325,
      "open_at_end": 0
     },
     {
@@ -1231,36 +1087,39 @@
      "jobs": 5236,
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
-     "routine_median": 2.0,
-     "overdue_equal": 0.23200366804218248,
-     "harm_days": 5358.05,
-     "open_at_end": 0
+     "routine_median": 3.0,
+     "overdue_equal": 0.28317486564696154,
+     "harm_days": 8857.925,
+     "open_at_end": 13
     }
    ],
-   "key": "need_0.05",
-   "seconds": 17.808824062347412
+   "joint_saving": 6457555.392487676,
+   "joint_trips": 1924,
+   "cost_per_job_joint": 648.2963833068646,
+   "key": "need_0.2",
+   "seconds": 31.743733644485474
   },
-  "need_0": {
+  "need_0.1": {
    "policy": "need",
-   "lam": 0.0,
-   "label": "Need first, cost ignored",
-   "total_cost": 38447694.6796906,
-   "cost_travel": 25022564.679690603,
-   "cost_per_job": 1025.0531801133252,
-   "jobs_done": 37508,
-   "open_at_end": 0,
+   "lam": 0.1,
+   "label": "Need first (lam 0.1)",
+   "total_cost": 33975323.41740383,
+   "cost_travel": 20557198.417403836,
+   "cost_per_job": 905.8878394188464,
+   "jobs_done": 37505,
+   "open_at_end": 3,
    "urgent_p90_town": 3.0,
    "urgent_p90_remote": 9.0,
    "urgent_median_town": 2.0,
    "urgent_median_remote": 2.0,
-   "overdue_equal_town": 0.20533333333333334,
-   "overdue_equal_remote": 0.32784588441331,
-   "overdue_official_remote": 0.12492702860478692,
-   "harm_days_total": 58191.825000000004,
-   "air_trips": 2812,
-   "trips": 8374,
+   "overdue_equal_town": 0.2039163544058987,
+   "overdue_equal_remote": 0.32592592592592595,
+   "overdue_official_remote": 0.12645502645502646,
+   "harm_days_total": 62346.975,
+   "air_trips": 2207,
+   "trips": 7667,
    "gap_p90": 3.0,
-   "duplicates_merged": 208,
+   "duplicates_merged": 221,
    "immediate_made_safe_within_1_day": 1.0,
    "bands": [
     {
@@ -1269,8 +1128,8 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.20533333333333334,
-     "harm_days": 15720.75,
+     "overdue_equal": 0.2039163544058987,
+     "harm_days": 15915.5,
      "open_at_end": 0
     },
     {
@@ -1279,28 +1138,28 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.23419041000694926,
-     "harm_days": 4259.6,
+     "overdue_equal": 0.22556390977443608,
+     "harm_days": 4219.924999999999,
      "open_at_end": 0
     },
     {
      "band": "Remote (road)",
      "jobs": 2925,
      "urgent_median": 2.0,
-     "urgent_p90": 23.0,
-     "routine_median": 8.0,
-     "overdue_equal": 0.49554655870445347,
-     "harm_days": 12038.675,
+     "urgent_p90": 21.0,
+     "routine_median": 9.0,
+     "overdue_equal": 0.4918759231905465,
+     "harm_days": 12286.175,
      "open_at_end": 0
     },
     {
      "band": "Very remote (road)",
      "jobs": 673,
-     "urgent_median": 8.0,
-     "urgent_p90": 30.599999999999994,
+     "urgent_median": 7.0,
+     "urgent_p90": 31.900000000000034,
      "routine_median": 9.0,
-     "overdue_equal": 0.6982456140350877,
-     "harm_days": 3991.525,
+     "overdue_equal": 0.6761006289308176,
+     "harm_days": 4025.85,
      "open_at_end": 0
     },
     {
@@ -1309,8 +1168,98 @@
      "urgent_median": 2.0,
      "urgent_p90": 10.0,
      "routine_median": 3.0,
-     "overdue_equal": 0.34102189781021897,
-     "harm_days": 17376.199999999997,
+     "overdue_equal": 0.34148285942067497,
+     "harm_days": 19822.125,
+     "open_at_end": 0
+    },
+    {
+     "band": "Island (fly-in)",
+     "jobs": 5236,
+     "urgent_median": 2.0,
+     "urgent_p90": 3.0,
+     "routine_median": 3.0,
+     "overdue_equal": 0.22902025630425796,
+     "harm_days": 6077.4,
+     "open_at_end": 3
+    }
+   ],
+   "joint_saving": 8816755.62820343,
+   "joint_trips": 2044,
+   "cost_per_job_joint": 670.805700285306,
+   "key": "need_0.1",
+   "seconds": 28.926130056381226
+  },
+  "need_0.05": {
+   "policy": "need",
+   "lam": 0.05,
+   "label": "Need first (lam 0.05)",
+   "total_cost": 35909637.06903702,
+   "cost_travel": 22488397.069037016,
+   "cost_per_job": 957.3860794773653,
+   "jobs_done": 37508,
+   "open_at_end": 0,
+   "urgent_p90_town": 3.0,
+   "urgent_p90_remote": 9.0,
+   "urgent_median_town": 2.0,
+   "urgent_median_remote": 2.0,
+   "overdue_equal_town": 0.20452073008582133,
+   "overdue_equal_remote": 0.32571428571428573,
+   "overdue_official_remote": 0.12317460317460317,
+   "harm_days_total": 61435.2,
+   "air_trips": 2464,
+   "trips": 8021,
+   "gap_p90": 3.0,
+   "duplicates_merged": 216,
+   "immediate_made_safe_within_1_day": 1.0,
+   "bands": [
+    {
+     "band": "Town",
+     "jobs": 17431,
+     "urgent_median": 2.0,
+     "urgent_p90": 3.0,
+     "routine_median": 2.0,
+     "overdue_equal": 0.20452073008582133,
+     "harm_days": 16013.875,
+     "open_at_end": 0
+    },
+    {
+     "band": "Near town (road)",
+     "jobs": 3352,
+     "urgent_median": 2.0,
+     "urgent_p90": 3.0,
+     "routine_median": 3.0,
+     "overdue_equal": 0.22556390977443608,
+     "harm_days": 4226.75,
+     "open_at_end": 0
+    },
+    {
+     "band": "Remote (road)",
+     "jobs": 2925,
+     "urgent_median": 2.0,
+     "urgent_p90": 22.0,
+     "routine_median": 8.0,
+     "overdue_equal": 0.49926144756277696,
+     "harm_days": 12608.349999999999,
+     "open_at_end": 0
+    },
+    {
+     "band": "Very remote (road)",
+     "jobs": 673,
+     "urgent_median": 7.0,
+     "urgent_p90": 30.30000000000001,
+     "routine_median": 9.0,
+     "overdue_equal": 0.6729559748427673,
+     "harm_days": 4083.0,
+     "open_at_end": 0
+    },
+    {
+     "band": "Remote, cut in the wet",
+     "jobs": 7891,
+     "urgent_median": 2.0,
+     "urgent_p90": 10.0,
+     "routine_median": 3.0,
+     "overdue_equal": 0.33935689609354236,
+     "harm_days": 19047.0,
      "open_at_end": 0
     },
     {
@@ -1319,13 +1268,106 @@
      "urgent_median": 2.0,
      "urgent_p90": 3.0,
      "routine_median": 2.0,
-     "overdue_equal": 0.22558459422283356,
-     "harm_days": 4805.075000000001,
+     "overdue_equal": 0.2277800744109136,
+     "harm_days": 5456.224999999999,
      "open_at_end": 0
     }
    ],
+   "joint_saving": 10197696.152232597,
+   "joint_trips": 2111,
+   "cost_per_job_joint": 685.5055166045757,
+   "key": "need_0.05",
+   "seconds": 28.97834539413452
+  },
+  "need_0": {
+   "policy": "need",
+   "lam": 0.0,
+   "label": "Need first, cost ignored",
+   "total_cost": 38499978.4973206,
+   "cost_travel": 25077313.4973206,
+   "cost_per_job": 1026.4471178767355,
+   "jobs_done": 37508,
+   "open_at_end": 0,
+   "urgent_p90_town": 3.0,
+   "urgent_p90_remote": 9.0,
+   "urgent_median_town": 2.0,
+   "urgent_median_remote": 2.0,
+   "overdue_equal_town": 0.2047624803577904,
+   "overdue_equal_remote": 0.3217989417989418,
+   "overdue_official_remote": 0.12095238095238095,
+   "harm_days_total": 60452.8,
+   "air_trips": 2821,
+   "trips": 8377,
+   "gap_p90": 3.0,
+   "duplicates_merged": 213,
+   "immediate_made_safe_within_1_day": 1.0,
+   "bands": [
+    {
+     "band": "Town",
+     "jobs": 17431,
+     "urgent_median": 2.0,
+     "urgent_p90": 3.0,
+     "routine_median": 2.0,
+     "overdue_equal": 0.2047624803577904,
+     "harm_days": 16143.624999999998,
+     "open_at_end": 0
+    },
+    {
+     "band": "Near town (road)",
+     "jobs": 3352,
+     "urgent_median": 2.0,
+     "urgent_p90": 3.0,
+     "routine_median": 3.0,
+     "overdue_equal": 0.2299498746867168,
+     "harm_days": 4359.9,
+     "open_at_end": 0
+    },
+    {
+     "band": "Remote (road)",
+     "jobs": 2925,
+     "urgent_median": 2.0,
+     "urgent_p90": 22.700000000000045,
+     "routine_median": 8.0,
+     "overdue_equal": 0.4963072378138848,
+     "harm_days": 12703.4,
+     "open_at_end": 0
+    },
+    {
+     "band": "Very remote (road)",
+     "jobs": 673,
+     "urgent_median": 7.0,
+     "urgent_p90": 30.30000000000001,
+     "routine_median": 9.0,
+     "overdue_equal": 0.6698113207547169,
+     "harm_days": 4071.4249999999993,
+     "open_at_end": 0
+    },
+    {
+     "band": "Remote, cut in the wet",
+     "jobs": 7891,
+     "urgent_median": 2.0,
+     "urgent_p90": 10.0,
+     "routine_median": 3.0,
+     "overdue_equal": 0.3337762423598193,
+     "harm_days": 18236.225,
+     "open_at_end": 0
+    },
+    {
+     "band": "Island (fly-in)",
+     "jobs": 5236,
+     "urgent_median": 2.0,
+     "urgent_p90": 3.0,
+     "routine_median": 2.0,
+     "overdue_equal": 0.22033898305084745,
+     "harm_days": 4938.225,
+     "open_at_end": 0
+    }
+   ],
+   "joint_saving": 12447146.497724008,
+   "joint_trips": 2136,
+   "cost_per_job_joint": 694.5940066011675,
    "key": "need_0",
-   "seconds": 20.06539797782898
+   "seconds": 35.43039345741272
   }
  },
  "sensitivity": [
@@ -1335,11 +1377,11 @@
    "policy": "cheapest",
    "lam": 1.0,
    "key": "cheapest_1",
-   "cost_per_job": 546.4051877408194,
+   "cost_per_job": 546.2738752049197,
    "urgent_p90_remote": 69.0,
    "urgent_p90_town": 3.0,
-   "harm_days": 253543.85,
-   "overdue_equal_remote": 0.637594862813777
+   "harm_days": 259741.125,
+   "overdue_equal_remote": 0.6368253968253968
   },
   {
    "param": "capacity_factor",
@@ -1347,227 +1389,227 @@
    "policy": "guarantee",
    "lam": 0.2,
    "key": "guarantee_0.2",
-   "cost_per_job": 853.025260522636,
-   "urgent_p90_remote": 8.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 96878.6,
-   "overdue_equal_remote": 0.309748978400467
-  },
-  {
-   "param": "capacity_factor",
-   "value": 1.15,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2_h3",
-   "cost_per_job": 800.3163295532534,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 74891.325,
-   "overdue_equal_remote": 0.2694687682428488
-  },
-  {
-   "param": "capacity_factor",
-   "value": 1.5,
-   "policy": "cheapest",
-   "lam": 1.0,
-   "key": "cheapest_1",
-   "cost_per_job": 564.077209231762,
-   "urgent_p90_remote": 57.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 206681.25,
-   "overdue_equal_remote": 0.5942790426152949
-  },
-  {
-   "param": "capacity_factor",
-   "value": 1.5,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2",
-   "cost_per_job": 902.3369008379354,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 52452.1,
-   "overdue_equal_remote": 0.24319906596614127
-  },
-  {
-   "param": "capacity_factor",
-   "value": 1.5,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2_h3",
-   "cost_per_job": 822.0623790036394,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 44494.899999999994,
-   "overdue_equal_remote": 0.22743724460011674
-  },
-  {
-   "param": "wet_cut_week_share",
-   "value": 0.2,
-   "policy": "cheapest",
-   "lam": 1.0,
-   "key": "cheapest_1",
-   "cost_per_job": 559.0814816907545,
-   "urgent_p90_remote": 62.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 225116.075,
-   "overdue_equal_remote": 0.6067717454757735
-  },
-  {
-   "param": "wet_cut_week_share",
-   "value": 0.2,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2",
-   "cost_per_job": 895.3682752232324,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 52844.2,
-   "overdue_equal_remote": 0.2443666082895505
-  },
-  {
-   "param": "wet_cut_week_share",
-   "value": 0.2,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2_h3",
-   "cost_per_job": 816.0469512163469,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 44468.600000000006,
-   "overdue_equal_remote": 0.22837127845884414
-  },
-  {
-   "param": "wet_cut_week_share",
-   "value": 0.5,
-   "policy": "cheapest",
-   "lam": 1.0,
-   "key": "cheapest_1",
-   "cost_per_job": 563.4725916073937,
-   "urgent_p90_remote": 58.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 208718.3,
-   "overdue_equal_remote": 0.5988324576765908
-  },
-  {
-   "param": "wet_cut_week_share",
-   "value": 0.5,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2",
-   "cost_per_job": 880.2576148848212,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 74052.225,
-   "overdue_equal_remote": 0.282778750729714
-  },
-  {
-   "param": "wet_cut_week_share",
-   "value": 0.5,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2_h3",
-   "cost_per_job": 825.005785663621,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 44547.55,
-   "overdue_equal_remote": 0.22685347343841214
-  },
-  {
-   "param": "charter_per_hour",
-   "value": 1500,
-   "policy": "cheapest",
-   "lam": 1.0,
-   "key": "cheapest_1",
-   "cost_per_job": 544.1462555715651,
-   "urgent_p90_remote": 59.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 219763.175,
-   "overdue_equal_remote": 0.6127262113251606
-  },
-  {
-   "param": "charter_per_hour",
-   "value": 1500,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2",
-   "cost_per_job": 775.2071425644535,
-   "urgent_p90_remote": 8.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 96505.6,
-   "overdue_equal_remote": 0.30834792761237595
-  },
-  {
-   "param": "charter_per_hour",
-   "value": 1500,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2_h3",
-   "cost_per_job": 751.73196959212,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 43802.325,
-   "overdue_equal_remote": 0.22825452422650322
-  },
-  {
-   "param": "charter_per_hour",
-   "value": 3000,
-   "policy": "cheapest",
-   "lam": 1.0,
-   "key": "cheapest_1",
-   "cost_per_job": 556.5157950758576,
-   "urgent_p90_remote": 74.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 267034.8,
-   "overdue_equal_remote": 0.6200817279626386
-  },
-  {
-   "param": "charter_per_hour",
-   "value": 3000,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2",
-   "cost_per_job": 971.09727522675,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 75143.92499999999,
-   "overdue_equal_remote": 0.2819614711033275
-  },
-  {
-   "param": "charter_per_hour",
-   "value": 3000,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2_h3",
-   "cost_per_job": 901.4890048816372,
-   "urgent_p90_remote": 3.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 45066.125,
-   "overdue_equal_remote": 0.22685347343841214
-  },
-  {
-   "param": "random_year",
-   "value": 99,
-   "policy": "cheapest",
-   "lam": 1.0,
-   "key": "cheapest_1",
-   "cost_per_job": 535.9352935914472,
-   "urgent_p90_remote": 56.0,
-   "urgent_p90_town": 3.0,
-   "harm_days": 211389.75,
-   "overdue_equal_remote": 0.5921573636479754
-  },
-  {
-   "param": "random_year",
-   "value": 99,
-   "policy": "guarantee",
-   "lam": 0.2,
-   "key": "guarantee_0.2",
-   "cost_per_job": 817.5467579949833,
+   "cost_per_job": 869.0312752887278,
    "urgent_p90_remote": 7.0,
    "urgent_p90_town": 3.0,
-   "harm_days": 98934.0,
-   "overdue_equal_remote": 0.3029761144462894
+   "harm_days": 100890.9,
+   "overdue_equal_remote": 0.2985185185185185
+  },
+  {
+   "param": "capacity_factor",
+   "value": 1.15,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 814.6920664600063,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 77510.775,
+   "overdue_equal_remote": 0.2634920634920635
+  },
+  {
+   "param": "capacity_factor",
+   "value": 1.5,
+   "policy": "cheapest",
+   "lam": 1.0,
+   "key": "cheapest_1",
+   "cost_per_job": 563.6567698212554,
+   "urgent_p90_remote": 56.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 212733.925,
+   "overdue_equal_remote": 0.5928042328042328
+  },
+  {
+   "param": "capacity_factor",
+   "value": 1.5,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2",
+   "cost_per_job": 919.5228721015203,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 54451.125,
+   "overdue_equal_remote": 0.2397883597883598
+  },
+  {
+   "param": "capacity_factor",
+   "value": 1.5,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 834.8688005545831,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 46304.725,
+   "overdue_equal_remote": 0.2258201058201058
+  },
+  {
+   "param": "wet_cut_week_share",
+   "value": 0.2,
+   "policy": "cheapest",
+   "lam": 1.0,
+   "key": "cheapest_1",
+   "cost_per_job": 563.5423794152478,
+   "urgent_p90_remote": 56.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 212325.175,
+   "overdue_equal_remote": 0.5901587301587301
+  },
+  {
+   "param": "wet_cut_week_share",
+   "value": 0.2,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2",
+   "cost_per_job": 861.3829908717369,
+   "urgent_p90_remote": 7.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 102132.2,
+   "overdue_equal_remote": 0.30137566137566135
+  },
+  {
+   "param": "wet_cut_week_share",
+   "value": 0.2,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 828.6845872699901,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 46299.075,
+   "overdue_equal_remote": 0.22666666666666666
+  },
+  {
+   "param": "wet_cut_week_share",
+   "value": 0.5,
+   "policy": "cheapest",
+   "lam": 1.0,
+   "key": "cheapest_1",
+   "cost_per_job": 563.1956006395268,
+   "urgent_p90_remote": 57.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 214090.52500000002,
+   "overdue_equal_remote": 0.597989417989418
+  },
+  {
+   "param": "wet_cut_week_share",
+   "value": 0.5,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2",
+   "cost_per_job": 924.1441648571188,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 54346.350000000006,
+   "overdue_equal_remote": 0.23735449735449735
+  },
+  {
+   "param": "wet_cut_week_share",
+   "value": 0.5,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 838.5457431012327,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 46305.225,
+   "overdue_equal_remote": 0.2252910052910053
+  },
+  {
+   "param": "charter_per_hour",
+   "value": 1500,
+   "policy": "cheapest",
+   "lam": 1.0,
+   "key": "cheapest_1",
+   "cost_per_job": 543.7201812498665,
+   "urgent_p90_remote": 58.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 228561.65,
+   "overdue_equal_remote": 0.6146031746031746
+  },
+  {
+   "param": "charter_per_hour",
+   "value": 1500,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2",
+   "cost_per_job": 836.5380363399711,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 53947.75,
+   "overdue_equal_remote": 0.2382010582010582
+  },
+  {
+   "param": "charter_per_hour",
+   "value": 1500,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 768.0726686918945,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 45274.09999999999,
+   "overdue_equal_remote": 0.2252910052910053
+  },
+  {
+   "param": "charter_per_hour",
+   "value": 3000,
+   "policy": "cheapest",
+   "lam": 1.0,
+   "key": "cheapest_1",
+   "cost_per_job": 556.4682898994113,
+   "urgent_p90_remote": 74.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 274656.475,
+   "overdue_equal_remote": 0.62
+  },
+  {
+   "param": "charter_per_hour",
+   "value": 3000,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2",
+   "cost_per_job": 949.6474961626726,
+   "urgent_p90_remote": 7.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 102954.04999999999,
+   "overdue_equal_remote": 0.30148148148148146
+  },
+  {
+   "param": "charter_per_hour",
+   "value": 3000,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 919.1839319307948,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 47044.649999999994,
+   "overdue_equal_remote": 0.2252910052910053
+  },
+  {
+   "param": "random_year",
+   "value": 99,
+   "policy": "cheapest",
+   "lam": 1.0,
+   "key": "cheapest_1",
+   "cost_per_job": 556.7008713584027,
+   "urgent_p90_remote": 76.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 282196.375,
+   "overdue_equal_remote": 0.6263899184581171
+  },
+  {
+   "param": "random_year",
+   "value": 99,
+   "policy": "guarantee",
+   "lam": 0.2,
+   "key": "guarantee_0.2",
+   "cost_per_job": 1014.0143033261414,
+   "urgent_p90_remote": 3.0,
+   "urgent_p90_town": 3.0,
+   "harm_days": 64487.0,
+   "overdue_equal_remote": 0.25436831515408237
   },
   {
    "param": "random_year",
@@ -1575,11 +1617,11 @@
    "policy": "guarantee",
    "lam": 0.2,
    "key": "guarantee_0.2_h3",
-   "cost_per_job": 741.3361490495661,
+   "cost_per_job": 891.220910301767,
    "urgent_p90_remote": 3.0,
    "urgent_p90_town": 3.0,
-   "harm_days": 41508.275,
-   "overdue_equal_remote": 0.2226337974198493
+   "harm_days": 87419.35,
+   "overdue_equal_remote": 0.2745949380493487
   }
  ],
  "quality": {
@@ -1649,9 +1691,9 @@
      "top1": 0.9159420289855073,
      "top3": 1.0,
      "macro_f1": 0.9160428853789834,
-     "log_loss": 0.29023358095883456,
-     "brier": 0.1268289985559427,
-     "ece": 0.08587811830765645
+     "log_loss": 0.2902335809588342,
+     "brier": 0.1268289985559426,
+     "ece": 0.0858781183076563
     },
     "curves": {
      "roc": [
@@ -2394,37 +2436,37 @@
      ],
      "reliability": [
       [
-       0.1493803517675075,
+       0.1493803517675079,
        0.0,
        1
       ],
       [
-       0.279305345947058,
+       0.27930534594705736,
        0.0,
        2
       ],
       [
-       0.3482264453913119,
+       0.3482264453913133,
        0.8333333333333334,
        6
       ],
       [
-       0.46665512985496643,
+       0.46665512985496543,
        0.5,
        10
       ],
       [
-       0.5471346602569991,
+       0.5471346602569999,
        0.75,
        24
       ],
       [
-       0.6519843701248704,
+       0.6519843701248706,
        0.72,
        25
       ],
       [
-       0.7498678167334454,
+       0.7498678167334459,
        0.8809523809523809,
        42
       ],
@@ -2441,10 +2483,10 @@
      ]
     },
     "ranking": {
-     "kendall_tau_read": 0.7958453683773123,
-     "kendall_tau_checked": 0.8874102949089008,
-     "spearman_read": 0.8580547040679106,
-     "spearman_checked": 0.9260961555051819,
+     "kendall_tau_read": 0.7982255365014785,
+     "kendall_tau_checked": 0.8890136522715134,
+     "spearman_read": 0.8591430427668525,
+     "spearman_checked": 0.9267986845724996,
      "top_k": 75,
      "dangerous_in_top_k_read": 0.8266666666666667,
      "dangerous_in_top_k_checked": 0.88
@@ -2515,9 +2557,9 @@
      "top1": 0.47391304347826085,
      "top3": 0.7202898550724638,
      "macro_f1": 0.45789154527558373,
-     "log_loss": 2.031975009688224,
-     "brier": 0.7586676914963162,
-     "ece": 0.1638411911648388
+     "log_loss": 2.031975009688223,
+     "brier": 0.7586676914963161,
+     "ece": 0.16384119116483875
     },
     "curves": {
      "roc": [
@@ -4206,65 +4248,65 @@
      ],
      "reliability": [
       [
-       0.08736884255075873,
+       0.0873688425507592,
        0.14285714285714285,
        7
       ],
       [
-       0.1615089305800485,
+       0.16150893058004864,
        0.38095238095238093,
        189
       ],
       [
-       0.2469440347885336,
+       0.2469440347885339,
        0.44623655913978494,
        186
       ],
       [
-       0.34766253869169567,
+       0.3476625386916954,
        0.5357142857142857,
        112
       ],
       [
-       0.444449091699859,
+       0.4444490916998596,
        0.4868421052631579,
        76
       ],
       [
-       0.5458465721789075,
+       0.5458465721789073,
        0.5641025641025641,
        39
       ],
       [
-       0.6579306154824169,
+       0.6579306154824165,
        0.6551724137931034,
        29
       ],
       [
-       0.7433162166691978,
+       0.743316216669198,
        0.5925925925925926,
        27
       ],
       [
-       0.850559392471578,
+       0.8505593924715786,
        0.75,
        16
       ],
       [
-       0.9294064212137173,
+       0.9294064212137181,
        0.5555555555555556,
        9
       ]
      ]
     },
     "ranking": {
-     "kendall_tau_read": 0.6248622616151266,
-     "kendall_tau_checked": 0.8485282073671658,
-     "spearman_read": 0.7145243747518124,
-     "spearman_checked": 0.8964585827656215,
+     "kendall_tau_read": 0.603090317970255,
+     "kendall_tau_checked": 0.8189616607204763,
+     "spearman_read": 0.6876689486825187,
+     "spearman_checked": 0.8602690054548663,
      "top_k": 150,
-     "dangerous_in_top_k_read": 0.7866666666666666,
-     "dangerous_in_top_k_checked": 0.9533333333333334
+     "dangerous_in_top_k_read": 0.7733333333333333,
+     "dangerous_in_top_k_checked": 0.9066666666666666
     }
    },
    "threshold_sweep": [
@@ -4361,177 +4403,157 @@
     "cheapest_1": [
      {
       "year": "main",
-      "cost_per_job": 559.1847256648142,
+      "cost_per_job": 558.7486594547371,
       "urgent_p90_remote": 62.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 225766.65,
-      "jobs_done": 36687
+      "harm_days_total": 231877.05,
+      "jobs_done": 36672
      },
      {
       "year": 11,
-      "cost_per_job": 559.3010370114782,
-      "urgent_p90_remote": 62.600000000000364,
+      "cost_per_job": 558.7726409182873,
+      "urgent_p90_remote": 62.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 230878.925,
-      "jobs_done": 36766
+      "harm_days_total": 238511.55,
+      "jobs_done": 36786
      },
      {
       "year": 12,
-      "cost_per_job": 559.9548404371697,
+      "cost_per_job": 559.900981314267,
       "urgent_p90_remote": 63.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 228776.82499999998,
-      "jobs_done": 36267
+      "harm_days_total": 235827.625,
+      "jobs_done": 36261
      },
      {
       "year": 13,
-      "cost_per_job": 558.2473100648383,
-      "urgent_p90_remote": 65.0,
+      "cost_per_job": 558.5417533579503,
+      "urgent_p90_remote": 63.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 228573.3,
-      "jobs_done": 36719
+      "harm_days_total": 235568.65000000002,
+      "jobs_done": 36724
      },
      {
       "year": 14,
-      "cost_per_job": 559.1491765941588,
-      "urgent_p90_remote": 63.0,
+      "cost_per_job": 558.5860520736926,
+      "urgent_p90_remote": 62.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 230567.72499999998,
-      "jobs_done": 36360
+      "harm_days_total": 235718.7,
+      "jobs_done": 36392
      }
     ],
     "guarantee_0.2": [
      {
       "year": "main",
-      "cost_per_job": 876.3860311350252,
+      "cost_per_job": 893.6415071916992,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 74179.25,
-      "jobs_done": 37474
+      "harm_days_total": 76694.475,
+      "jobs_done": 37477
      },
      {
       "year": 11,
-      "cost_per_job": 882.3326439542576,
-      "urgent_p90_remote": 6.0,
+      "cost_per_job": 898.4473846460612,
+      "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 78991.525,
+      "harm_days_total": 82224.4,
       "jobs_done": 37530
      },
      {
       "year": 12,
-      "cost_per_job": 874.6091397575082,
+      "cost_per_job": 888.62942578815,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 73763.70000000001,
-      "jobs_done": 37039
+      "harm_days_total": 76385.125,
+      "jobs_done": 37040
      },
      {
       "year": 13,
-      "cost_per_job": 875.4533220820676,
+      "cost_per_job": 893.5010157652656,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 75808.8,
+      "harm_days_total": 78682.425,
       "jobs_done": 37445
      },
      {
       "year": 14,
-      "cost_per_job": 866.5352484307218,
+      "cost_per_job": 882.1209876667037,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 70247.55,
+      "harm_days_total": 71676.825,
       "jobs_done": 37131
      }
     ],
     "guarantee_0.2_h3": [
      {
       "year": "main",
-      "cost_per_job": 803.4281081180503,
+      "cost_per_job": 816.2482918546614,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 61051.649999999994,
-      "jobs_done": 37487
+      "harm_days_total": 63235.5,
+      "jobs_done": 37488
      },
      {
       "year": 11,
-      "cost_per_job": 816.338760151733,
+      "cost_per_job": 828.7740788434847,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 62778.125,
-      "jobs_done": 37535
+      "harm_days_total": 65097.649999999994,
+      "jobs_done": 37537
      },
      {
       "year": 12,
-      "cost_per_job": 802.6474657924241,
+      "cost_per_job": 813.662993569741,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 60475.7,
-      "jobs_done": 37051
+      "harm_days_total": 62283.524999999994,
+      "jobs_done": 37052
      },
      {
       "year": 13,
-      "cost_per_job": 806.8649641062381,
+      "cost_per_job": 820.7385929131653,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 62090.45,
-      "jobs_done": 37461
+      "harm_days_total": 64108.649999999994,
+      "jobs_done": 37466
      },
      {
       "year": 14,
-      "cost_per_job": 794.6624498090652,
+      "cost_per_job": 808.4830007155753,
       "urgent_p90_remote": 3.0,
       "urgent_p90_town": 3.0,
-      "harm_days_total": 58057.524999999994,
-      "jobs_done": 37150
+      "harm_days_total": 59508.274999999994,
+      "jobs_done": 37151
      }
     ]
    },
    "spread": {
     "cheapest_1": {
      "cost_per_job": {
-      "mean": 559.1674179544918,
-      "sd": 0.5449989084911103,
-      "min": 558.2473100648383,
-      "max": 559.9548404371697
+      "mean": 558.9100174237868,
+      "sd": 0.503485868902582,
+      "min": 558.5417533579503,
+      "max": 559.900981314267
      },
      "urgent_p90_remote": {
-      "mean": 63.120000000000076,
-      "sd": 1.0087616170334417,
+      "mean": 62.4,
+      "sd": 0.4898979485566356,
       "min": 62.0,
-      "max": 65.0
+      "max": 63.0
      },
      "harm_days_total": {
-      "mean": 228912.68499999997,
-      "sd": 1824.0851667753855,
-      "min": 225766.65,
-      "max": 230878.925
+      "mean": 235500.715,
+      "sd": 2114.4776282571556,
+      "min": 231877.05,
+      "max": 238511.55
      }
     },
     "guarantee_0.2": {
      "cost_per_job": {
-      "mean": 875.0632770719161,
-      "sd": 5.053296379530232,
-      "min": 866.5352484307218,
-      "max": 882.3326439542576
-     },
-     "urgent_p90_remote": {
-      "mean": 3.6,
-      "sd": 1.2000000000000002,
-      "min": 3.0,
-      "max": 6.0
-     },
-     "harm_days_total": {
-      "mean": 74598.16500000001,
-      "sd": 2848.4003119119307,
-      "min": 70247.55,
-      "max": 78991.525
-     }
-    },
-    "guarantee_0.2_h3": {
-     "cost_per_job": {
-      "mean": 804.7883495955022,
-      "sd": 7.02412697299694,
-      "min": 794.6624498090652,
-      "max": 816.338760151733
+      "mean": 891.268064211576,
+      "sd": 5.52799001752663,
+      "min": 882.1209876667037,
+      "max": 898.4473846460612
      },
      "urgent_p90_remote": {
       "mean": 3.0,
@@ -4540,93 +4562,113 @@
       "max": 3.0
      },
      "harm_days_total": {
-      "mean": 60890.68999999999,
-      "sd": 1626.4552668764072,
-      "min": 58057.524999999994,
-      "max": 62778.125
+      "mean": 77132.65,
+      "sd": 3430.5841485088217,
+      "min": 71676.825,
+      "max": 82224.4
+     }
+    },
+    "guarantee_0.2_h3": {
+     "cost_per_job": {
+      "mean": 817.5813915793254,
+      "sd": 6.857928004910251,
+      "min": 808.4830007155753,
+      "max": 828.7740788434847
+     },
+     "urgent_p90_remote": {
+      "mean": 3.0,
+      "sd": 0.0,
+      "min": 3.0,
+      "max": 3.0
+     },
+     "harm_days_total": {
+      "mean": 62846.719999999994,
+      "sd": 1911.6854712138188,
+      "min": 59508.274999999994,
+      "max": 65097.649999999994
      }
     }
    },
    "paired": {
     "fault_days_cut_vs_cheapest": {
      "values": [
-      0.7295807418854823,
-      0.7280907081493038,
-      0.735656354178357,
-      0.7283565053311126,
-      0.7481975198393445
+      0.7272886644021045,
+      0.7270670959121267,
+      0.7358938546745744,
+      0.7278557651877702,
+      0.7475453793016846
      ],
-     "min": 0.7280907081493038,
-     "max": 0.7481975198393445
+     "min": 0.7270670959121267,
+     "max": 0.7475453793016846
     },
     "cost_rise_vs_cheapest": {
      "values": [
-      0.43678478907458596,
-      0.45956954507663417,
-      0.43341463959089754,
-      0.4453539668870483,
-      0.42119935622447735
+      0.4608505596258772,
+      0.48320447021435586,
+      0.45322658956555717,
+      0.46943104607469177,
+      0.4473741292217488
      ],
-     "min": 0.42119935622447735,
-     "max": 0.45956954507663417
+     "min": 0.4473741292217488,
+     "max": 0.48320447021435586
     },
     "cost_saved_by_sharing": {
      "values": [
-      72.95792301697486,
-      65.99388380252458,
-      71.96167396508406,
-      68.58835797582958,
-      71.87279862165667
+      77.39321533703787,
+      69.67330580257646,
+      74.96643221840895,
+      72.76242285210026,
+      73.63798695112848
      ],
-     "min": 65.99388380252458,
-     "max": 72.95792301697486
+     "min": 69.67330580257646,
+     "max": 77.39321533703787
     },
     "fault_days_cut_by_sharing": {
      "values": [
-      0.17697132284297845,
-      0.20525493082960478,
-      0.18014280737002097,
-      0.1809598621795887,
-      0.17352953946436578
+      0.17548819520571735,
+      0.20829279386654087,
+      0.18461185996619112,
+      0.1852227482820974,
+      0.1697696570683761
      ],
-     "min": 0.17352953946436578,
-     "max": 0.20525493082960478
+     "min": 0.1697696570683761,
+     "max": 0.20829279386654087
     }
    },
    "planner": {
-    "plans": 25996,
-    "optimal_share": 0.9943452838898292,
+    "plans": 25972,
+    "optimal_share": 0.991606345294933,
     "gap_median": 0.0,
     "gap_p95": 0.0,
-    "gap_max": 0.8539348710990502,
-    "solve_median_s": 0.006623500000000001,
-    "solve_p95_s": 0.15532375,
+    "gap_max": 0.8504861111111112,
+    "solve_median_s": 0.0089257565,
+    "solve_p95_s": 0.1854222259999998,
     "time_limit_s": 2.0,
-    "hit_limit_share": 0.005808585936297892
+    "hit_limit_share": 0.008432157708301247
    }
   }
  },
  "inclusion": {
   "words": {
-   "gap_mean": 19.227961819202694,
-   "gap_max": 45,
-   "short_ranked_lower": 0.9657495788882651,
-   "queue_places_lost_pct": 13.803350177802734,
-   "short_points_missed": 19.05670971364402,
-   "vulnerable_recognised_short": 0.04077010192525481,
+   "gap_mean": 43.34619625137817,
+   "gap_max": 960,
+   "short_ranked_lower": 0.9724366041896362,
+   "queue_places_lost_pct": 14.441381844909962,
+   "short_points_missed": 28.054024255788313,
+   "vulnerable_recognised_short": 0.03530751708428246,
    "vulnerable_recognised_full": 1.0
   },
   "intake": {
-   "gap_mean": 1.760247052217855,
-   "gap_max": 35,
-   "short_ranked_lower": 0.10836608646827625,
-   "queue_places_lost_pct": 1.227877596855699,
-   "short_points_missed": 1.128579449747333,
-   "vulnerable_recognised_short": 0.9150622876557192,
+   "gap_mean": 5.25909592061742,
+   "gap_max": 940,
+   "short_ranked_lower": 0.12017640573318633,
+   "queue_places_lost_pct": 1.352747151782433,
+   "short_points_missed": -10.385887541345094,
+   "vulnerable_recognised_short": 0.9145785876993167,
    "vulnerable_recognised_full": 1.0
   },
   "n": 3000,
-  "households_with_something_to_say": 0.5936666666666667,
+  "households_with_something_to_say": 0.6046666666666667,
   "answer_rate": 0.9,
   "note": "Synthetic households. Answers are assumed true when given; unanswered questions earn no points."
  },
@@ -4635,23 +4677,23 @@
    "key": "cheapest_1",
    "share": 0.0,
    "cost_per_job": 558.7486594547371,
-   "urgent_p90_remote": 63.0,
+   "urgent_p90_remote": 62.0,
    "urgent_p90_town": 3.0,
-   "harm_days_total": 226125.15,
+   "harm_days_total": 231877.05,
    "jobs_done": 36672
   },
   {
    "key": "cheapest_1",
    "share": 0.1,
    "cost_per_job": 607.5475067084363,
-   "urgent_p90_remote": 76.60000000000036,
+   "urgent_p90_remote": 74.0,
    "urgent_p90_town": 6.0,
-   "harm_days_total": 268735.075,
+   "harm_days_total": 276214.925,
    "jobs_done": 36609,
    "visits_missed": 3945,
    "jobs_missed": 3595,
    "missed_twice": 317,
-   "urgent_remote_missed": 783,
+   "urgent_remote_missed": 870,
    "urgent_remote_missed_p90": 126.0,
    "urgent_remote_missed_median": 28.0,
    "open_at_end": 162
@@ -4659,27 +4701,27 @@
   {
    "key": "guarantee_0.2_h3",
    "share": 0.0,
-   "cost_per_job": 803.9805030286136,
+   "cost_per_job": 816.1985636040494,
    "urgent_p90_remote": 3.0,
    "urgent_p90_town": 3.0,
-   "harm_days_total": 60996.524999999994,
-   "jobs_done": 37487
+   "harm_days_total": 63066.425,
+   "jobs_done": 37488
   },
   {
    "key": "guarantee_0.2_h3",
    "share": 0.1,
-   "cost_per_job": 861.8242675638071,
+   "cost_per_job": 873.0625109750167,
    "urgent_p90_remote": 9.0,
-   "urgent_p90_town": 3.3000000000010914,
-   "harm_days_total": 91376.725,
-   "jobs_done": 37428,
-   "visits_missed": 4042,
-   "jobs_missed": 3641,
-   "missed_twice": 368,
-   "urgent_remote_missed": 842,
-   "urgent_remote_missed_p90": 20.0,
+   "urgent_p90_town": 6.0,
+   "harm_days_total": 94942.32499999998,
+   "jobs_done": 37455,
+   "visits_missed": 4043,
+   "jobs_missed": 3622,
+   "missed_twice": 371,
+   "urgent_remote_missed": 897,
+   "urgent_remote_missed_p90": 17.0,
    "urgent_remote_missed_median": 9.0,
-   "open_at_end": 11
+   "open_at_end": 14
   }
  ],
  "joint_trips": [
@@ -4693,18 +4735,18 @@
   },
   {
    "key": "guarantee_0.2_h3",
-   "cost_per_job": 803.9805030286136,
-   "cost_per_job_joint": 673.9252359524048,
-   "joint_trips": 1482,
-   "joint_saving": 4875381.796885841,
-   "trips": 8199
+   "cost_per_job": 816.1740771125518,
+   "cost_per_job_joint": 676.8330923055534,
+   "joint_trips": 1489,
+   "joint_saving": 5223614.838444758,
+   "trips": 8280
   }
  ],
  "disaster": [
   {
    "label": "No flood",
-   "cost_per_job": 803.9805030286136,
-   "cost_per_job_joint": 673.9252359524048,
+   "cost_per_job": 816.1985636040494,
+   "cost_per_job_joint": 676.8575787970509,
    "event_jobs": 0,
    "event_urgent": 0,
    "event_houses": 0,
@@ -4718,14 +4760,14 @@
   },
   {
    "label": "Flood, usual crews",
-   "cost_per_job": 806.0904534257764,
-   "cost_per_job_joint": 675.0832880901003,
+   "cost_per_job": 818.891012395445,
+   "cost_per_job_joint": 678.4186475468192,
    "event_jobs": 94,
    "event_urgent": 74,
    "event_houses": 44,
-   "event_urgent_p90": 14.700000000000003,
-   "event_all_p90": 21.80000000000001,
-   "event_fixed_within_28": 0.925531914893617,
+   "event_urgent_p90": 14.0,
+   "event_all_p90": 17.700000000000003,
+   "event_fixed_within_28": 0.9787234042553191,
    "event_open_at_end": 0,
    "event_made_safe_same_day": 1.0,
    "other_urgent_p90": 10.0,
@@ -4733,8 +4775,8 @@
   },
   {
    "label": "Flood, surge crews",
-   "cost_per_job": 810.12815722899,
-   "cost_per_job_joint": 676.3821207432654,
+   "cost_per_job": 822.5395783127706,
+   "cost_per_job_joint": 679.7754258347763,
    "event_jobs": 94,
    "event_urgent": 74,
    "event_houses": 44,

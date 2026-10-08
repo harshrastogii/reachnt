@@ -1,24 +1,24 @@
 {
  "words": {
-  "gap_mean": 19.227961819202694,
-  "gap_max": 45,
-  "short_ranked_lower": 0.9657495788882651,
-  "queue_places_lost_pct": 13.803350177802734,
-  "short_points_missed": 19.05670971364402,
-  "vulnerable_recognised_short": 0.04077010192525481,
+  "gap_mean": 43.34619625137817,
+  "gap_max": 960,
+  "short_ranked_lower": 0.9724366041896362,
+  "queue_places_lost_pct": 14.441381844909962,
+  "short_points_missed": 28.054024255788313,
+  "vulnerable_recognised_short": 0.03530751708428246,
   "vulnerable_recognised_full": 1.0
  },
  "intake": {
-  "gap_mean": 1.760247052217855,
-  "gap_max": 35,
-  "short_ranked_lower": 0.10836608646827625,
-  "queue_places_lost_pct": 1.227877596855699,
-  "short_points_missed": 1.128579449747333,
-  "vulnerable_recognised_short": 0.9150622876557192,
+  "gap_mean": 5.25909592061742,
+  "gap_max": 940,
+  "short_ranked_lower": 0.12017640573318633,
+  "queue_places_lost_pct": 1.352747151782433,
+  "short_points_missed": -10.385887541345094,
+  "vulnerable_recognised_short": 0.9145785876993167,
   "vulnerable_recognised_full": 1.0
  },
  "n": 3000,
- "households_with_something_to_say": 0.5936666666666667,
+ "households_with_something_to_say": 0.6046666666666667,
  "answer_rate": 0.9,
  "note": "Synthetic households. Answers are assumed true when given; unanswered questions earn no points."
 }

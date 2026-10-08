@@ -1,6 +1,6 @@
 # Validation: what we checked, what we fixed, what is still missing
 
-Checked 7 October 2026 against the live portal (https://reachnt.vercel.app), the Python engine and the standards that similar services now have to meet. Every check that can be automated runs in `tests/` (70 Python checks, 10 server checks), which GitHub Actions runs on every push.
+Checked 8 October 2026 against the live portal (https://reachnt.vercel.app), the Python engine and the standards that similar services now have to meet. Every check that can be automated runs in `tests/` (81 Python checks, 22 server checks), which GitHub Actions runs on every push.
 
 ## 1. Checks we ran
 
@@ -12,6 +12,8 @@ Checked 7 October 2026 against the live portal (https://reachnt.vercel.app), the
 | Security | Known vulnerabilities in libraries | **Fixed:** jsPDF 2.5.1 → 4.2.1 (CVE-2025-29907, CVE-2025-57810, CVE-2025-68428). Dependabot alerts and security updates switched on for the repository. |
 | Security | Text typed by a tenant cannot inject code | Pass. Every value is escaped before display; tested with `<script>` and `<img onerror>`. |
 | API | `/api/sync` input validation | **Was weak. Fixed:** it accepted a 3 MB junk body. It now enforces allowed status values, a job-id format, a 64 KB / 200-update limit and 400/413 errors, and returns the ids it rejected. |
+| API | `/api/warnings` (NT Road Report, Bureau of Meteorology) | Pass. Keeps only closures and flooding; when a feed is down the saved snapshot is used and labelled (2 server checks). From this container both feeds were blocked, so the live path is checked with recorded payloads; the snapshot path ran end to end in the browser. |
+| Triage | Vulnerability tiers | Pass. Tier 1 outranks Tier 2 outranks none; losing power, water or cooling is Immediate for Tier 1 only; one tier per household from answers or words (3 Python checks). The portal's copy of the score agrees with the engine on every planned job (`ReachNT.selfCheck()` = 0). |
 | Offline | Updates made without signal | **Bug fixed:** the phone marked every queued update as sent when the server answered, even rejected ones. Rejected updates now stay on the phone. |
 | Accessibility | axe-core, WCAG 2.2 AA, every view (coordinator, trips, report reader, tradesperson, tenant, comparison) | **One failure, fixed:** overlapping community buttons were too small to tap (2.5.8), and this is how a tap on Barunga opened Jilkminggan. Badges that would overlap now merge into one "N places" badge that zooms in. Map buttons kept the name "Map marker" for screen readers; they now read e.g. "Binjari, 8". Re-run: 0 violations. |
 | Map accuracy | Each community's position and the example houses, against satellite imagery for all 70 | **Was wrong for several. Fixed:** the government list gives positions to ~1 km, so some badges sat in bush (Barunga) or on an airstrip (Milyakburra), and houses were scattered at random. Positions now come from OpenStreetMap (one, Jilkminggan, from its buildings), and example houses sit on cells that contain mapped buildings. |
@@ -20,7 +22,7 @@ Checked 7 October 2026 against the live portal (https://reachnt.vercel.app), the
 | Reader | ROC-AUC, PR-AUC, calibration, cross-validation | See report Appendix G. The model's confidence runs ahead of its accuracy on new wording, so no percentage is shown to tenants. |
 | Data | 70 communities, inside the NT, houses > 0, every community has a hub, unique ids, valid hazards, request days within the year | Pass |
 | Simulation | In all 14 plans: done + open = all jobs, no negative waits, nothing fixed before it was reported, same requests in every plan | Pass (66 of 66) |
-| Simulation | Results hold in other random years; solver close to optimal | Pass (Appendix G: five years; 99.4% of 25,996 weekly plans proved optimal) |
+| Simulation | Results hold in other random years; solver close to optimal | Pass (Appendix G: five years; 99.2% of 25,972 weekly plans proved optimal) |
 | Build | A fresh install can run the code | **Was broken:** `requirements.txt` did not list `h3`, `scipy` or `requests`. Fixed, and CI now installs from scratch on every push. |
 | Links | 45 links in the report and research notes | 36 load; 7 are government sites that refuse automated requests (they open in a browser); **2 were dead and are fixed in our notes** (the NIAA review needs `.pdf`; the CARE principles page moved, so we cite Carroll et al. 2020, https://doi.org/10.5334/dsj-2020-043). |
 | Page weight | Brotli on the wire | Page 2 KB, app 28 KB, data 195 KB, map library 217 KB. Bundled offline tiles load only when needed. |

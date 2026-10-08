@@ -21,9 +21,9 @@ Figures come from `outputs/numbers.json` (run of 8 October 2026). Every repair r
 
 The problem: a schedule built to clear the most jobs per dollar keeps choosing town jobs, and nobody decides that remote tenants wait. In the simulated year:
 - cheapest-first left 9 in 10 urgent remote repairs waiting up to 62 days, against 3 in town;
-- ReachNT fixed them within 3 days for $803 per repair against $559, 44% more;
+- ReachNT fixed them within 3 days for $816 per repair against $559, 46% more;
 - households lived with faults for 73% fewer days;
-- shared trips saved $73 per repair against the same plan without them.
+- shared trips saved $77 per repair against the same plan without them.
 
 The benefit is that the trade-off becomes visible, priced and signed, rather than a side effect.
 
@@ -38,10 +38,10 @@ The benefit is that the trade-off becomes visible, priced and signed, rather tha
 | Distance or cost pushes remote tenants back | The need score never uses location or cost (a unit test fails if they appear). Cost can only change *which week a trip goes*, under a cost weight a named person signs, and the tenant is told when it does. | Report sections 2.3 and 3.2; `tests/test_core.py` |
 | The reader understands some groups' words worse | Doubtful reports go to a person. Per-language testing on real reports is required before use, and a weekly audit continues after it. | `docs/REAL_LANGUAGE_TEST_PROTOCOL.md`; Checks tab |
 | Some communities wait longer | Waits are reported by remoteness band, and per community over the whole year. | Report Figure 3; the portal's year view |
-| Tenants who say less, speak little English, use an interpreter or don't use the app get fewer points or a later place | The household part of the score comes from the same standard questions on every channel, the tenancy record and the job history, not only the tenant's words; an unanswered question never removes points. The clock starts at first contact with anyone. Channel, language and timing are never inputs (a unit test fails if they appear). | `docs/INCLUSIVE_DECISION_MODEL.md`; `evaluate.inclusion()`: points lost by a short telling fell from 19 to 1.8 |
+| Tenants who say less, speak little English, use an interpreter or don't use the app get fewer points or a later place | The household part of the score comes from the same standard questions on every channel, the tenancy record and the job history, not only the tenant's words; an unanswered question never removes points. The clock starts at first contact with anyone. Channel, language and timing are never inputs (a unit test fails if they appear). | `docs/INCLUSIVE_DECISION_MODEL.md`; `evaluate.inclusion()`: points lost by a short telling fell from 43 to 5 |
 | Household tiers are used to rank people unfairly, or need sensitive facts | Tiers ask only what changes the harm from a fault: power, cooling or medical supplies; a baby or frail elder; children, pregnancy, illness or mobility. Age is asked as "old enough for aged care", so Aboriginality is never needed. Who heads the household, income and the community's isolation are not used. The points are published assumptions to set with the community. | `docs/INCLUSIVE_DECISION_MODEL.md`; `tests/test_core.py` (tier tests) |
 | Live road and weather feeds move people in the line | They only prompt the coordinator (closures, heavy rain, heat); nothing changes the line unless a person decides, and a declared event is logged. A feed that is down is replaced by a labelled saved snapshot. | `web/api/warnings.js`; `tests/test_api.mjs` |
-| A missed visit drops a job to the back | The job keeps its waiting time and gets the deadline boost; the coordinator sends it to the next trip, a named crew or any contractor of that trade | `experiments.missed_visits()`: missed urgent remote repairs fixed within 20 days (9 in 10) under ReachNT, 126 under cheapest-first |
+| A missed visit drops a job to the back | The job keeps its waiting time and gets the deadline boost; the coordinator sends it to the next trip, a named crew or any contractor of that trade | `experiments.missed_visits()`: missed urgent remote repairs fixed within 17 days (9 in 10) under ReachNT, 126 under cheapest-first |
 
 ## 5. Reliability and safety
 
@@ -50,7 +50,7 @@ The benefit is that the trade-off becomes visible, priced and signed, rather tha
 | Dangerous reports caught by the whole system, unfamiliar wording | 99.3% (labelled Immediate, or sent to a person) |
 | Model alone, spotting danger on unfamiliar wording | ROC-AUC 0.84, PR-AUC 0.72 (guessing scores 0.22) |
 | Reports sent to a person, unfamiliar wording | 40% |
-| Weekly plans proved optimal by the solver | 99.4% of 25,996 |
+| Weekly plans proved optimal by the solver | 99.2% of 25,972 |
 | Results across five random years | ReachNT cut fault-days 73–75% against cheapest-first in every year |
 
 Safety controls:

@@ -852,11 +852,11 @@
     (D.roads || []).forEach((x) => {
       const near = coms.filter((c) => (c.closure && x.road && c.closure.toLowerCase().includes(x.road.toLowerCase().replace(/\s+(4wd|road|highway|hwy|track)$/i, "").trim()) && x.road.length > 3)
         || [x.start, x.end].some((p) => Array.isArray(p) && kmTo(c.lat, c.lon, p[0], p[1]) <= ROAD_KM));
-      near.forEach((c) => {
-        const n = open.filter((r) => r.site === c.cid).length; const flood = /flood/i.test(`${x.type} ${x.restriction}`);
-        out.push({ kind: "road", c, flood, t: `${x.road}: ${x.restriction.toLowerCase()}${x.type ? ` (${x.type.toLowerCase()})` : ""} near ${c.name}.`,
-          p: `${n} repair${n === 1 ? "" : "s"} waiting there. ${c.airstrip ? "It has an airstrip: a charter can still go." : "No airstrip: trips by road wait until it opens."}${flood ? " If houses are flooding, declare a flood." : ""}` });
-      });
+      if (!near.length) return;
+      const n = open.filter((r) => near.some((c) => c.cid === r.site)).length; const flood = /flood/i.test(`${x.type} ${x.restriction}`);
+      const air = near.filter((c) => c.airstrip), road = near.filter((c) => !c.airstrip);
+      out.push({ kind: "road", cs: near, flood, t: `${x.road}: ${x.restriction.toLowerCase()}${x.type ? ` (${x.type.toLowerCase()})` : ""} near ${near.map((c) => c.name).join(", ")}.`,
+        p: `${n} repair${n === 1 ? "" : "s"} waiting there. ${air.length ? `${air.map((c) => c.name).join(", ")} ${air.length > 1 ? "have airstrips" : "has an airstrip"}: a charter can still go. ` : ""}${road.length ? `${road.map((c) => c.name).join(", ")}: no airstrip, so road trips wait until it opens. ` : ""}${flood ? "If houses are flooding, declare a flood." : ""}`.trim() });
     });
     (D.weather || []).forEach((w) => {
       const near = coms.filter((c) => kmTo(c.lat, c.lon, w.lat, w.lon) <= WX_KM);
@@ -896,7 +896,7 @@
     $$("[data-wjob]", body).forEach((b) => b.addEventListener("click", () => openJob(b.dataset.wjob)));
     $$("[data-wflood]", body).forEach((b) => b.addEventListener("click", () => {
       const D = WARN.example ? warnExample() : WARN.data; const x = warnPrompts(D)[+b.dataset.wflood];
-      WARN.prefill = { communities: x.cs ? x.cs.map((c) => c.cid) : [x.c.cid], note: x.t };
+      WARN.prefill = { communities: x.cs.map((c) => c.cid), note: x.t };
       renderCoord(); const box = $("#evbox"); if (box) { box.open = true; box.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }); }
     }));
   }

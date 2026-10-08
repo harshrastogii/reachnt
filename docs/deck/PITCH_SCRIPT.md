@@ -70,7 +70,7 @@ Thanks Harsh. There's a quieter unfairness too.
 If points come only from what tenants say, "my nana lives here, nine of us, third time I rang" beats "toilet blocked, please come". Same house, same need.
 So whoever the tenant tells asks the same six questions, with a free interpreter, and the tenancy record fills in the rest.
 Tier one, like someone on dialysis or a newborn, gets more points, and losing power or water becomes an emergency for them.
-On three thousand made-up households, saying less cost 19 points from words alone. With the questions, about 2.
+On three thousand made-up households, saying less cost 43 points from words alone. With the questions, about 5.
 And the clock starts when the tenant first told anyone.
 
 ### 7. Why H3 hexagons  
@@ -86,14 +86,14 @@ And one grid does four jobs: shared trips, privacy, public numbers by area, and 
 
 Every week Google's OR-Tools plans the trips around crew hours, road closures and airstrips. A job running out of time gets a boost onto the next trip.
 Instead of two trips out and back, one tradesperson does one loop, and H3 tells us which pairs are close enough. And a plumber and an electrician going to the same place share the ute or the plane.
-That saves about $73 on every repair, and because the savings buy more visits, households spend 18% fewer days living with faults.
-And it's fast: the solver proved 99.4 percent of over 25 thousand weekly plans to be the best possible plan.
+That saves about $77 on every repair, and because the savings buy more visits, households spend 17% fewer days living with faults.
+And it's fast: the solver proved 99.2 percent of over 25 thousand weekly plans to be the best possible plan.
 
 ### 9. Results  
 *HARSH, about 50 seconds*
 
 So what does it buy? A year of 37,508 made-up requests over the real Territory.
-Planning for the cheapest jobs costs $559 a repair. ReachNT costs $803. About 44% more.
+Planning for the cheapest jobs costs $559 a repair. ReachNT costs $816. About 46% more.
 For that, nine in ten urgent remote repairs are fixed within 3 days instead of 62, and households live with faults for 73% fewer days. That's the chart.
 We didn't trust one lucky year, so we ran five. The result held every time.
 We're not saying cost doesn't matter. We're saying the trade-off should be visible, priced, and signed by a person.
@@ -102,7 +102,7 @@ We're not saying cost doesn't matter. We're saying the trade-off should be visib
 *AASHISH, about 40 seconds*
 
 Floods and cyclones hit whole communities at once. The coordinator declares an event: every house made safe within 48 hours, one team trip with all the trades, and surge crews from the contractor panel.
-We modelled a flood like January 2023 at Kalkarindji. With the usual crews, flood repairs took 15 days, and everyone else in the region slipped from 3 to 10.
+We modelled a flood like January 2023 at Kalkarindji. With the usual crews, flood repairs took 14 days, and everyone else in the region slipped from 3 to 10.
 With surge crews, both stayed at 3 days. A disaster shouldn't quietly take other communities' trades.
 The portal also reads the NT Road Report and the Bureau of Meteorology, so heavy rain near a community prompts the coordinator to declare a flood. It prompts; a person decides.
 
@@ -157,16 +157,16 @@ Their Community Housing Officer, in the Housing officer view. They log reports w
 The tenant, or their housing officer, says "still broken". The job reopens with 50 extra points and keeps the day it was first reported, so its deadline has passed and it goes on the next trip. The coordinator can send a different crew.
 
 **Can different trades go together?**
-Yes. A plumber and an electrician booked to the same community that week share one ute or one charter. In our year that saved a further $130 per repair. Different trades going to neighbouring communities are suggested to share one loop.
+Yes. A plumber and an electrician booked to the same community that week share one ute or one charter. In our year that saved a further $139 per repair. Different trades going to neighbouring communities are suggested to share one loop.
 
 **What happens in a flood or cyclone?**
-The coordinator declares an event over the communities hit. Every house is made safe within 48 hours, one team trip carries all the trades, and surge crews come from the contractor panel. In our model of a January 2023-style flood at Kalkarindji, the usual crews took 15 days and the rest of the region slipped from 3 to 10 days; with surge crews both stayed at 3.
+The coordinator declares an event over the communities hit. Every house is made safe within 48 hours, one team trip carries all the trades, and surge crews come from the contractor panel. In our model of a January 2023-style flood at Kalkarindji, the usual crews took 14 days and the rest of the region slipped from 3 to 10 days; with surge crews both stayed at 3.
 
 **How do repair requests get into ReachNT? Does the coordinator type them in?**
 No. The tenant tells someone: the repairs line, their Community Housing Officer, the maintenance officer, a tradesperson, the front counter, or the app. That person logs the tenant's words in "New report" and asks the same six questions. The coordinator looks after the line, the trips and the checks. In our demo, the year of requests is synthetic; reports logged in the portal are validated by the server, and in production they go into the database.
 
 **What if a tradesperson can't do the job?**
-They record why: no one home, can't get in, need parts, needs another trade, or unsafe. "No one home" needs the time and what they tried. The job is never closed. The coordinator sends it to the next trip, a named crew, or offers it to any tradesperson of that trade on the panel; the first to accept gets it. It keeps its waiting time, and as its deadline nears it gets a boost onto the next trip. With 1 in 10 visits missing, ReachNT still fixed 9 in 10 missed urgent remote repairs within 20 days; cheapest-first took 126.
+They record why: no one home, can't get in, need parts, needs another trade, or unsafe. "No one home" needs the time and what they tried. The job is never closed. The coordinator sends it to the next trip, a named crew, or offers it to any tradesperson of that trade on the panel; the first to accept gets it. It keeps its waiting time, and as its deadline nears it gets a boost onto the next trip. With 1 in 10 visits missing, ReachNT still fixed 9 in 10 missed urgent remote repairs within 17 days; cheapest-first took 126.
 
 **An urgency can change. Who updates it?**
 Any person, any time: when the tenant rings, when the housing officer or a tradesperson sees it, from a photo, or after a review. Raising it takes effect at once, and "dangerous" sends the maintenance officer that day. Lowering a dangerous repair needs someone who spoke to the tenant or saw it, and a reason the tenant can read. The computer can never lower it. Tenants and tradespeople can also press "it got worse", and a person calls back the same day.
@@ -178,7 +178,7 @@ The tiers ask only what changes the harm from a fault. Tier 1 is life-preservati
 The NT Road Report's public feed for closures and flooding, and Bureau of Meteorology station observations for rain since 9 am and temperature, read every 10 minutes. If a feed is down, the portal shows a saved copy and says so. They only prompt the coordinator: a road closed near a community, heavy rain ("Declare a flood?"), or heat for Tier 1 homes without power or cooling. Nothing changes anyone's place unless a person decides.
 
 **Doesn't ranking by need still favour people who explain well?**
-That's what we fixed. Points for a baby, an elder or a crowded house used to come only from the tenant's words. Now everyone is asked the same questions, the tenancy record fills in household size, and the repair history fills in repeats. Saying less used to cost 19 points on average; now it costs about 2. When or how you report, your language and whether you use the app are never in the score, and a test fails if they ever are.
+That's what we fixed. Points for who lives there (Tier 1 or Tier 2) or a crowded house used to come only from the tenant's words. Now everyone is asked the same questions, the tenancy record fills in household size, and the repair history fills in repeats. Saying less used to cost 43 points on average; now it costs about 5, and an unanswered question gets a call-back. When or how you report, your language and whether you use the app are never in the score, and a test fails if they ever are.
 
 **Is this real data?**
 The communities, house counts, roads, wet-season closures, airstrips, deadlines and costs are real or come from published sources. The repair requests are made up, because no public NT repair data exists. That's why we compare plans against each other rather than claim exact dollar figures.
@@ -198,7 +198,7 @@ On wording it had never seen, the whole system caught 99.3% of dangerous reports
 - It's open source from Uber, and Postgres supports it.
 
 **Doesn't ReachNT just cost more?**
-About 44% more per repair than planning for the cheapest jobs. For that, urgent remote repairs are fixed in 3 days instead of 62, and families live with faults for 73% fewer days. Shared trips win back $73 of that on every repair. The point is that someone chooses that trade-off openly and signs it.
+About 46% more per repair than planning for the cheapest jobs. For that, urgent remote repairs are fixed in 3 days instead of 62, and families live with faults for 73% fewer days. Shared trips win back $77 of that on every repair. The point is that someone chooses that trade-off openly and signs it.
 
 **What stops a tradesperson saying "no one home" to skip a hard job?**
 They can't close the job that way. They record the time and at least one thing they tried, the tenant is told, and the job stays open for the next trip. The server rejects a "no one home" without that evidence.

@@ -67,11 +67,11 @@ Category sets the clock. Inside a category, points order the line:
 
 Tier 1 (life-preservation) is someone who needs power, cooling or medical supplies, a baby under 12 months or a frail elder; for them, losing power, water or cooling is Immediate. Tier 2 is young children, pregnancy, illness or limited mobility. Aboriginality, income and who heads the household are never asked. Harm values adapt the HHSRS severity weighting [14]. The waiting term means no job waits forever. The only inputs are the fault, what the report says and days waited; a unit test fails if distance, cost, region or community appear in the function.
 
-FIGURE: outputs/figures/fig1_map.png | 11.5 | Figure 1. The 70 communities by access band, each community's H3 resolution-4 hexagon, and the 68 possible shared trips (pairs of communities within two hexagon rings that can share a trip).
+FIGURE: outputs/figures/fig1_map.png | 10.0 | Figure 1. The 70 communities by access band, each community's H3 resolution-4 hexagon, and the 68 possible shared trips (pairs of communities within two hexagon rings that can share a trip).
 
 ## 2.4 H3 hexagons
 
-H3 is Uber's open-source hierarchical grid of hexagons [21]. Every point sits in one cell at each of 16 resolutions, and each finer level is about a seventh of the area. A hexagon has six neighbours, all the same distance from its centre, so "every cell within k rings" is a fair circle in every direction; square grids such as S2 have edge and corner neighbours at two distances [21]. ReachNT uses H3 four ways:
+H3 is Uber's open-source hierarchical grid of hexagons [21]. Every point sits in one cell at each of 16 resolutions, and each finer level is about a seventh of the area. A hexagon's six neighbours are all the same distance from its centre, so "within k rings" is fair in every direction; square grids have neighbours at two distances [21]. ReachNT uses H3 four ways:
 1. **Shared trips.** Two communities served from the same hub share one trip when their resolution-4 cells (about 1,770 km²) are within two rings, about 90 km. That gives 68 pairs, such as Ngukurr and Rittarangu, and the three Tiwi communities.
 2. **While you're out there.** A tradesperson's phone lists open jobs in their trade within three resolution-5 rings of the communities on their run.
 3. **A house is a hexagon.** Operational records hold a house ID and its resolution-10 cell (a 76 m hexagon), never an address.
@@ -97,15 +97,15 @@ Requests arrive at 4 per house per year, 25% more in the wet season, with faults
 
 **How to read our numbers.** *Cost per repair* is everything spent in the year (labour, travel, charters, overnight stays) divided by the repairs done. *9 in 10 fixed within* is the number of days by which 9 out of 10 urgent repairs were done (the 90th percentile). *Fault-days* add up every day a household lived with an unfixed fault; a dangerous fault counts more than a small one.
 
-Each week a job is not done, the planner logs the reason: road cut, no trip because of cost, crew fully booked, or the trip came but did higher-scoring jobs first. The tenant's answer is assembled from that log, the score parts and the signed decision record, so it can only state reasons that happened. A test checks each section reads at Flesch 50 or above.
+Each week a job is not done, the planner logs why: road cut, no trip because of cost, crew fully booked, or higher-scoring jobs first. The tenant's answer is built from that log, the score parts and the signed decision, so it can only state reasons that happened (Flesch 50 or above, tested).
 
 ## 2.7 Personal information and the database
 
-ReachNT will hold names, phone numbers and addresses, so the design keeps them in one place (Appendix F). A `pii` schema holds them encrypted with pgcrypto, readable only by intake staff through a function that logs every read. The `ops` schema holds work keyed by house ID and H3 cell. Row-level security limits a tradesperson to their trips and nearby open jobs, a tenant to their own jobs, and the public to resolution-6 summaries. The decision ledger is append-only, each row hashing the one before it. Everything runs on PostgreSQL, PostGIS and h3-pg, all free and open source: on NT Government servers for $0 in licences, or for a pilot on Neon's Sydney region, which supports all three; its free tier has 1 GB and 100 compute-hours a project [22]. A year of data is under 1 GB.
+Names, phone numbers and addresses sit in one `pii` schema, encrypted with pgcrypto and readable only by intake staff through a function that logs every read (Appendix F). Work is keyed by house ID and H3 cell; row-level security limits a tradesperson to their trips and nearby jobs, a tenant to their own jobs, and the public to resolution-6 summaries. The decision ledger is append-only, each row hashing the one before. PostgreSQL, PostGIS and h3-pg are free and open source; a pilot fits Neon's Sydney free tier [22], as a year of data is under 1 GB.
 
 ## 2.8 Inclusive intake and decisions
 
-Household points (the tier, a crowded house, a repeat) used to come only from the tenant's words, so a household could lose up to 45 points by saying less. Now whoever the tenant tells asks the same six questions, with a free interpreter where needed (Aboriginal Interpreter Service, TIS National, National Relay Service); the tenancy record gives household size and the job history gives repeats. Any "yes" counts; an unanswered question never removes points. The clock starts when the tenant first told anyone. Channel, language and timing are never scored (a unit test checks). A person can raise urgency at any time; lowering a dangerous repair needs someone who spoke to the tenant or saw it. A missed visit goes to the next trip, a named crew or any contractor of that trade, keeping its wait and deadline boost. The Trips tab reads the NT Road Report and Bureau of Meteorology observations and prompts the coordinator about closures, heavy rain and heat for Tier 1 households; it never changes the line (Appendix I).
+Household points (the tier, a crowded house, a repeat) used to come only from the tenant's words, so a household could lose up to 45 points by saying less. Now whoever the tenant tells asks the same six questions, with a free interpreter where needed (Aboriginal Interpreter Service, TIS National, National Relay Service); the tenancy record gives household size and the job history gives repeats. Any "yes" counts; an unanswered question never removes points. The clock starts when the tenant first told anyone. Channel, language and timing are never scored (a unit test checks). A person can raise urgency at any time; lowering a dangerous repair needs someone who spoke to the tenant or saw it. A missed visit goes to the next trip, a named crew or any contractor of that trade, keeping its wait and deadline boost. Live NT Road Report and Bureau of Meteorology readings prompt the coordinator about closures, heavy rain and heat, but never change the line (Appendix I).
 
 # 3 Findings
 
@@ -157,7 +157,7 @@ SENSITIVITY_SENTENCE
 
 ## 3.8 Saying less, and missed visits
 
-We described 3,000 synthetic households in full and in a few words. From the words alone, the short telling lost {{IN['words']['gap_mean']:.0f}} points on average, ranked lower {{pct(IN['words']['short_ranked_lower'])}} of the time, and only {{pct(IN['words']['vulnerable_recognised_short'])}} of vulnerable households were recognised. With the standard questions it lost {{IN['intake']['gap_mean']:.1f}} and ranked lower {{pct(IN['intake']['short_ranked_lower'])}} of the time (unanswered questions, assumed 1 in 10); {{pct(IN['intake']['vulnerable_recognised_short'])}} were recognised. When 1 in 10 booked visits missed, ReachNT still fixed 9 in 10 of the missed urgent remote repairs within {{d(MV['guarantee_0.2_h3'][1]['urgent_remote_missed_p90'])}} days, against {{d(MV['cheapest_1'][1]['urgent_remote_missed_p90'])}} under cheapest-first, because a missed job keeps its clock and gets the deadline boost. Misses cost ReachNT {{money(MV['guarantee_0.2_h3'][1]['cost_per_job'] - MV['guarantee_0.2_h3'][0]['cost_per_job'])}} per repair and moved its remote urgent 90th percentile from {{d(MV['guarantee_0.2_h3'][0]['urgent_p90_remote'])}} to {{d(MV['guarantee_0.2_h3'][1]['urgent_p90_remote'])}} days.
+We described 3,000 synthetic households in full and in a few words. From the words alone, the short telling lost {{IN['words']['gap_mean']:.0f}} points on average, ranked lower {{pct(IN['words']['short_ranked_lower'])}} of the time, and only {{pct(IN['words']['vulnerable_recognised_short'])}} of Tier 1 or 2 households were recognised. With the standard questions it lost {{IN['intake']['gap_mean']:.1f}} and ranked lower {{pct(IN['intake']['short_ranked_lower'])}} of the time (unanswered questions, assumed 1 in 10); {{pct(IN['intake']['vulnerable_recognised_short'])}} were recognised. When 1 in 10 booked visits missed, ReachNT still fixed 9 in 10 of the missed urgent remote repairs within {{d(MV['guarantee_0.2_h3'][1]['urgent_remote_missed_p90'])}} days, against {{d(MV['cheapest_1'][1]['urgent_remote_missed_p90'])}} under cheapest-first, because a missed job keeps its clock and gets the deadline boost. Misses cost ReachNT {{money(MV['guarantee_0.2_h3'][1]['cost_per_job'] - MV['guarantee_0.2_h3'][0]['cost_per_job'])}} per repair and moved its remote urgent 90th percentile from {{d(MV['guarantee_0.2_h3'][0]['urgent_p90_remote'])}} to {{d(MV['guarantee_0.2_h3'][1]['urgent_p90_remote'])}} days.
 
 ## 3.9 Fixes that didn't hold, trades together, and floods
 
@@ -169,13 +169,13 @@ A repair the tenant says is still broken reopens with {{RW}} rework points and k
 
 The brief names the risk: efficiency quietly decides who waits. ReachNT answers it three ways. The urgency score cannot see place. The equity cost is shown in dollars and days before anyone chooses. The choice is signed, so a tenant told "this was a cost decision" can see who made it and when. This follows the Robodebt Royal Commission's call for plain-language information about automated decisions and a path to review, and the Ombudsman's better practice guide [17]. ReachNT recommends and a person decides. Immediate jobs are always confirmed by phone and made safe by a local officer.
 
-The score uses what is known about the household (its tier, a crowded house). Taken from the tenant's words alone, that rewarded people who say more; ReachNT takes it from the same questions on every channel, the tenancy record and the job history (§2.8, §3.8), and no one gains a place by reporting earlier, online or in better English. Privacy Act transparency rules for automated decisions start on 10 December 2026 for organisations they cover, which may include contractors [18].
+Household points come from the same questions on every channel, the tenancy record and the job history, not only the tenant's words (§2.8, §3.8); no one gains a place by reporting earlier, online or in better English. The tiers never ask Aboriginality, income or who heads the household. Privacy Act transparency rules for automated decisions start on 10 December 2026 for organisations they cover, which may include contractors [18].
 
 ## 4.2 Cultural and community impacts
 
 Most remote tenants are Aboriginal, and many speak Kriol, Aboriginal English or another Aboriginal language first [20]. A reader trained on standard English will under-read them, as Table 2 shows on unfamiliar wording. ReachNT is an assistant to intake staff, never machine-translates into Aboriginal languages, and writes answers to be read out with a Community Housing Officer or interpreter.
 
-Community-level results are sensitive: a map of long waits can read as a judgement on the community rather than the service. Under the CARE principles and Closing the Gap Priority Reform 4, communities should see the data the Department uses, first [19]. The portal uses satellite imagery of Country rather than Aboriginal art; any artwork would be commissioned and licensed through an Aboriginal art centre under the Creative Australia protocols [23]. No community has seen ReachNT. Co-design with tenants, Aboriginal Housing NT, land councils and the Aboriginal Business Enterprises that hold maintenance contracts [9] must come before any use.
+Community-level results are sensitive: a map of long waits can read as a judgement on the community rather than the service. Under the CARE principles and Closing the Gap Priority Reform 4, communities should see the data the Department uses, first [19]. The portal uses satellite imagery of Country, not Aboriginal art [23]. No community has seen ReachNT. Co-design with tenants, Aboriginal Housing NT, land councils and the Aboriginal Business Enterprises that hold maintenance contracts [9] must come before any use.
 
 ## 4.3 Limitations
 
@@ -186,11 +186,11 @@ The requests are synthetic, so absolute numbers are illustrations and the compar
 **For DHLGCD:**
 1. Keep urgency and logistics as separate, published steps; ask every tenant the same short questions on every channel, start the clock at first contact, and test that location, channel and language are not inputs to urgency.
 2. Make the remote allowance in FS17 an explicit, signed decision, reviewed each quarter with its cost and its effect on remote waits, and report urgent waits by access band.
-3. Plan trips on H3 shared trips, and give Community Housing Officers and tenants read access to each job's status and logged reasons, which closes the gap the ANAO found [10].
+3. Plan trips on H3 shared trips, and give Community Housing Officers and tenants read access to each job's status and reasons, closing the gap the ANAO found [10].
 4. Build on PostgreSQL, PostGIS and h3-pg, hosted in Australia, with personal details in an encrypted vault and public outputs at resolution 6.
 
 **For contractors and industry:**
-5. Log a reason for every week a job waits and evidence for every missed visit, so cost decisions can be told apart from capacity shortfalls and a missed job is reassigned without losing its place.
+5. Log a reason for every week a job waits and evidence for every missed visit, so cost decisions can be told apart from capacity shortfalls.
 6. Price charters, shared trips, trades travelling together and a disaster surge panel into contracts, and train local tradespeople in the communities that wait longest.
 
 **For communities and their organisations:**
@@ -235,7 +235,7 @@ pip install -r requirements.txt
 python run_all.py                      rebuilds every number, figure and the portal data (about 15 minutes on 8 cores)
 python run_all.py --quality           quality measures only (Appendix G)
 python run_all.py --extras            the inclusion measure and the missed-visit experiment (section 3.8)
-pytest -q tests                        75 checks: need-only urgency, inclusive intake, reader safety net, planner limits, missed visits, data integrity
+pytest -q tests                        81 checks: need-only urgency, tiers, inclusive intake, reader safety net, planner limits, missed visits, data integrity
 node tests/test_api.mjs                 17 checks on the server: validation, no-access evidence, urgency changes, reassignment, sign-in rules
 https://reachnt.vercel.app             the ReachNT portal, desktop and phone (or serve web/ locally); works offline
 https://github.com/harshrastogii/reachnt   all code, data links and documents

@@ -10,7 +10,7 @@ drifts toward town work. That drift is the thing we make visible.
                 a community gets a trip only if it can be reached this week (road open, or an airstrip)
 
 `value_j` comes from the policy:
-  cheapest  every job is worth the same (1000 points): clear as many jobs as the money allows
+  cheapest  every job is worth the same (planning.cheapest_job_value, 1000 points): clear as many jobs as the money allows
   need      urgency points (urgency.py) + a deadline bonus for jobs about to breach the equal clock
   official  urgency points + a deadline bonus for jobs about to breach the official clock (remote allowance)
 """
@@ -64,6 +64,14 @@ def run_option(a, b, road_a: bool, road_b: bool, km_ab: float) -> TripOption | N
     return None
 
 
+def job_cost(hours: float, site: str, option: TripOption | None) -> float:
+    """The job's own cost in the objective (travel comes on top): labour, plus town driving or nights away."""
+    C = params()["costs"]
+    if site == "TOWN":
+        return hours * C["labour_per_hour"] + C["town_travel_per_job"]
+    return hours * C["labour_per_hour"] + (C["overnight_per_night"] * hours / C["hours_per_day"] if option.overnight else 0)
+
+
 @dataclass
 class PlanResult:
     done: list[str]
@@ -73,12 +81,18 @@ class PlanResult:
     cost: dict[str, float]          # travel, labour, overnight
     optimal: bool = True            # solver proved no better plan exists
     gap: float = 0.0                # (best bound - plan value) / |best bound|; 0 when optimal
-    solve_s: float = 0.0
+    solve_s: float = 0.0            # wall-clock seconds (varies with the machine; reported, never used to stop)
+    work: float = 0.0               # CP-SAT deterministic time used (the same on every machine)
+    limit: str = ""                 # "" proved optimal, "work" stopped at the deterministic limit, "wall" at the safety cap
 
 
 def plan_week(jobs: list[dict], options: dict[str, TripOption], capacity_hours: float, lam: float,
-              time_limit: float | None = None, runs: dict[str, tuple[TripOption, tuple[str, str]]] | None = None) -> PlanResult:
-    """jobs: dicts with job_id, site ('TOWN' or cid), hours, value. Returns what gets done."""
+              time_limit: float | None = None, runs: dict[str, tuple[TripOption, tuple[str, str]]] | None = None,
+              work_limit: float | None = None) -> PlanResult:
+    """jobs: dicts with job_id, site ('TOWN' or cid), hours, value. Returns what gets done.
+
+    The solver stops on a deterministic work limit, not on wall-clock time, so the same inputs give the same plan on
+    any machine and under any load. The wall-clock limit is a safety cap only."""
     P = params()
     C = P["costs"]
     if not jobs or capacity_hours <= 0:
@@ -105,16 +119,13 @@ def plan_week(jobs: list[dict], options: dict[str, TripOption], capacity_hours: 
         hj = int(round(j["hours"] * SCALE))
         hours_terms.append(hj * v)
         s = j["site"]
-        if s == "TOWN":
-            jcost = j["hours"] * C["labour_per_hour"] + C["town_travel_per_job"]
-        else:
+        if s != "TOWN":
             if s not in x and s not in covers:
                 m.Add(v == 0)
                 continue
             m.Add(v <= sum(([x[s]] if s in x else []) + covers.get(s, [])))
             by_site.setdefault(s, []).append(hj * v)
-            o = options[s]
-            jcost = j["hours"] * C["labour_per_hour"] + (C["overnight_per_night"] * j["hours"] / C["hours_per_day"] if o.overnight else 0)
+        jcost = job_cost(j["hours"], s, options.get(s))
         obj.append(int(round((j["value"] - lam * jcost) * SCALE)) * v)
     for s, xs in x.items():
         o = options[s]
@@ -131,8 +142,11 @@ def plan_week(jobs: list[dict], options: dict[str, TripOption], capacity_hours: 
     m.Add(sum(hours_terms) <= int(capacity_hours * SCALE))
     m.Maximize(sum(obj))
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = time_limit or P["planning"]["solver_time_limit_s"]
-    solver.parameters.num_workers = 1          # single worker + fixed seed: identical results on every run
+    work = work_limit or P["planning"]["solver_deterministic_limit"]
+    wall = time_limit or P["planning"]["solver_time_limit_s"]
+    solver.parameters.max_deterministic_time = work
+    solver.parameters.max_time_in_seconds = wall
+    solver.parameters.num_workers = 1          # single worker + fixed seed + deterministic limit: identical results on every run
     solver.parameters.random_seed = 7
     st = solver.Solve(m)
     if st not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
@@ -153,8 +167,9 @@ def plan_week(jobs: list[dict], options: dict[str, TripOption], capacity_hours: 
     hours = sum(j["hours"] for j in jobs if j["job_id"] in dset) + sum(o.travel_hours for o in trips.values())
     val, bound = solver.ObjectiveValue(), solver.BestObjectiveBound()
     gap = 0.0 if st == cp_model.OPTIMAL else max(0.0, (bound - val) / max(abs(bound), 1.0))
+    limit = "" if st == cp_model.OPTIMAL else "work" if solver.deterministic_time >= 0.98 * work else "wall"
     return PlanResult(done, trips, hours, capacity_hours, {"travel": travel, "labour": labour, "overnight": overnight},
-                      st == cp_model.OPTIMAL, gap, solver.WallTime())
+                      st == cp_model.OPTIMAL, gap, solver.WallTime(), solver.deterministic_time, limit)
 
 
 def single_job_cost(option: TripOption, hours: float) -> dict:

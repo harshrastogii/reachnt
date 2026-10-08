@@ -30,9 +30,9 @@ PLAIN = {   # every setting in the comparison chart, in words a coordinator woul
     "guarantee_0.2": "Most urgent first, one community per trip", "guarantee_0.5": "Most urgent first, tighter budget",
     "guarantee_0.2_h3": "ReachNT: most urgent first, with shared trips", "guarantee_0.5_h3": "ReachNT with a tighter budget",
     "cheapest_1_h3": "Cheapest first, with shared trips",
-    "need_0.8": "Most urgent first, no deadline, cost counts a lot", "need_0.4": "Most urgent first, no deadline, cost counts some",
-    "need_0.2": "Most urgent first, no deadline, cost counts a little", "need_0.1": "Most urgent first, no deadline, cost counts very little",
-    "need_0.05": "Most urgent first, no deadline, cost barely counts", "need_0": "Most urgent first, cost ignored",
+    "need_0.8": "Most urgent first, no guarantee, cost counts a lot", "need_0.4": "Most urgent first, no guarantee, cost counts some",
+    "need_0.2": "Most urgent first, no guarantee, cost counts a little", "need_0.1": "Most urgent first, no guarantee, cost counts very little",
+    "need_0.05": "Most urgent first, no guarantee, cost barely counts", "need_0": "Most urgent first, cost ignored",
 }
 SHORT = {"guarantee_0.2_h3": "ReachNT", "guarantee_0.2": "Urgent first", "floor_1": "Cheapest + deadline", "cheapest_1": "Cheapest first"}
 LEDGER = {
@@ -184,7 +184,7 @@ def build(N: dict) -> None:
         notice=N["synthetic_notice"],
         hub=DEMO_HUB,
         taxonomy=taxonomy(), triage=P["triage"], clocks=P["clocks"], h3=Hc,
-        planning={k: P["planning"][k] for k in ("due_soon_days", "deadline_bonus", "floor_bonus", "ageing_points_per_day")},
+        planning={k: P["planning"][k] for k in ("due_soon_days", "deadline_bonus", "floor_bonus", "ageing_points_per_day", "cheapest_job_value")},
         crews=crews,
         disaster_params={k: P["disaster"][k] for k in ("name", "communities", "damaged_share", "faults_per_house", "fault_mix")},
         disaster=N.get("disaster", []), joint_trips=N.get("joint_trips", []),

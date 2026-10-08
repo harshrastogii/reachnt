@@ -26,12 +26,14 @@ def main(quick: bool = False) -> None:
     com = geo.build_communities()
     print("2. Synthetic requests (read by the triage reader)")
     req = simulate.prepare_requests(force=True)
+    for seed in [s for s in evaluate.YEARS if s is not None] + [99]:   # the other years too, read by the same (current) reader
+        simulate.prepare_requests(force=True, seed=seed)
     print("3. Reader evaluation")
     reader = experiments.reader_eval()
     print("4. Cost calibration against Nous (2017)")
     calib = experiments.calibration()
     print("5. Policies")
-    summaries, results = experiments.run_policies(req)
+    summaries, plan_stats = experiments.run_policies(req)
     pd.DataFrame([{k: v for k, v in s.items() if k != "bands"} for s in summaries]).to_csv(OUTPUTS / "policies.csv", index=False)
     pd.DataFrame([dict(key=s["key"], label=s["label"], **b) for s in summaries for b in s["bands"]]).to_csv(OUTPUTS / "bands.csv", index=False)
     sens = []
@@ -57,33 +59,39 @@ def main(quick: bool = False) -> None:
         reader=reader, calibration=calib, policies=S, sensitivity=sens,
     )
     print("6b. Quality measures: ROC/PR-AUC, calibration, ranking, solver gap, five random years")
-    numbers["quality"] = evaluate.build()
+    # the main year is the policy run above (plans are deterministic): reused, not run again
+    numbers["quality"] = evaluate.build(main={k: (S[k], plan_stats[k]) for k in S})
     print("6c. Inclusion (saying less costs no points) and missed visits")
-    numbers.update(extras())
+    numbers.update(extras(S))
     (OUTPUTS / "numbers.json").write_text(json.dumps(numbers, indent=1, default=float))
     print("7. Figures")
     figures.build_all(numbers)
     print("8. Web prototype data")
     export_web.build(numbers)
     c, f, n = S["cheapest_1"], S["guarantee_0.2"], S["guarantee_0.2_h3"]
+    print(f"  Cheapest first: {c['open_never_worth_doing']} of {c['open_at_end']} jobs open at the end are never worth doing "
+          f"(job term negative before any travel).")
     print(f"\nDone. Cheapest-first: ${c['cost_per_job']:.0f}/job, remote urgent P90 {c['urgent_p90_remote']:.0f} days vs town {c['urgent_p90_town']:.0f}. "
           f"Need + guarantee: ${f['cost_per_job']:.0f}/job, harm-days {f['harm_days_total']:.0f}. ReachNT (+ H3 run zones): ${n['cost_per_job']:.0f}/job, harm-days {n['harm_days_total']:.0f}.")
 
 
-def extras() -> dict:
+def extras(policies: dict | None = None) -> dict:
+    """policies: the main-year policy summaries by key; the no-miss and trades-together rows reuse them."""
     inc = evaluate.inclusion()
-    mv = experiments.missed_visits()
+    mv = experiments.missed_visits(policies)
     pd.DataFrame(mv).to_csv(OUTPUTS / "missed_visits.csv", index=False)
     (OUTPUTS / "inclusion.json").write_text(json.dumps(inc, indent=1))
     w, i = inc["words"], inc["intake"]
-    print(f"  Short reports, words only: {w['gap_mean']:.0f} points lower, {w['short_ranked_lower']:.0%} ranked lower. "
-          f"With the standard questions: {i['gap_mean']:.1f} points, {i['short_ranked_lower']:.0%}.")
+    print(f"  Short reports, words only: {w['gap_mean']:.0f} points lower (median {w['gap_median']:.0f}, {w['category_cliffs']} fell a category), "
+          f"{w['short_ranked_lower']:.0%} ranked lower. With the standard questions: {i['gap_mean']:.1f} points "
+          f"(median {i['gap_median']:.0f}, {i['category_cliffs']} fell a category), {i['short_ranked_lower']:.0%}.")
     for r in mv:
         print(f"  {r['key']:18s} {r['share']:.0%} of visits missed: ${r['cost_per_job']:.0f}/job, urgent P90 remote {r['urgent_p90_remote']:.0f} d, "
               f"harm-days {r['harm_days_total']:.0f}" + (f", missed urgent remote jobs P90 {r['urgent_remote_missed_p90']:.0f} d" if r["share"] else ""))
-    jt = experiments.joint_trips()
+    jt = experiments.joint_trips(policies)
     for r in jt:
-        print(f"  {r['key']:18s} trades travelling together: {r['joint_trips']} shared trips, ${r['cost_per_job']:.0f} -> ${r['cost_per_job_joint']:.0f} per repair")
+        print(f"  {r['key']:18s} trades travelling together (estimate, net of waiting): {r['joint_trips']} shared trips, "
+              f"${r['cost_per_job']:.0f} -> ${r['cost_per_job_joint']:.0f} per repair")
     dz = experiments.disaster()
     for r in dz:
         print(f"  {r['label']:22s} flood jobs {r['event_jobs']}, urgent P90 {r['event_urgent_p90']}, rest of hub urgent P90 {r['other_urgent_p90']:.0f} d")
@@ -94,7 +102,7 @@ def extras() -> dict:
 
 def extras_only() -> None:
     numbers = json.loads((OUTPUTS / "numbers.json").read_text())
-    numbers.update(extras())
+    numbers.update(extras(numbers.get("policies")))
     (OUTPUTS / "numbers.json").write_text(json.dumps(numbers, indent=1, default=float))
 
 

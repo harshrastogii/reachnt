@@ -57,7 +57,7 @@ CONTENT_W = W - 2 * MARGIN
 S = {
     "body": ParagraphStyle("body", fontName="Arial", fontSize=11, leading=13.8, textColor=INK, spaceAfter=5, alignment=TA_LEFT),
     "h1": ParagraphStyle("h1", fontName="Arial-Bold", fontSize=14, leading=17, textColor=INK, spaceBefore=10, spaceAfter=6, keepWithNext=1),
-    "h2": ParagraphStyle("h2", fontName="Arial-Bold", fontSize=11, leading=14, textColor=INK, spaceBefore=6, spaceAfter=3, keepWithNext=1),
+    "h2": ParagraphStyle("h2", fontName="Arial-Bold", fontSize=14, leading=16.5, textColor=INK, spaceBefore=6, spaceAfter=3, keepWithNext=1),   # every heading 14 pt bold, as the brief asks
     "cap": ParagraphStyle("cap", fontName="Arial", fontSize=10, leading=12.5, textColor=MUTED, spaceAfter=10),
     "tcap": ParagraphStyle("tcap", fontName="Arial", fontSize=10, leading=12.5, textColor=MUTED, spaceAfter=3, keepWithNext=1),
     "cell": ParagraphStyle("cell", fontName="Arial", fontSize=10, leading=12, textColor=INK),
@@ -72,9 +72,10 @@ S = {
 
 
 def inline(text: str) -> str:
-    """Escape XML, then turn **bold** into <b> and bare URLs into links."""
+    """Escape XML, then turn **bold** into <b>, *italic* into <i>, and bare URLs into links."""
     t = escape(text)
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+    t = re.sub(r"(?<![*\w])\*(?=\S)(.+?)(?<=\S)\*(?![*\w])", r"<i>\1</i>", t)
     t = re.sub(r"(https?://[^\s<]+)", lambda m: f'<link href="{m.group(1)}" color="#2a5b9a">{m.group(1)}</link>', t)
     return t
 
@@ -90,7 +91,8 @@ def data_table(rows):
     ncol = len(rows[0])
     # Column widths proportional to the longest text in each column, within limits.
     lens = [max(len(r[c].strip()) for r in rows) for c in range(ncol)]
-    lens = [min(max(l, 8), 70) for l in lens]
+    words = [max(len(w) for r in rows for w in (r[c].split() or [""])) for c in range(ncol)]
+    lens = [max(min(max(l, 8), 70), int(w * 1.15) + 2) for l, w in zip(lens, words)]   # never narrower than the longest word
     widths = [CONTENT_W * l / sum(lens) for l in lens]
     body = [[Paragraph(inline(c.strip()), S["cellh"] if r == 0 else S["cell"]) for c in row] for r, row in enumerate(rows)]
     t = Table(body, colWidths=widths, repeatRows=1)

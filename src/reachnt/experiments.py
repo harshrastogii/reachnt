@@ -29,6 +29,7 @@ POLICIES = [
     simulate.Policy("need", 0.05, "Need first (lam 0.05)"),
     simulate.Policy("need", 0.0, "Need first, cost ignored"),
 ]
+SWEPT = [("crews", "capacity_factor"), ("access", "wet_cut_week_share"), ("costs", "charter_per_hour")]
 SNAPSHOT_WEEKS = (12, 30)   # late September (dry) and early February (wet), from a July start
 
 
@@ -88,18 +89,32 @@ def _save(p: simulate.Policy, r: simulate.SimResult) -> None:
 
 
 def _one(args) -> dict:
-    """Run one setting in its own process. overrides: {(section, key): value}; seed: request-stream seed."""
+    """Run one setting in a pooled worker. overrides: {(section, key): value}; seed: the year (requests, road closures
+    and misses). The worker runs many tasks, so params are reloaded from params.yaml before and after each task:
+    an override never carries into the next task."""
+    from . import config
+    config.params.cache_clear()
+    try:
+        return _one_clean(args)
+    finally:
+        config.params.cache_clear()
+
+
+def _one_clean(args) -> dict:
     p, overrides, seed, save, *rest = args
     miss = rest[0] if rest else 0.0
-    from . import config
-    P = config.params()
+    P = params()
     for (a, b), v in (overrides or {}).items():
         P[a][b] = v
     t = time.time()
-    r = simulate.run(p, simulate.prepare_requests(seed=seed), snapshot_weeks=SNAPSHOT_WEEKS if save else (), miss_share=miss)
+    stats: list = []
+    r = simulate.run(p, simulate.prepare_requests(seed=seed), seed=seed, snapshot_weeks=SNAPSHOT_WEEKS if save else (),
+                     miss_share=miss, plan_stats=stats)
     if save:
         _save(p, r)
     s = simulate.summarise(r)
+    s["params_used"] = {path: P[path[0]][path[1]] for path in SWEPT}   # checked by sensitivity(): no override leaks
+    s["plan_stats"] = stats
     if miss:
         j = r.jobs[r.jobs.week < params()["demand"]["weeks"]]
         hit = j[j.reason_counts.map(lambda c: c.get("no_access", 0) > 0)]
@@ -123,24 +138,31 @@ def _pool(tasks: list) -> list[dict]:
 
 
 def run_policies(req: pd.DataFrame) -> tuple[list[dict], dict]:
+    """Every policy on the main year. Returns the summaries and each run's planner stats (key -> list), which
+    evaluate.simulation_quality reuses for the main year instead of running it again."""
     summaries = _pool([(p, None, None, True) for p in POLICIES])
+    stats = {}
     for p, s in zip(POLICIES, summaries):
+        stats[s["key"]] = s.pop("plan_stats")
+        s.pop("params_used")
         print(f"  {p.label:52s} ${s['cost_per_job']:7.0f}/job  urgent P90 remote {s['urgent_p90_remote']:5.1f} d  "
               f"harm-days {s['harm_days_total']:9.0f}  ({s['seconds']:.0f}s)")
-    return summaries, {}
+    return summaries, stats
 
 
-def missed_visits() -> list[dict]:
+def missed_visits(policies: dict | None = None) -> list[dict]:
     """What if 1 in 10 booked visits miss? The missed job keeps its clock, goes back into next week's plan for any crew of
-    its trade, and its value rises as its time runs out. Headline settings only; the headline numbers are not changed."""
+    its trade, and its value rises as its time runs out. Headline settings only; the headline numbers are not changed.
+    policies: the main-year summaries by key; the no-miss rows reuse them (plans are deterministic, so it is the same run)."""
     share = params()["missed_visits"]["share"]
     heads = [simulate.Policy("cheapest", 1.0), simulate.Policy("guarantee", 0.2, runs=True)]
-    # each setting is run with and without misses on the same machine: the solver's 2-second limit makes results vary
-    # slightly with CPU speed, so the comparison is like for like
     tasks = [(h, None, None, False, m) for h in heads for m in (0.0, share)]
-    res = _pool(tasks)
+    todo = [t for t in tasks if not (t[4] == 0.0 and policies and key(t[0]) in policies)]
+    done = dict(zip(map(id, todo), _pool(todo)))
     rows = []
-    for (h, *_rest, m), s in zip(tasks, res):
+    for t in tasks:
+        h, *_rest, m = t
+        s = done[id(t)] if id(t) in done else policies[key(h)]
         rows.append(dict(key=key(h), share=m, cost_per_job=s["cost_per_job"], urgent_p90_remote=s["urgent_p90_remote"],
                          urgent_p90_town=s["urgent_p90_town"], harm_days_total=s["harm_days_total"], jobs_done=s["jobs_done"],
                          **{k: v for k, v in s.get("missed", {}).items() if k != "share"}))
@@ -170,9 +192,9 @@ def event_requests(seed: int = 31) -> pd.DataFrame:
 
 
 def _disaster_one(args):
-    label, req, surge, closed = args
+    label, req, surge, closed, crews = args
     p = simulate.Policy("guarantee", 0.2, runs=True)
-    r = simulate.run(p, req, surge=surge, closed=closed)
+    r = simulate.run(p, req, surge=surge, closed=closed, crews=crews)
     s = simulate.summarise(r)
     D = params()["disaster"]
     j = r.jobs
@@ -189,7 +211,8 @@ def _disaster_one(args):
                 event_urgent_p90=p90(ev_u.wait_days), event_all_p90=p90(ev.wait_days),
                 event_fixed_within_28=float((ev.wait_days <= 28).mean()) if len(ev) else None,
                 event_open_at_end=int(ev.open_at_end.sum()) if len(ev) else 0,
-                event_made_safe_same_day=float(((ev.made_safe_day - ev.day) <= 1)[ev.true_category == "immediate"].mean()) if len(ev) else None,
+                event_made_safe_same_day=float(((ev.made_safe_day - ev.day) <= 0)[ev.true_category == "immediate"].mean()) if len(ev) else None,
+                event_made_safe_within_1_day=float(((ev.made_safe_day - ev.day) <= 1)[ev.true_category == "immediate"].mean()) if len(ev) else None,
                 other_urgent_p90=p90(other_u.wait_days), other_jobs=int(len(other)))
 
 
@@ -202,19 +225,24 @@ def disaster() -> list[dict]:
     closed = {cid: (D["week"], D["week"] + D["road_cut_weeks"]) for cid in D["communities"]}
     hub = geo.load_communities().set_index("cid").loc[D["communities"][0], "hub"]
     surge = {"hub": hub, "factor": D["surge_factor"], "weeks": (D["week"], D["week"] + D["surge_weeks"])}
-    tasks = [("No flood", base, None, None), ("Flood, usual crews", both, None, closed), ("Flood, surge crews", both, surge, closed)]
+    crews = simulate.crew_sizes(base)          # the usual crews are sized for a normal year, not for the flood's own jobs
+    tasks = [("No flood", base, None, None, crews), ("Flood, usual crews", both, None, closed, crews),
+             ("Flood, surge crews", both, surge, closed, crews)]
     from concurrent.futures import ProcessPoolExecutor
     with ProcessPoolExecutor(3) as ex:
         return list(ex.map(_disaster_one, tasks))
 
 
-def joint_trips() -> list[dict]:
-    """How much trades save by travelling together to the same community in the same week (counted after planning)."""
+def joint_trips(policies: dict | None = None) -> list[dict]:
+    """How much trades could save by travelling together to the same community in the same week, net of the time one
+    waits for the other (an estimate, counted after planning: simulate.joint_trips). policies: the main-year summaries
+    by key; reused when given, so these are the same runs as the policy table."""
     rows = []
     for p in [simulate.Policy("cheapest", 1.0), simulate.Policy("guarantee", 0.2, runs=True)]:
-        s = simulate.summarise(simulate.run(p, simulate.prepare_requests()))
+        s = policies[key(p)] if policies and key(p) in policies else simulate.summarise(simulate.run(p, simulate.prepare_requests()))
         rows.append(dict(key=key(p), cost_per_job=s["cost_per_job"], cost_per_job_joint=s.get("cost_per_job_joint"),
-                         joint_trips=s.get("joint_trips"), joint_saving=s.get("joint_saving"), trips=s["trips"]))
+                         joint_trips=s.get("joint_trips"), joint_saving=s.get("joint_saving"),
+                         joint_idle_cost=s.get("joint_idle_cost"), trips=s["trips"]))
     return rows
 
 
@@ -232,8 +260,11 @@ def sensitivity(base_req: pd.DataFrame) -> list[dict]:
                 tasks.append((h, {path: v}, None, False)); meta.append((name, v, h))
     for h in heads:
         tasks.append((h, None, 99, False)); meta.append(("random_year", 99, h))
+    P = params()
     rows = []
-    for (name, v, h), s in zip(meta, _pool(tasks)):
+    for (name, v, h), (_, over, _, _), s in zip(meta, tasks, _pool(tasks)):
+        # each task saw its own override and the base value of everything else
+        assert s["params_used"] == {path: (over or {}).get(path, P[path[0]][path[1]]) for path in SWEPT}, (name, v, s["params_used"])
         rows.append(dict(param=name, value=v, policy=h.name, lam=h.lam, key=key(h), cost_per_job=s["cost_per_job"],
                          urgent_p90_remote=s["urgent_p90_remote"], urgent_p90_town=s["urgent_p90_town"],
                          harm_days=s["harm_days_total"], overdue_equal_remote=s["overdue_equal_remote"]))

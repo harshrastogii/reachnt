@@ -20,7 +20,7 @@
   const REASON = { travel_cost: "No trip this week", crew_full: "Trades fully booked", cut: "Road cut", lower_priority: "More urgent jobs first", booked: "Booked this week",
                    no_access: "Visit missed", parts: "Waiting for parts", needs_other_trade: "Needs another trade", unsafe: "Unsafe to work",
                    new: "New: planned next week", offered: "Offered to any trade", assigned: "Given to a crew", next_trip: "Next trip",
-                   rework: "Fix didn't hold", done_nearby: "Fixed while nearby" };
+                   rework: "Fix didn't hold", done_nearby: "Fixed while nearby", crew_hours: "Didn't fit the crew's hours", job_cost: "Costs more than the plan allows" };
   const MISSED = { "No one home": "no_access", "Can't get in": "no_access", "Need parts": "parts", "Needs another trade": "needs_other_trade", "Unsafe to work": "unsafe" };
   const CAT = { immediate: "Dangerous", urgent: "Urgent", routine: "Routine" };
   const ICON = {
@@ -1583,7 +1583,9 @@
     const trade = TRADE[r.trade].toLowerCase();
     const tripCost = (x) => Object.entries(x.by).map(([m, b]) => `${x.n > 1 && Object.keys(x.by).length > 1 ? `${b.n} week${b.n > 1 ? "s" : ""} ` : ""}about ${money(b.cost)} to ${m}`).join(", ");
     const say = { travel_cost: (x) => `No ${trade} was sent to ${esc(r.place)}. ${Object.keys(x.by).length ? `A trip there and back cost ${tripCost(x)}. ` : ""}That was a cost decision.`,
-                  crew_full: () => `Every ${trade} was busy with repairs more urgent than yours.`, cut: () => `The road was cut and there was no way to fly someone in.`,
+                  crew_full: () => `Every ${trade} was busy with repairs more urgent than yours.`,
+                  crew_hours: () => `The ${trade}s' hours went on trips that fitted more repairs into the week; yours didn't fit in the hours left.`,
+                  job_cost: () => `This plan counts the labour and nights away for this one job as worth more than the job. That was a cost decision.`, cut: () => `The road was cut and there was no way to fly someone in.`,
                   lower_priority: () => `${an(trade, true)} was nearby but did more urgent repairs first.` };
     const visit = updateOf(r.id, "visit"), review = updateOf(r.id, "review"), confirm = updateOf(r.id, "confirm"), worse = updateOf(r.id, "escalate");
     const missed = !!(visit && visit.status !== "done"), visited = !!(visit && visit.status === "done");

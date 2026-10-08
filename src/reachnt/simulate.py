@@ -14,10 +14,7 @@ import pandas as pd
 
 from . import geo, intake, synth, urgency
 from .config import OUTPUTS, PROCESSED, params, taxonomy
-from .planner import plan_week, run_option, trip_option
-
-CAT_FACTOR = {"immediate": 3.0, "urgent": 1.5, "routine": 0.5}   # harm-day weight per category (ASSUMPTION)
-MADE_SAFE_FACTOR = 1.5                                             # immediate job after make-safe weighs like urgent
+from .planner import job_cost, plan_week, run_option, trip_option
 
 
 # ------------------------------------------------------------------ requests
@@ -52,12 +49,13 @@ def read_requests(req: pd.DataFrame, com: pd.DataFrame | None = None) -> pd.Data
     req["vulnerable"] = [("vulnerable" in r.modifiers) for r in reads]
     req["crowded"] = [("crowded" in r.modifiers) for r in reads]
     req["repeat"] = [("repeat" in r.modifiers) for r in reads]
-    # a person reviews flagged reports next business day and records the true fault (ASSUMPTION: review is correct)
+    # a person reviews flagged reports and records the true fault (ASSUMPTION: review is correct): the next business day,
+    # or the same day when the fault is Immediate (the reader's reasons say "a person calls today" for a possible danger)
     req["hazard"] = np.where(req.needs_human | req.read_hazard.isna(), req.true_hazard, req.read_hazard)
-    req["available_day"] = req.day + np.where(req.needs_human, 1, 0)
     mods = [{k: 1 for k in ("tier1", "vulnerable") if r.modifiers.get(k)} for r in reads]
     # Tier 1 households (power, cooling or medical supplies; newborn; frail elder) losing power, water or cooling: Immediate
     req["category"] = [urgency.category(h, m) for h, m in zip(req.hazard, mods)]
+    req["available_day"] = req.day + np.where(req.needs_human & (req.category != "immediate"), 1, 0)
     req["true_category"] = [urgency.category(h, m) for h, m in zip(req.true_hazard, mods)]
     req["trade"] = req.hazard.map(lambda h: H[h]["trade"])
     req["hours"] = req.hazard.map(lambda h: H[h]["hours"])
@@ -96,7 +94,7 @@ class Policy:
 def job_value(job: dict, policy: Policy, day_end: float) -> float:
     P = params()["planning"]
     if policy.name in ("cheapest", "floor"):
-        v = 1000.0
+        v = float(P["cheapest_job_value"])
         if policy.name == "floor" and job["category"] in ("urgent", "immediate") and job["day"] + job["clock_equal"] - day_end <= P["due_soon_days"]:
             v += P["floor_bonus"]
         return v
@@ -123,32 +121,39 @@ class SimResult:
 
 def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, seed: int | None = None,
         snapshot_weeks: tuple[int, ...] = (), miss_share: float = 0.0, surge: dict | None = None,
-        closed: dict | None = None) -> SimResult:
+        closed: dict | None = None, crews: dict | None = None, plan_stats: list | None = None) -> SimResult:
     """miss_share: the share of booked visits that miss (no one home, can't get in, parts). A missed job is not closed:
     it keeps its clock and its waiting time, logs "no_access", and goes back into next week's plan for whichever crew
     of that trade goes (crews are pooled per hub and trade), where its shrinking time left raises its value.
     surge: {"hub": name, "factor": x, "weeks": (w0, w1)}: extra crews from the contractor panel after a disaster.
     closed: {cid: (w0, w1)}: roads cut by a flood in those weeks (fly-in only, if there is an airstrip).
+    crews: {(hub, trade): n}; by default sized from `req` (crew_sizes). A flood run passes the usual year's crews.
+    seed: the year. It sets the request stream (when `req` is None) and the road-closure and missed-visit streams.
+    plan_stats: if a list is given, one (optimal, gap, wall seconds, deterministic work, limit hit) per weekly plan.
 
     Trades that go to the same community (or the same shared trip) in the same week can travel together: one
     vehicle or one charter instead of one each. The planner still plans each trade on its own; the saving is
-    counted afterwards, so it is a floor on what planning for it would save (SimResult.reasons["joint"])."""
+    counted afterwards, net of the time the trade with fewer hours on site waits for the other, so it is an
+    estimate, not a bound (SimResult.reasons["joint"])."""
     P = params()
-    miss_rng = np.random.default_rng(P["seed"] + 99)    # its own stream, so miss_share=0 changes nothing else
+    year = P["seed"] if seed is None else seed
+    miss_rng = np.random.default_rng(year + 99)    # its own stream, so miss_share=0 changes nothing else
     req = prepare_requests(seed=seed) if req is None else req
     com = geo.load_communities().set_index("cid", drop=False)
-    crews = crew_sizes(req)
+    crews = crew_sizes(req) if crews is None else crews
     pairs = geo.run_pairs(com.reset_index(drop=True)) if policy.runs else pd.DataFrame(columns=["hub", "a", "b", "km"])
-    rng = np.random.default_rng(P["seed"] + 7)
+    rng = np.random.default_rng(year + 7)
     jobs = req.copy()
     jobs["clock_equal"] = [urgency.clock_days("urgent" if c == "immediate" else c, r, "equal") for c, r in zip(jobs.category, jobs.remote)]
     jobs["clock_official"] = [urgency.clock_days("urgent" if c == "immediate" else c, r, "official") for c, r in zip(jobs.category, jobs.remote)]
     jobs["done_day"] = np.nan
     jobs["done_mode"] = ""
     jobs["merged_into"] = ""      # a second report of the same fault at the same house, while the first is still open
-    # Immediate faults are made safe the day they are reported, by the community's Remote Housing Maintenance Officer
-    # (DHLGCD FS17: response within 4 hours; ASSUMPTION that an officer is always available). The repair is a second clock.
-    jobs["made_safe_day"] = np.where(jobs.true_category == "immediate", jobs.available_day, np.nan)
+    # A job read as Immediate (or flagged, and confirmed Immediate by the person who calls back that day) is made safe
+    # the day it is available, by the community's Remote Housing Maintenance Officer (DHLGCD FS17: response within 4 hours;
+    # ASSUMPTION that an officer is always available). The repair is a second clock. A dangerous fault the reader missed
+    # and did not flag gets no make-safe visit: it is safe only when it is fixed (set below).
+    jobs["made_safe_day"] = np.where(jobs.category == "immediate", jobs.available_day, np.nan)
     recs = jobs.to_dict("records")
     by_hub: dict[str, list[dict]] = {}
     for j in recs:
@@ -159,6 +164,7 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
     last_reason: dict[str, dict] = {}
     weekly = []
     joint_rows: list[dict] = []
+    cap_site = P["planning"]["max_jobs_per_site"]
     weeks = P["demand"]["weeks"] + extra_weeks
     start_month = P["demand"]["start_month"]
     for wk in range(weeks):
@@ -170,6 +176,7 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                 road[cid] = False
         for hub, hjobs in by_hub.items():
             hub_trips: dict[str, dict] = {}
+            hub_onsite: dict[str, Counter] = {}
             open_jobs = [j for j in hjobs if np.isnan(j["done_day"]) and j["available_day"] < day_end]
             # duplicates join the earliest open job for the same house and fault, and are fixed on the same visit
             first: dict[tuple, dict] = {}
@@ -196,7 +203,7 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                 per_site: Counter = Counter()
                 trimmed = []
                 for d in plan_jobs:
-                    if per_site[d["site"]] < (400 if d["site"] == "TOWN" else 40):
+                    if per_site[d["site"]] < cap_site["town" if d["site"] == "TOWN" else "community"]:
                         trimmed.append(d); per_site[d["site"]] += 1
                 runs = {}
                 if policy.runs:
@@ -207,8 +214,14 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                             if o:
                                 runs[o.site] = (o, (pr.a, pr.b))
                 res = plan_week(trimmed, options, cap, policy.lam, runs=runs)
+                if plan_stats is not None and trimmed:
+                    plan_stats.append((res.optimal, res.gap, res.solve_s, res.work, res.limit))
                 hub_trips[trade] = res.trips
                 done = set(res.done)
+                hub_onsite[trade] = Counter()
+                for j in tj:
+                    if j["job_id"] in done and not j["town"]:
+                        hub_onsite[trade][res.trips[j["site"]].site] += j["hours"]
                 missed = {jid for jid in sorted(done) if miss_rng.random() < miss_share} if miss_share else set()
                 if wk in snapshot_weeks:
                     vals = {d["job_id"]: d["value"] for d in plan_jobs}
@@ -221,7 +234,10 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                                           run=(res.trips[site].site if site in res.trips and "+" in res.trips[site].site else ""),
                                           reachable=(o.reachable if o else True), trip_cost=(o.fixed_cost if o else 0.0),
                                           travel_hours=(o.travel_hours if o else 0.0), capacity=cap, used=res.hours_used))
-                full = res.hours_used >= 0.92 * cap
+                full = res.hours_used >= P["planning"]["crew_full_share"] * cap
+                # "scored higher" is said only when every job booked for this trade this week outranked the job
+                vals = {d["job_id"]: d["value"] for d in plan_jobs}
+                lowest = min((vals[x] for x in done), default=math.inf)
                 for j in tj:
                     jid = j["job_id"]
                     site = "TOWN" if j["town"] else j["site"]
@@ -233,8 +249,14 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                         code = "no_access"
                     elif site != "TOWN" and not options[site].reachable:
                         code = "cut"
+                    elif vals[jid] - policy.lam * job_cost(j["hours"], site, options.get(site)) <= 0:
+                        code = "job_cost"        # its own labour and nights cost more than it is worth: never picked
+                    elif site != "TOWN" and site not in res.trips and not full:
+                        code = "travel_cost"
+                    elif lowest <= vals[jid]:
+                        code = "crew_hours"      # hours went on trips that fitted more repairs in; not every one scored higher
                     elif site != "TOWN" and site not in res.trips:
-                        code = "crew_full" if full else "travel_cost"
+                        code = "crew_full"
                     else:
                         code = "lower_priority"
                     reasons[jid][code] += 1
@@ -247,24 +269,25 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                     if j["trade"] == trade:
                         lead = next((x for x in tj if x["job_id"] == j["merged_into"]), None)
                         if lead is not None and not np.isnan(lead["done_day"]):
-                            if lead["done_day"] >= j["day"]:      # fixed on the same visit
-                                j["done_day"], j["done_mode"] = lead["done_day"], lead["done_mode"]
+                            if lead["done_day"] >= j["day"]:      # fixed on the same visit, closed once it is on the books
+                                j["done_day"], j["done_mode"] = max(lead["done_day"], j["available_day"]), lead["done_mode"]
                             else:                                  # reported after that visit: a new job, not a duplicate
                                 j["merged_into"] = ""
                 weekly.append(dict(week=wk, hub=hub, trade=trade, month=month, crew=crews.get((hub, trade), 1), capacity=cap,
                                    hours_used=res.hours_used, jobs_done=len(done), trips=len(res.trips),
                                    air_trips=sum(o.mode.startswith("air") for o in res.trips.values()),
                                    run_trips=len({o.site for o in res.trips.values() if "+" in o.site}), **{f"cost_{k}": v for k, v in res.cost.items()}))
-            joint_rows.extend(joint_trips(wk, hub, hub_trips))
+            joint_rows.extend(joint_trips(wk, hub, hub_trips, hub_onsite))
     out = pd.DataFrame(recs)
     end = weeks * 7
     out["open_at_end"] = out.done_day.isna()
     out["wait_days"] = np.where(out.open_at_end, end - out.day, out.done_day - out.day)
     out["overdue_equal"] = out.wait_days > out.clock_equal
     out["overdue_official"] = out.wait_days > out.clock_official
-    w = out.harm / 100 * out.true_category.map(CAT_FACTOR)
-    w = np.where(out.true_category == "immediate", out.harm / 100 * MADE_SAFE_FACTOR, w)   # made safe on day one
-    out["harm_days"] = w * out.wait_days
+    # a missed danger (read as less than Immediate, never flagged) is made safe only by the fix
+    missed_danger = (out.true_category == "immediate") & (out.category != "immediate")
+    out.loc[missed_danger, "made_safe_day"] = out.loc[missed_danger, "done_day"]
+    out["harm_days"] = harm_days(out)
     out["reason_counts"] = out.job_id.map(lambda k: dict(reasons[k]))
     out["reason_log"] = out.job_id.map(lambda k: logs.get(k, []))
     out["last_reason"] = out.job_id.map(lambda k: last_reason.get(k, {}))
@@ -273,13 +296,29 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
     return SimResult(policy, out, pd.DataFrame(weekly), {"snapshots": pd.DataFrame(snaps), "joint": pd.DataFrame(joint_rows)})
 
 
-SEATS = {"road": 3, "road-run": 3, "air": 5, "air-run": 5}   # ASSUMPTION: a work ute takes 3 trades and tools; a light twin 5
+def harm_days(out: pd.DataFrame) -> pd.Series:
+    """Fault-days: harm/100 x category weight x days waited (params harm_weights, ASSUMPTION). A truly Immediate job
+    weighs as Immediate until it is made safe and as made-safe (like urgent) from then until it is fixed."""
+    W = params()["harm_weights"]
+    h = out.harm / 100
+    w = h * out.true_category.map(W) * out.wait_days
+    imm = out.true_category == "immediate"
+    unsafe = (out.made_safe_day.fillna(np.inf) - out.day).clip(lower=0)
+    unsafe = np.minimum(unsafe, out.wait_days)
+    return pd.Series(np.where(imm, h * (W["immediate"] * unsafe + W["made_safe"] * (out.wait_days - unsafe)), w), index=out.index)
 
 
-def joint_trips(week: int, hub: str, trips_by_trade: dict[str, dict]) -> list[dict]:
+def joint_trips(week: int, hub: str, trips_by_trade: dict[str, dict], onsite: dict[str, dict] | None = None) -> list[dict]:
     """Trades going to the same community, or the same shared trip, in the same week travel together.
     Each trade's trips dict maps a community to its TripOption (a shared trip appears under both communities,
-    each with half the cost). Returns one row per trip that two or more trades could share."""
+    each with half the cost). onsite: trade -> {trip: hours of work on site}. Trades in one vehicle leave and come back
+    together, so each waits for the one with the most hours on site; that waiting is paid labour and comes off the
+    saving (trades are seated by hours on site, longest first). Where waiting costs more than the vehicle saves,
+    they travel separately (saving 0). Returns one row per trip that two or more trades could share. An estimate:
+    it ignores extra pick-up legs on a shared charter, and the planner did not plan for it."""
+    seats = params()["joint_trips"]["seats"]
+    rate = params()["costs"]["labour_per_hour"]
+    onsite = onsite or {}
     legs: dict[str, dict[str, tuple[str, float]]] = {}
     for trade, trips in trips_by_trade.items():
         for o in trips.values():
@@ -292,12 +331,33 @@ def joint_trips(week: int, hub: str, trips_by_trade: dict[str, dict]) -> list[di
             continue
         modes = {m for m, _ in by_trade.values()}
         mode = sorted(modes)[0]
-        costs = sorted((c for _, c in by_trade.values()), reverse=True)
-        vehicles = math.ceil(len(costs) / SEATS.get(mode, 3))
-        together = sum(costs[i] for i in range(0, len(costs), SEATS.get(mode, 3)))  # one vehicle per group of seats
-        rows.append(dict(week=week, hub=hub, trip=k, trades=sorted(by_trade), mode=mode, separate=sum(costs),
-                         together=together, saving=sum(costs) - together, vehicles=vehicles))
+        n = seats.get(mode, 3)
+        trades = sorted(by_trade, key=lambda t: (-onsite.get(t, {}).get(k, 0.0), t))
+        groups = [trades[i:i + n] for i in range(0, len(trades), n)]       # one vehicle per group of seats
+        separate = sum(c for _, c in by_trade.values())
+        together = sum(max(by_trade[t][1] for t in g) for g in groups)
+        idle = sum(len(g) * max(onsite.get(t, {}).get(k, 0.0) for t in g) - sum(onsite.get(t, {}).get(k, 0.0) for t in g)
+                   for g in groups)
+        if separate - together - idle * rate <= 0:                         # waiting costs more: each goes on its own
+            together, idle, groups = separate, 0.0, [[t] for t in trades]
+        rows.append(dict(week=week, hub=hub, trip=k, trades=sorted(by_trade), mode=mode, separate=separate,
+                         together=together, idle_hours=idle, idle_cost=idle * rate, saving=separate - together - idle * rate,
+                         vehicles=len(groups)))
     return rows
+
+
+def _worth_doing(jobs: pd.DataFrame, policy: Policy) -> pd.Series:
+    """Is each job's own term in the planner's objective positive (planner.plan_week), on the last day it waited?
+    Travel comes on top, so a job with a negative term is never done. Overnight as on the usual trip (road, or air
+    for an island)."""
+    com = geo.load_communities().set_index("cid", drop=False)
+    usual = {cid: trip_option(com.loc[cid], not bool(com.loc[cid, "island"])) for cid in set(jobs.site) - {None} if cid in com.index}
+    out = []
+    for j in jobs.to_dict("records"):
+        site = "TOWN" if j["town"] else j["site"]
+        cost = job_cost(j["hours"], site, usual.get(site))
+        out.append(job_value(j, policy, j["day"] + j["wait_days"]) - policy.lam * cost > 0)
+    return pd.Series(out, index=jobs.index, dtype=bool)
 
 
 # ------------------------------------------------------------------ metrics
@@ -309,7 +369,8 @@ def summarise(res: SimResult, houses: pd.Series | None = None) -> dict:
     wk = res.weekly
     cost = wk[[c for c in wk.columns if c.startswith("cost_")]].sum()
     total = float(cost.sum())
-    done = int((~j.open_at_end).sum())
+    dup = j.merged_into != "" if "merged_into" in j else pd.Series(False, index=j.index)
+    done = int((~j.open_at_end & ~dup).sum())      # a merged duplicate is fixed on its lead's visit: no extra repair
     urg = j[j.category.isin(["urgent", "immediate"])]
     remote = urg[~urg.town]
     town = urg[urg.town]
@@ -322,9 +383,19 @@ def summarise(res: SimResult, houses: pd.Series | None = None) -> dict:
              overdue_official_remote=float(remote.overdue_official.mean()),
              harm_days_total=float(j.harm_days.sum()), air_trips=int(wk.air_trips.sum()), trips=int(wk.trips.sum()))
     s["gap_p90"] = s["urgent_p90_remote"] / max(s["urgent_p90_town"], 0.1)
-    s["duplicates_merged"] = int((j.merged_into != "").sum()) if "merged_into" in j else 0
+    s["duplicates_merged"] = int(dup.sum())
+    s["duplicates_closed"] = int((dup & ~j.open_at_end).sum())
     imm = j[j.true_category == "immediate"]
-    s["immediate_made_safe_within_1_day"] = float(((imm.made_safe_day - imm.day) <= 1).mean()) if "made_safe_day" in j and len(imm) else None
+    if "made_safe_day" in j and len(imm):
+        safe = imm.made_safe_day - imm.day
+        s["immediate_made_safe_same_day"] = float((safe <= 0).mean())
+        s["immediate_made_safe_within_1_day"] = float((safe <= 1).mean())
+        s["immediate_missed_by_reader"] = int((imm.category != "immediate").sum())   # no make-safe visit: safe only once fixed
+    # jobs left open whose job term (value less lam x labour and nights) is negative before any travel at the end of
+    # the run: the planner would never pick them, whatever the trip
+    o = j[j.open_at_end]
+    s["open_never_worth_doing"] = int(len(o) - _worth_doing(o, res.policy).sum())
+    s["open_never_worth_doing_share"] = s["open_never_worth_doing"] / max(len(o), 1)
     by = []
     for b in BAND_ORDER:
         x = j[j.band == b]
@@ -340,6 +411,7 @@ def summarise(res: SimResult, houses: pd.Series | None = None) -> dict:
     if J is not None and len(J):
         Jy = J[J.week < params()["demand"]["weeks"]]
         s["joint_saving"] = float(Jy.saving.sum())
-        s["joint_trips"] = int(len(Jy))
+        s["joint_trips"] = int((Jy.saving > 0).sum())
+        s["joint_idle_cost"] = float(Jy.idle_cost.sum()) if "idle_cost" in Jy else 0.0
         s["cost_per_job_joint"] = (total - float(Jy.saving.sum())) / max(done, 1)
     return s

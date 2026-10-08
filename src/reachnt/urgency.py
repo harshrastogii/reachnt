@@ -2,7 +2,7 @@
 
 The score never sees distance, travel cost, community, region or anything about who the tenant is
 beyond what the report itself says (a baby, an elder, a crowded house, a repeat report).
-That rule is tested in tests/test_urgency.py.
+That rule is tested in tests/test_core.py (test_urgency_signature_has_no_place_or_cost_inputs).
 
     points = category base + harm + Healthy Living Practice rank + exposure + repeat + ageing + rework
 
@@ -22,11 +22,11 @@ returned so the explanation can show the arithmetic.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 
 from .config import params, taxonomy
 
-CATEGORY_BASE = {"immediate": 1000, "urgent": 500, "routine": 100}
 INPUTS_ALLOWED = {"hazard", "modifiers", "days_waited", "clock_days"}   # the only things urgency may read
 
 
@@ -77,12 +77,12 @@ def score(hazard: str, modifiers: dict, days_waited: float = 0.0, clock: float |
     H = taxonomy()["hazards"][hazard]
     T = params()["triage"]
     cat = category(hazard, modifiers)
-    clock = clock if clock is not None else clock_days(cat, False)
-    hlp_pts = (10 - H["hlp"]) * 4                    # Safety (0) = 40 ... HLP 9 = 4
+    clock = clock if clock is not None else clock_days("urgent" if cat == "immediate" else cat, False)   # the repair clock, as callers and the portal use
+    hlp_pts = (10 - H["hlp"]) * T["hlp_points_per_rank"]      # Safety (0) = 40 ... HLP 9 = 4
     tier_pts = {1: T["tier1_points"], 2: T["vulnerable_points"], 3: 0}[tier(modifiers)]
     exposure = tier_pts + (T["crowded_points"] if "crowded" in modifiers else 0)
     repeat = T["repeat_points"] if "repeat" in modifiers else 0
     over_half = max(0.0, days_waited - clock / 2)
-    ageing = int(round(params()["planning"]["ageing_points_per_day"] * over_half))
+    ageing = math.floor(params()["planning"]["ageing_points_per_day"] * over_half + 0.5)   # half up, as JS Math.round
     rework = T["rework_points"] if "rework" in modifiers else 0
-    return Urgency(cat, CATEGORY_BASE[cat], int(H["harm"]), hlp_pts, exposure, repeat, ageing, rework)
+    return Urgency(cat, T["category_base"][cat], int(H["harm"]), hlp_pts, exposure, repeat, ageing, rework)

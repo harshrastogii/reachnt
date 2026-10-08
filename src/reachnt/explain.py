@@ -3,10 +3,11 @@
 Every sentence is built from the job's own record (reading, score parts, the reason codes logged each week
 it was not done) and from the decision ledger. Nothing is generated freely, so nothing can be made up.
 Sentences are short so a Community Housing Officer or an Aboriginal Interpreter Service interpreter can read
-them out. tests/test_explain.py checks the reading level.
+them out. tests/test_core.py checks the reading level.
 """
 from __future__ import annotations
 
+import math
 import re
 
 from . import urgency
@@ -18,13 +19,21 @@ CAT_WORD = {"immediate": "Immediate (danger)", "urgent": "Urgent", "routine": "R
 HOTLINE = "1800 104 076"
 
 
+def _round(x: float) -> int:
+    return math.floor(x + 0.5)              # half up, as the portal's Math.round
+
+
 def _days(d: float) -> str:
-    d = int(round(d))
+    d = _round(d)
     return "1 day" if d == 1 else f"{d} days"
 
 
 def _money(x: float) -> str:
     return f"${int(round(x, -2)):,}"
+
+
+def _weeks(n: int) -> str:
+    return "1 week" if n == 1 else f"{n} weeks"
 
 
 def _a(word: str) -> str:
@@ -40,18 +49,35 @@ def _why(log: list, trade: str, place: str, ledger: dict, community: dict | None
         road = f"{road.title()} closed" if isinstance(road, str) and road else "wet-season conditions"
         why.append(f"For {_days(rc['cut'] * 7)} the road to {place} was cut ({road}) and there was no airstrip to fly {_a(trade)} in.")
     if rc.get("travel_cost"):
-        cost = max(c for _, code, c, _ in log if code == "travel_cost")
-        mode = "fly" if any(m == "air" for _, code, _, m in log if code == "travel_cost") else "drive"
-        why.append(f"For {_days(rc['travel_cost'] * 7)} no {trade} was sent to {place}. "
-                   f"It costs about {_money(cost)} to {mode} one there and back.")
+        by_mode: dict[str, list] = {}       # mode -> [weeks, latest cost]: a drive most weeks, a flight while the road is cut
+        for _, code, c, m in log:
+            if code == "travel_cost":
+                k = "fly" if str(m).startswith("air") else "drive"
+                by_mode.setdefault(k, [0, c])[0] += 1
+                by_mode[k][1] = c
+        why.append(f"For {_days(rc['travel_cost'] * 7)} no {trade} was sent to {place}.")
+        if len(by_mode) == 1:
+            k, (_, c) = next(iter(by_mode.items()))
+            why.append(f"It costs about {_money(c)} to {k} one there and back.")
+        else:
+            (_, (nd, cd)), (_, (nf, cf)) = sorted(by_mode.items())   # drive, fly
+            why.append(f"A trip there and back costs about {_money(cd)} to drive, or {_money(cf)} to fly while the road is closed: "
+                       f"{_weeks(nd)} by road, {_weeks(nf)} by air.")
+    if rc.get("job_cost"):
+        why.append(f"For {_days(rc['job_cost'] * 7)} your repair was left off the plan. "
+                   "The hours it takes, and the nights away, cost more than this setting allows for one repair.")
+    if rc.get("travel_cost") or rc.get("job_cost"):
         if ledger.get("date", "").startswith("("):
             why.append("That was a cost decision, not a judgement about your repair. Nobody signed off on it.")
         else:
             why.append(f"That was a cost decision, not a judgement about your repair. "
                        f"It follows the setting the {ledger.get('role', 'coordinator')} approved on {ledger['date']}.")
-    if rc.get("crew_full"):
+    if rc.get("crew_full"):                 # logged only when every repair booked for that trade outranked this one
         why.append(f"For {_days(rc['crew_full'] * 7)} every {trade} was fully booked on repairs that scored higher than yours. "
                    "Higher scores mean more danger or a longer wait.")
+    if rc.get("crew_hours"):                # not every repair booked for that trade scored higher: say what did happen
+        why.append(f"For {_days(rc['crew_hours'] * 7)} the {trade}s' hours went on trips that fitted more repairs into the week. "
+                   "Your repair did not fit in the hours left.")
     if rc.get("lower_priority"):
         why.append(f"For {_days(rc['lower_priority'] * 7)} {_a(trade)} was working nearby but did higher-scoring repairs first.")
     return why
@@ -107,14 +133,19 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
         status.append(f"Not fixed yet. You have waited {_days(waited)}.")
     else:
         status.append(f"Fixed after {_days(waited)}.")
-    if waited > clock:
-        status.append(f"That is longer than our rule, by {_days(waited - clock)}.")
+    late = waited - clock
+    if late > 0.5:                          # the portal's due chip: overdue only past half a day
+        status.append(f"That is longer than our rule, by {_days(max(1, _round(late)))}.")
     if rank and not booked:
         status.append(f"You are number {rank[0]} of {rank[1]} waiting for {_a(trade)} from {job['hub']}.")
     if job.get("merged_into"):
         status.append("This fault was already reported for your house, so we joined the two reports: one visit fixes it.")
-    if job.get("true_category", cat) == "immediate" or cat == "immediate":
-        status.append("A maintenance officer makes it safe the day you report it. Fixing it properly is a second step, with its own date.")
+    if cat == "immediate":                  # a danger the reader missed got no make-safe visit, so nothing is claimed
+        safe = job.get("made_safe_day")
+        safe = None if safe is None or safe != safe else safe - job["day"]
+        when = "the day you report it" if safe is None else "the day you reported it" if safe <= 0 else "the day after you reported it"
+        verb = "makes" if safe is None else "made"
+        status.append(f"A maintenance officer {verb} it safe {when}. Fixing it properly is a second step, with its own date.")
     sections.append(("Where it is up to", " ".join(status)))
 
     why = _why(log, trade, place, ledger, community)
@@ -140,6 +171,7 @@ def tenant_explanation(job: dict, place: str, ledger: dict, community: dict | No
     short = (f"Your {H['label'].lower()} repair is {cat}. "
              + ("Booked this week. " if booked else ("Waiting " + _days(waited) + ". " if is_open else f"Fixed after {_days(waited)}. "))
              + ("Held up by travel cost. " if "travel_cost" in held else "")
+             + ("Held up by its own cost. " if "job_cost" in held else "")
              + ("Road was cut. " if "cut" in held else "")
              + f"Ask why: {HOTLINE}")
     return dict(short=short, sections=sections, score=u.parts(), score_text=score_txt)

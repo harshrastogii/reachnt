@@ -178,32 +178,29 @@ def reader_quality() -> dict:
     return out
 
 
+YEAR_KEYS = ("cost_per_job", "urgent_p90_remote", "urgent_p90_town", "harm_days_total", "jobs_done")
+
+
 def _year(args):
     key, seed = args
     from .experiments import POLICIES, key as pkey
     pol = next(p for p in POLICIES if pkey(p) == key)
-    stats = []
-    real = simulate.plan_week
-
-    def rec(*a, **k):
-        r = real(*a, **k)
-        if a[0]:
-            stats.append((r.optimal, r.gap, r.solve_s))
-        return r
-    simulate.plan_week = rec
-    try:
-        s = simulate.summarise(simulate.run(pol, seed=seed))
-    finally:
-        simulate.plan_week = real
-    return key, seed, {k: s[k] for k in ("cost_per_job", "urgent_p90_remote", "urgent_p90_town", "harm_days_total", "jobs_done")}, stats
+    stats: list = []
+    s = simulate.summarise(simulate.run(pol, seed=seed, plan_stats=stats))
+    return key, seed, {k: s[k] for k in YEAR_KEYS}, stats
 
 
-def simulation_quality(workers: int = 8) -> dict:
+def simulation_quality(workers: int = 8, main: dict | None = None) -> dict:
+    """main: {key: (summary, plan stats)} from experiments.run_policies; the main year is reused from it, not run again
+    (plans are deterministic, so it would be the same run)."""
+    main = {k: v for k, v in (main or {}).items() if k in HEADLINE}
     for s in YEARS:                 # build each year's requests once, before the workers race to write them
         simulate.prepare_requests(seed=s)
-    tasks = [(k, s) for s in YEARS for k in HEADLINE]
+    tasks = [(k, s) for s in YEARS for k in HEADLINE if not (s is None and k in main)]
     with ProcessPoolExecutor(workers) as ex:
         res = list(ex.map(_year, tasks))
+    res += [(k, None, {m: summ[m] for m in YEAR_KEYS}, st) for k, (summ, st) in main.items()]
+    res.sort(key=lambda r: (YEARS.index(r[1]), HEADLINE.index(r[0])))
     years = {}
     stats = []
     for k, s, summ, st in res:
@@ -221,10 +218,16 @@ def simulation_quality(workers: int = 8) -> dict:
         fault_days_cut_by_sharing=[1 - r[y]["harm_days_total"] / g[y]["harm_days_total"] for y in r])
     paired = {k: dict(values=[float(v) for v in vs], min=float(min(vs)), max=float(max(vs))) for k, vs in paired.items()}
     opt = np.array([s[0] for s in stats]); gap = np.array([s[1] for s in stats]); t = np.array([s[2] for s in stats])
-    limit = params()["planning"]["solver_time_limit_s"]
+    work = np.array([s[3] for s in stats]); lim = np.array([s[4] for s in stats])
+    PL = params()["planning"]
     planner = dict(plans=int(len(stats)), optimal_share=float(opt.mean()), gap_median=float(np.median(gap)),
                    gap_p95=float(np.percentile(gap, 95)), gap_max=float(gap.max()), solve_median_s=float(np.median(t)),
-                   solve_p95_s=float(np.percentile(t, 95)), time_limit_s=float(limit), hit_limit_share=float((t >= limit * 0.98).mean()))
+                   solve_p95_s=float(np.percentile(t, 95)), solve_max_s=float(t.max()),
+                   # the solver stops on a deterministic work limit (the same on every machine); the wall clock is a safety cap
+                   work_limit=float(PL["solver_deterministic_limit"]), work_median=float(np.median(work)),
+                   time_limit_s=float(PL["solver_time_limit_s"]),
+                   hit_limit_share=float((~opt).mean()),                    # stopped at a limit with a feasible plan
+                   hit_work_limit_share=float((lim == "work").mean()), hit_wall_limit_share=float((lim == "wall").mean()))
     return dict(years=years, spread=spread, paired=paired, planner=planner)
 
 
@@ -232,25 +235,35 @@ def inclusion(n: int = 3000, seed: int = 21) -> dict:
     """Same household, two tellings: "full" names the baby, the crowding and the earlier call; "short" names only the
     fault (a tenant with little English, a relayed message, or someone who just wants it fixed). The fault is the same,
     so any gap in points comes from how the household was described. Answers to the standard questions are assumed
-    true when given; a share (1 - intake_answer_rate) is left "unknown" at random."""
+    true when given; a share (1 - intake_answer_rate) is left "unknown" at random.
+
+    The household's true circumstances are the ones drawn plus any the fault wording itself already shows ("too hot for
+    the baby"), so the short telling is never scored above the truth. A cliff is a household whose short telling lands
+    in a lower category than its full telling (a Tier 1 household losing power read as urgent, not Immediate)."""
     T = params()["triage"]
+    S, D = params()["demand"]["household_share"], params()["demand"]
     rng = np.random.default_rng(seed)
     w = synth.hazard_weights()
     hz, pw = list(w), np.array(list(w.values()))
     rate = T["intake_answer_rate"]
+    thr = T["crowded_people_per_bedroom"]
+    HOUSE = ("tier1", "vulnerable", "crowded", "repeat")
     rows = []
     for _ in range(n):
         h = hz[rng.choice(len(hz), p=pw)]
-        v, c, r = rng.random() < 0.3, rng.random() < 0.35, rng.random() < 0.12      # as synth.request_stream, remote
-        base = synth.make_report(h, rng, "heldout" if rng.random() < 0.3 else "train")
+        v, c, r = rng.random() < S["vulnerable"], rng.random() < S["crowded_remote"], rng.random() < S["repeat"]   # as a remote report
+        base = synth.make_report(h, rng, "heldout" if rng.random() < D["heldout_share"] else "train")
         extra = [synth.MODIFIER_PHRASES[k][rng.integers(len(synth.MODIFIER_PHRASES[k]))] for k, on in
                  (("vulnerable", v), ("crowded", c), ("repeat", r)) if on]
+        cues = {k for k in intake.modifier_hits(base) if k in HOUSE}
         # the household's true tier: Tier 1 if what they live with is life-preservation (a newborn, dialysis), else Tier 2
-        t1 = bool(v and "tier1" in intake.modifier_hits(extra[0]))
+        t1 = bool(v and "tier1" in intake.modifier_hits(extra[0])) or "tier1" in cues
+        v, c, r = v or t1 or "vulnerable" in cues, c or "crowded" in cues, r or "repeat" in cues
         vkey = "tier1" if t1 else "vulnerable"
         full = ", ".join([base] + extra)
         bedrooms = int(rng.integers(2, 5))
-        people = int(bedrooms * (rng.uniform(2.1, 4) if c else rng.uniform(0.5, 2)))
+        # crowded: more than `thr` people per bedroom (intake.household's test), otherwise at most `thr`
+        people = int(rng.integers(thr * bedrooms + 1, 4 * bedrooms + 1)) if c else int(rng.integers(max(1, bedrooms // 2), thr * bedrooms + 1))
         which = (rng.choice(list(intake.TIER1_QUESTIONS)) if t1 else intake.TIER2_QUESTIONS[0]) if v else None
         answers = {q: ("unknown" if rng.random() > rate else ("yes" if q == which else "no")) for q in intake.VULNERABLE_QUESTIONS}
         answers["before"] = "unknown" if rng.random() > rate else ("yes" if r else "no")
@@ -258,10 +271,12 @@ def inclusion(n: int = 3000, seed: int = 21) -> dict:
         true = urgency.score(h, {k: 1 for k, on in ((vkey, v), ("crowded", c), ("repeat", r)) if on}).total
         out = dict(true=true, v=v, c=c, r=r)
         for tell, text in (("full", full), ("short", base)):
-            words = {k: x for k, x in intake.modifier_hits(text).items() if k in ("tier1", "vulnerable", "crowded", "repeat")}
+            words = {k: x for k, x in intake.modifier_hits(text).items() if k in HOUSE}
             mods, _, _ = intake.household(words, answers, record, history)
             for m, mm in (("words", words), ("intake", mods)):
-                out[f"{tell}_{m}"] = urgency.score(h, {k: 1 for k in mm}).total
+                u = urgency.score(h, {k: 1 for k in mm})
+                out[f"{tell}_{m}"] = u.total
+                out[f"{tell}_{m}_cat"] = intake.CAT_RANK[u.category]
                 out[f"{tell}_{m}_vulnerable"] = "vulnerable" in mm or "tier1" in mm
         rows.append(out)
     import pandas as pd
@@ -272,7 +287,10 @@ def inclusion(n: int = 3000, seed: int = 21) -> dict:
         gap = (d[f"full_{m}"] - d[f"short_{m}"]).to_numpy()
         pos = pd.concat([d[f"full_{m}"], d[f"short_{m}"]]).rank(ascending=False, pct=True).to_numpy()
         lost = pos[n:] - pos[:n]               # how much further down one shared queue the short telling sits (share of queue)
-        res[m] = dict(gap_mean=float(gap[has].mean()), gap_max=int(gap.max()), short_ranked_lower=float((gap[has] > 0).mean()),
+        cliff = (d[f"short_{m}_cat"] > d[f"full_{m}_cat"]).to_numpy()   # the short telling fell a category
+        res[m] = dict(gap_mean=float(gap[has].mean()), gap_median=float(np.median(gap[has])), gap_max=int(gap.max()),
+                      category_cliffs=int(cliff.sum()), gap_mean_without_cliffs=float(gap[has & ~cliff].mean()),
+                      short_ranked_lower=float((gap[has] > 0).mean()),
                       queue_places_lost_pct=float(lost[has].mean() * 100),
                       short_points_missed=float((d.true - d[f"short_{m}"]).to_numpy()[has].mean()),
                       vulnerable_recognised_short=float(d.loc[d.v, f"short_{m}_vulnerable"].mean()),
@@ -282,5 +300,5 @@ def inclusion(n: int = 3000, seed: int = 21) -> dict:
     return res
 
 
-def build() -> dict:
-    return dict(reader=reader_quality(), simulation=simulation_quality())
+def build(main: dict | None = None) -> dict:
+    return dict(reader=reader_quality(), simulation=simulation_quality(main=main))

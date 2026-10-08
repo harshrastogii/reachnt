@@ -161,24 +161,21 @@ def labelled_corpus(n_per_hazard: int, split: str, seed: int) -> pd.DataFrame:
 
 def hazard_weights() -> dict[str, float]:
     """Arrival weight per hazard: trade share from APY Table 3 split evenly over that trade's hazards,
-    then nudged so dangerous faults are rarer than routine ones (ASSUMPTION)."""
+    then nudged so dangerous faults are rarer than routine ones (params demand.rarity, ASSUMPTION)."""
     from .config import taxonomy
     H = taxonomy()["hazards"]
     by_trade: dict[str, list[str]] = {}
     for k, v in H.items():
         by_trade.setdefault(v["trade"], []).append(k)
     tot = sum(TRADE_MIX.values())
+    rarity = params()["demand"]["rarity"]
     w = {}
     for t, ks in by_trade.items():
         share = TRADE_MIX.get(t, 500) / tot
         for k in ks:
-            rarity = {"immediate": 0.35, "urgent": 1.0, "routine": 1.4}[H[k]["category"]]
-            w[k] = share / len(ks) * rarity
+            w[k] = share / len(ks) * rarity[H[k]["category"]]
     s = sum(w.values())
     return {k: v / s for k, v in w.items()}
-
-
-WET_HEAVY = {"roof_leak", "aircon_fan", "pests", "no_power", "electrical_danger", "sewage_overflow"}
 
 
 def request_stream(communities: pd.DataFrame, seed: int | None = None) -> pd.DataFrame:
@@ -186,6 +183,8 @@ def request_stream(communities: pd.DataFrame, seed: int | None = None) -> pd.Dat
     P = params()
     D = P["demand"]
     rng = np.random.default_rng(P["seed"] if seed is None else seed)
+    S = D["household_share"]
+    wet_heavy = np.isin(list(hazard_weights()), D["wet_heavy_faults"])
     w = hazard_weights()
     hz, pw = list(w), np.array(list(w.values()))
     sites = [dict(site=f"TOWN-{h}", hub=h, houses=v["town_houses"], town=True) for h, v in P["hubs"].items()]
@@ -200,11 +199,13 @@ def request_stream(communities: pd.DataFrame, seed: int | None = None) -> pd.Dat
             for _ in range(rng.poisson(lam)):
                 p = pw.copy()
                 if wet:
-                    p = np.where(np.isin(hz, list(WET_HEAVY)), p * 1.6, p)
+                    p = np.where(wet_heavy, p * D["wet_heavy_factor"], p)
                 p = p / p.sum()
                 h = hz[rng.choice(len(hz), p=p)]
-                v, c, r = rng.random() < 0.3, rng.random() < (0.1 if s["town"] else 0.35), rng.random() < 0.12
-                text = make_report(h, rng, "heldout" if rng.random() < 0.3 else "train", v, c, r)
+                v = rng.random() < S["vulnerable"]
+                c = rng.random() < S["crowded_town" if s["town"] else "crowded_remote"]
+                r = rng.random() < S["repeat"]
+                text = make_report(h, rng, "heldout" if rng.random() < D["heldout_share"] else "train", v, c, r)
                 rows.append(dict(job_id=f"J{jid:05d}", week=wk, day=wk * 7 + int(rng.integers(0, 5)), month=month, site=s["site"],
                                  hub=s["hub"], town=s["town"], house=f"{s['site']}-H{int(rng.integers(1, max(2, s['houses'] + 1))):03d}",
                                  true_hazard=h, text=text, synthetic=True))

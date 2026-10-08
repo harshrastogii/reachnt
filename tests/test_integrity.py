@@ -1,3 +1,4 @@
+import numpy as np
 """Integrity and robustness checks: the data is sane, every simulated plan keeps its books, and the reader fails safe.
 
 Data and simulation checks skip when the pipeline outputs are missing (run python run_all.py first).
@@ -96,10 +97,10 @@ def test_duplicates_are_fixed_on_the_same_visit_and_dangers_made_safe_first(path
         pytest.skip("outputs predate duplicate merging; run python run_all.py")
     lead = j.set_index("job_id")
     dup = j[(j.merged_into != "") & j.done_day.notna()]
-    assert (dup.done_day.values == lead.loc[dup.merged_into, "done_day"].values).all()
+    assert (dup.done_day.values == np.maximum(lead.loc[dup.merged_into, "done_day"].values, dup.available_day.values)).all()   # never before it was reported
     assert (lead.loc[dup.merged_into, "hazard"].values == dup.hazard.values).all()       # only the same fault is joined
-    imm = j[j.true_category == "immediate"]
-    assert imm.made_safe_day.notna().all() and (imm.made_safe_day <= imm.day + 1).all()   # made safe by the next day
+    imm = j[(j.true_category == "immediate") & (j.category == "immediate")]   # recognised as dangerous: made safe by the next day
+    assert imm.made_safe_day.notna().all() and (imm.made_safe_day <= imm.day + 1).all()
     assert j[j.true_category != "immediate"].made_safe_day.isna().all()
 
 

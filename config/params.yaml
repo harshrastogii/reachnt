@@ -1,8 +1,9 @@
 # ReachNT parameters.
 # Every value is tagged: `source` means it comes from a document or dataset (see research/RESEARCH.md),
-# `ASSUMPTION` means we chose it; the ones that move results are swept in simulate.sensitivity().
+# `ASSUMPTION` means we chose it, `model` is a setting of the method (seed, solver, grid sizes), not a claim about the world.
+# The assumptions that move results most are swept in experiments.sensitivity().
 
-seed: 20261007
+seed: 20261007                     # model: request stream; the road-closure and missed-visit streams are derived from the year's seed
 
 # ------------------------------------------------------------------ service clocks
 clocks:
@@ -86,19 +87,29 @@ h3:
 demand:
   reports_per_house_year: 4.0      # ASSUMPTION responsive requests only (APY all-work rate is ~26/house/yr incl. planned, Grealy 2022)
   wet_season_uplift: 1.25          # ASSUMPTION more roof leaks, storm damage, aircon and pest reports Nov-Apr
-  weeks: 52
-  start_month: 7                   # simulate Jul..Jun (financial year)
+  weeks: 52                        # model
+  start_month: 7                   # model: simulate Jul..Jun (financial year)
+  # The synthetic request stream (synth.request_stream). ASSUMPTIONS unless marked.
+  rarity: {immediate: 0.35, urgent: 1.0, routine: 1.4}   # ASSUMPTION: dangerous faults are rarer than routine ones (x the APY trade share)
+  wet_heavy_faults: [roof_leak, aircon_fan, pests, no_power, electrical_danger, sewage_overflow]
+  wet_heavy_factor: 1.6            # ASSUMPTION: these faults are this much more likely in a wet-season report
+  household_share:                 # ASSUMPTION: share of reports whose household has each circumstance (and says so in the report)
+    vulnerable: 0.3                #   Tier 1 or Tier 2 (the wording decides which)
+    crowded_town: 0.1
+    crowded_remote: 0.35
+    repeat: 0.12
+  heldout_share: 0.3               # ASSUMPTION: share of reports worded in phrasings the reader never trained on
 
 # ------------------------------------------------------------------ crews and costs
 crews:
   # Trades per hub and trade are sized from expected weekly job hours: n = ceil(capacity_factor x hours / 40).
   # A factor near 1 means "too few trades": the crew can clear the work only if it spends little time travelling.
   capacity_factor: 1.3        # ASSUMPTION; swept [1.15, 1.3, 1.5]
-  hours_per_week: 40
-  min_per_hub: 1
+  hours_per_week: 40          # ASSUMPTION
+  min_per_hub: 1              # ASSUMPTION
 costs:
   labour_per_hour: 130       # ASSUMPTION trade rate incl. on-costs (AUD)
-  hours_per_day: 8
+  hours_per_day: 8           # ASSUMPTION
   vehicle_per_km: 1.10       # ASSUMPTION 4WD running cost
   overnight_per_night: 320   # ASSUMPTION remote accommodation + allowance
   charter_per_hour: 2200     # ASSUMPTION light twin charter (round trip hours billed)
@@ -109,22 +120,42 @@ costs:
 
 # ------------------------------------------------------------------ planning
 planning:
-  max_onsite_days_per_trip: 5
-  solver_time_limit_s: 2.0
-  due_soon_days: 7           # jobs whose clock ends within this many days get the deadline bonus
-  deadline_bonus: 400        # points added to a due-soon job under guarantee policies
-  floor_bonus: 6000          # "floor" policy: an urgent job about to breach the equal clock is worth this much more than a routine job ($-points)
-  ageing_points_per_day: 3   # points per day past half the clock, so nothing waits forever
-  lambda_grid: [0.0, 0.02, 0.05, 0.1, 0.2, 0.4, 0.8]   # points per dollar of travel; the equity-efficiency dial
+  max_onsite_days_per_trip: 5   # ASSUMPTION
+  # CP-SAT stops on a deterministic work limit (CPU-independent), so every run gives the same plans.
+  # The wall-clock limit is only a safety cap; it should never be the limit that is hit.
+  solver_deterministic_limit: 0.5   # model: CP-SAT deterministic time per weekly plan. Measured on two full-year runs (3,474 plans):
+                                    # the 15 plans that hit the old 2-second wall limit got the same plan value in slightly less time,
+                                    # and the others are proved optimal well inside it (largest 0.22 in a 1-in-10 sample)
+  solver_time_limit_s: 30.0         # model: wall-clock safety cap (seconds)
+  max_jobs_per_site: {community: 40, town: 400}   # model: only the top jobs by value per site enter the weekly model
+  crew_full_share: 0.92      # model: a crew that used this share of its hours is "fully booked" in the reason codes
+  cheapest_job_value: 1000   # ASSUMPTION "cheapest" and "floor": every job is worth the same ($-points)
+  due_soon_days: 7           # ASSUMPTION jobs whose clock ends within this many days get the deadline bonus
+  deadline_bonus: 400        # ASSUMPTION points added to a due-soon job under the need, official and guarantee policies
+  floor_bonus: 6000          # ASSUMPTION "floor" and "guarantee": an urgent job about to breach the equal clock is worth this much more ($-points)
+  ageing_points_per_day: 3   # ASSUMPTION points per day past half the clock, so nothing waits forever
+  lambda_grid: [0.0, 0.02, 0.05, 0.1, 0.2, 0.4, 0.8]   # model: points per dollar of travel; the equity-efficiency dial
+
+# Fault-days (the harm measure): harm/100 x category weight x days waited. ASSUMPTION: the weights are ours, not sourced.
+harm_weights:
+  immediate: 3.0             # ASSUMPTION a dangerous fault, until it is made safe
+  urgent: 1.5                # ASSUMPTION
+  routine: 0.5               # ASSUMPTION
+  made_safe: 1.5             # ASSUMPTION an Immediate job, once made safe, weighs like an urgent one until it is fixed
+
+joint_trips:                 # experiments.joint_trips(): trades travelling together, counted after planning
+  seats: {road: 3, road-run: 3, air: 5, air-run: 5}   # ASSUMPTION: a work ute takes 3 trades and tools; a light twin 5
 
 triage:
-  confidence_threshold: 0.55     # below this the report goes to a person
+  category_base: {immediate: 1000, urgent: 500, routine: 100}   # ASSUMPTION urgency points per FS17 category: category comes first
+  hlp_points_per_rank: 4         # ASSUMPTION (10 - Healthy Living Practice rank) x this: Safety (0) = 40 ... HLP 9 = 4
+  confidence_threshold: 0.55     # ASSUMPTION below this the report goes to a person (evaluate.py sweeps it)
   tier1_points: 40               # ASSUMPTION Tier 1, life-preservation: needs power, cooling or medical supplies; newborn; frail elder
-  vulnerable_points: 25          # Tier 2, high systemic risk: young children, pregnancy, illness, disability, limited mobility
+  vulnerable_points: 25          # ASSUMPTION Tier 2, high systemic risk: young children, pregnancy, illness, disability, limited mobility
   # Tier 1 + one of these faults is Immediate: losing power, water or cooling is a danger to that household. ASSUMPTION
   lifeline_faults: [no_power, no_water, aircon_fan]
-  crowded_points: 10
-  repeat_points: 10
+  crowded_points: 10             # ASSUMPTION
+  repeat_points: 10              # ASSUMPTION
   rework_points: 50              # ASSUMPTION: a fix the tenant says didn't work comes back ahead of a fresh report of the same fault
   crowded_people_per_bedroom: 2  # ASSUMPTION: more than 2 people per bedroom counts as crowded (open to co-design)
   intake_answer_rate: 0.9        # ASSUMPTION for evaluate.inclusion(): share of standard questions answered on first contact
@@ -139,7 +170,7 @@ disaster:
   name: "Victoria River, January 2023 pattern"
   communities: [C48, C47, C45]   # Kalkarindji, Daguragu, Pigeon Hole (Katherine hub)
   week: 27                       # early January, counting from 1 July
-  road_cut_weeks: 4              # fly-in only while the roads are cut
+  road_cut_weeks: 4              # ASSUMPTION fly-in only while the roads are cut
   damaged_share: 0.4             # ASSUMPTION: share of houses with flood damage
   faults_per_house: [1, 3]       # ASSUMPTION: each damaged house reports 1 to 3 faults over the first 2 weeks
   surge_factor: 2.0              # ASSUMPTION: the contractor panel doubles the hub's crews ...

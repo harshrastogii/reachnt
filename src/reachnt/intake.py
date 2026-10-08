@@ -155,6 +155,7 @@ def read(text: str, clf: Classifier | None) -> Reading:
         # no percentage: on unfamiliar wording the model's confidence runs ahead of its accuracy (evaluate.py, calibration)
         reasons.append(f"No listed phrase matched. The model's best guess is '{H[mh]['label']}'.")
     if primary and "tier1" in mods and primary in params()["triage"]["lifeline_faults"] and H[primary]["category"] != "immediate":
+        needs_human = True                  # as the reason says, and as the portal does
         reasons.append("Someone there needs power, cooling or medical supplies, so this is treated as Immediate. A person calls today.")
     if primary and H[primary]["category"] == "immediate":
         reasons.append("Immediate jobs are confirmed by phone and made safe by the local Housing Maintenance Officer.")
@@ -177,7 +178,8 @@ def household(words: dict | None = None, answers: dict | None = None, record: di
     """Household modifiers for urgency.score, with where each one came from.
 
     words    modifier_hits() of the report text
-    answers  question id -> "yes" | "no" | "unknown" (or a number for "people")
+    answers  question id -> "yes" | "no" | "unknown" (or a number for "people"; anything but a positive number is
+             treated as unanswered and the record is used, so a bad answer never removes points)
     record   the tenancy record: {"people": int, "bedrooms": int}
     history  the house's job history: {"same_fault_open_or_recent": bool}
     Returns (modifiers, sources, unanswered question ids).
@@ -189,9 +191,11 @@ def household(words: dict | None = None, answers: dict | None = None, record: di
         src["tier1"].append("answer")
     if any(answers.get(q) == "yes" for q in TIER2_QUESTIONS):
         src["vulnerable"].append("answer")
-    people = answers.get("people") if isinstance(answers.get("people"), (int, float)) else record.get("people")
+    said = answers.get("people")
+    said = said if isinstance(said, (int, float)) and not isinstance(said, bool) and said > 0 else None
+    people = said if said is not None else record.get("people")
     if people and record.get("bedrooms") and people / record["bedrooms"] > T["crowded_people_per_bedroom"]:
-        src["crowded"].append("answer" if isinstance(answers.get("people"), (int, float)) else "record")
+        src["crowded"].append("answer" if said is not None else "record")
     if history.get("same_fault_open_or_recent"):
         src["repeat"].append("history")
     if answers.get("before") == "yes":
@@ -200,7 +204,7 @@ def household(words: dict | None = None, answers: dict | None = None, record: di
         if k in words:
             src[k].append("words")
     asked = [q["id"] for q in taxonomy().get("intake_questions", [])]
-    unanswered = [q for q in asked if answers.get(q) in (None, "unknown") and not (q == "people" and record.get("people"))]
+    unanswered = [q for q in asked if (not people if q == "people" else answers.get(q) in (None, "unknown"))]
     mods = {k: 1 for k, v in src.items() if v}
     if "tier1" in mods:                     # one tier per household: the highest one counts
         mods.pop("vulnerable", None)

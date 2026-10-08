@@ -33,7 +33,7 @@ hazards:
     hours: 2
     rta_s63: true
     patterns:
-      - "gas (leak|smell)|smell(s|ing)? (of )?gas|gas bottle.*(leak|hiss)"
+      - "gas (leak|smell)|smell(s|ing)? (like |of )?gas|gas bottle.*(leak|hiss)"
   structural_danger:
     label: Something about to fall or collapse
     category: immediate
@@ -213,7 +213,7 @@ hazards:
     hours: 3
     rta_s63: false
     patterns:
-      - "kitchen|sink|bench|cupboard|fridge (power|plug|point)"
+      - "sink|bench|cupboard|drawer|fridge (power|plug|point)"   # not the bare word "kitchen": "cockroaches in the kitchen" is pests
   power_point:
     label: Power point or light not working
     category: routine

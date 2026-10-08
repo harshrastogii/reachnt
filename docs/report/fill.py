@@ -114,7 +114,7 @@ def quality_appendix(N) -> str:
     rows.append("")
     pl = S["planner"]
     rows.append(f"Planner. Across the {pl['plans']:,} weekly plans in the runs below, CP-SAT proved {pl['optimal_share'] * 100:.1f}% of them optimal: no better plan exists "
-                f"under the model's rules. The other {pl['hit_limit_share'] * 100:.1f}% stopped at the {pl['time_limit_s']:.0f}-second limit with a feasible plan; for those the solver "
+                f"under the model's rules. The other {pl['hit_limit_share'] * 100:.1f}% stopped at a fixed work limit (deterministic, so every run repeats exactly) with a feasible plan; for those the solver "
                 f"can only bound how much better a plan might be, at most {pl['gap_max'] * 100:.0f}% in the worst week, and such bounds are usually loose. "
                 f"The median plan took {pl['solve_median_s'] * 1000:.0f} milliseconds and 95% took under {pl['solve_p95_s']:.2f} seconds.")
     rows.append("")

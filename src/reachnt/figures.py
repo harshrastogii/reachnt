@@ -42,13 +42,13 @@ def frontier(N: dict):
                           (axes[1], "urgent_p90_remote", "Days until 9 in 10 urgent\nremote repairs are fixed")]:
         scale = 1000 if col == "harm_days_total" else 1
         ax.plot(need.cost_per_job, need[col] / scale, color=GREY, lw=1.6, marker="o", ms=4.5, mec=SURFACE, mew=1.2,
-                label="Urgent first, no deadline (cost weight 0 to 0.8)", zorder=3)
+                label="Urgent first, no guarantee (cost weight 0 to 0.8)", zorder=3)
         g = P[(P.policy == "guarantee") & (~P.key.str.endswith("_h3"))].sort_values("lam")
         ax.plot(g.cost_per_job, g[col] / scale, color=BLUE, lw=2, marker="o", ms=6, mec=SURFACE, mew=1.5,
-                label="Urgent first, with a deadline", zorder=5)
+                label="Urgent first, with a guarantee", zorder=5)
         g3 = P[(P.policy == "guarantee") & (P.key.str.endswith("_h3"))].sort_values("lam")
         ax.plot(g3.cost_per_job, g3[col] / scale, color=VIOLET, lw=2.4, marker="h", ms=9, mec=SURFACE, mew=1.5,
-                label="ReachNT: urgent first, deadline, shared trips", zorder=6)
+                label="ReachNT: urgent first, guarantee, shared trips", zorder=6)
         c3 = P[P.key == "cheapest_1_h3"]
         if len(c3):
             ax.scatter(c3.cost_per_job, c3[col] / scale, s=60, marker="h", color=ORANGE, edgecolor=INK2, linewidth=0.8, zorder=4,
@@ -95,7 +95,8 @@ def band_waits(N: dict):
 
 
 def reasons(N: dict):
-    codes = [("travel_cost", "No trip: too costly that week", ORANGE), ("crew_full", "Trades fully booked", BLUE),
+    codes = [("travel_cost", "No trip: too costly that week", ORANGE), ("crew_full", "Trades fully booked on higher scores", BLUE),
+             ("crew_hours", "Trade hours went on other trips", VIOLET), ("job_cost", "Repair's own cost too high", GREY),
              ("cut", "Road cut, no airstrip", YELLOW), ("lower_priority", "Trade came, did more urgent jobs", AQUA)]
     fig, ax = plt.subplots(figsize=(7.2, 2.2))
     rows = []
@@ -121,7 +122,7 @@ def reasons(N: dict):
     ax.invert_yaxis()
     ax.set_xlabel("Weeks remote repairs spent waiting, by the reason written down (thousands)")
     ax.grid(axis="y", visible=False)
-    ax.legend(ncol=4, fontsize=7, loc="upper center", bbox_to_anchor=(0.45, -0.38))
+    ax.legend(ncol=3, fontsize=7, loc="upper center", bbox_to_anchor=(0.45, -0.38))
     fig.tight_layout()
     fig.savefig(FIG / "fig4_reasons.png", bbox_inches="tight")
     plt.close(fig)

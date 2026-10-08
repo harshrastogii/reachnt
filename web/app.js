@@ -19,7 +19,8 @@
   const TRADE_SHORT = { plumber: "Plumber", electrician: "Electrician", carpenter: "Carpenter", aircon: "Air-con", pest: "Pest", general: "Maintenance" };
   const REASON = { travel_cost: "No trip this week", crew_full: "Trades fully booked", cut: "Road cut", lower_priority: "More urgent jobs first", booked: "Booked this week",
                    no_access: "Visit missed", parts: "Waiting for parts", needs_other_trade: "Needs another trade", unsafe: "Unsafe to work",
-                   new: "New: planned next week", offered: "Offered to any trade", assigned: "Given to a crew", next_trip: "Next trip" };
+                   new: "New: planned next week", offered: "Offered to any trade", assigned: "Given to a crew", next_trip: "Next trip",
+                   rework: "Fix didn't hold" };
   const MISSED = { "No one home": "no_access", "Can't get in": "no_access", "Need parts": "parts", "Needs another trade": "needs_other_trade", "Unsafe to work": "unsafe" };
   const CAT = { immediate: "Dangerous", urgent: "Urgent", routine: "Routine" };
   const ICON = {
@@ -42,6 +43,7 @@
   const fieldData = () => (RN.demo[state.policy].field || {})[state.week] || {};
   const codeOf = (r) => {
     if (r.fresh) return "new";
+    if (r.rework && !(r.assign && r.assign.at > r.rework.at)) return "rework";
     const v = r.visit;
     if (v && v.status !== "done" && !(r.assign && r.assign.at > v.at)) return MISSED[v.status] || "no_access";
     if (r.assign && (!r.done || r.visit)) return r.assign.mode === "open" && !r.assign.accepted_by ? "offered" : r.assign.mode === "next" ? "next_trip" : "assigned";
@@ -111,11 +113,12 @@
   const dayEnd = () => +state.week * 7 + 7;    // the day the planner values jobs at
   const clockOf = (cat) => { const C = RN.clocks.equal; return (cat === "routine" ? C.routine_business_days.town : C.urgent_business_days.town) * 7 / 5; };
   // urgency.score, line for line: need only. Nothing about place, cost, channel, language or how much was said.
-  function needScore(hz, exposure, repeat, waited) {
+  const REWORK = RN.triage.rework_points || 50;
+  function needScore(hz, exposure, repeat, waited, rework = 0) {
     const h = H[hz], cat = h.category, clock = clockOf(cat);
     const ageing = Math.round(PL.ageing_points_per_day * Math.max(0, waited - clock / 2));
-    const p = { category: cat, base: BASE[cat], harm: h.harm, hlp: (10 - h.hlp) * 4, exposure, repeat, ageing };
-    p.total = p.base + p.harm + p.hlp + p.exposure + p.repeat + p.ageing; return p;
+    const p = { category: cat, base: BASE[cat], harm: h.harm, hlp: (10 - h.hlp) * 4, exposure, repeat, ageing, rework };
+    p.total = p.base + p.harm + p.hlp + p.exposure + p.repeat + p.ageing + p.rework; return p;
   }
   // simulate.job_value: the planner's value for a job. Need points, plus a boost as the job's clock runs out.
   function planValue(cat, needTotal, day) {
@@ -124,7 +127,7 @@
     if (pol === "cheapest" || pol === "floor") return 1000 + (pol === "floor" && cat !== "routine" && due ? PL.floor_bonus : 0);
     return needTotal + (due ? PL.deadline_bonus : 0) + (pol === "guarantee" && due && cat !== "routine" ? PL.floor_bonus : 0);
   }
-  const planNeed = (r) => needScore(r.hazard, r.score.exposure, r.score.repeat, dayEnd() - r.day).total;
+  const planNeed = (r) => needScore(r.hazard, r.score.exposure, r.score.repeat, dayEnd() - r.day, r.score.rework || 0).total;
   const timeLeft = (r) => clockOf(r.category) - r.wait;   // days left on the same-everywhere clock
   function dueChip(r) {
     if (r.done) return "";
@@ -140,7 +143,16 @@
       + `Our rule is the same in town and out bush: ${an(tw)} within ${bd} business days.` + (h.rta_s63 ? " The law calls this kind of fault an emergency repair." : "");
   }
   const CAT_WORD = { immediate: "immediate", urgent: "urgent", routine: "routine" };
-  const scoreText = (u) => `Score ${u.total}: ${u.base} for the ${u.category} category, ${u.harm} for harm, ${u.hlp} for the health practice it affects, ${u.exposure} for who lives there, ${u.repeat} for a repeat report, ${u.ageing} for waiting. Distance and cost are never part of this score.`;
+  const scoreText = (u) => `Score ${u.total}: ${u.base} for the ${u.category} category, ${u.harm} for harm, ${u.hlp} for the health practice it affects, ${u.exposure} for who lives there, ${u.repeat} for a repeat report, ${u.ageing} for waiting${u.rework ? `, ${u.rework} because the last fix didn't hold` : ""}. Distance and cost are never part of this score.`;
+  // a fix the tenant says didn't work: reopened with extra points, keeping the day it was first reported
+  function reopen(x, c) {
+    x.rework = c; x.done = false; x.trip = false; x.now = "rework";
+    x.score = needScore(x.hazard, x.score.exposure, x.score.repeat, x.wait, REWORK);
+    x.value = planValue(x.category, planNeed(x), x.day);
+    x.score_text = scoreText(x.score);
+  }
+  // a declared flood, cyclone or fire: its communities are tagged until the coordinator ends it
+  const eventNow = () => { const e = store("rn-event"); return e && e.week === state.week && !e.ended ? e : null; };
 
   // ---------------------------------------------------------------- checking urgency: any time, by any person, never by the computer alone
   const CHECK_SOURCES = { called_in: "The tenant rang the repairs line", phoned: "We phoned the tenant", cho: "The Community Housing Officer saw it",
@@ -152,7 +164,7 @@
     const h = H[hz]; const wasTrade = x.trade;
     x.hazard = hz; x.category = h.category;
     if (!(x.assign && x.assign.trade)) x.trade = h.trade;
-    x.score = needScore(hz, x.score.exposure, x.score.repeat, x.wait);
+    x.score = needScore(hz, x.score.exposure, x.score.repeat, x.wait, x.score.rework || 0);
     x.value = planValue(x.category, planNeed(x), x.day);
     if (x.category === "immediate" && x.made_safe == null) x.made_safe = day;
     if (x.trade !== wasTrade && x.done) { x.done = false; x.trip = false; x.now = "needs_other_trade"; }
@@ -186,18 +198,21 @@
     if (memo.key === key && memo.base === base) return memo.out;
     const U = checksAll(), A = assignsAll();
     const visits = Object.fromEntries(outbox().filter((u) => (u.kind || "visit") === "visit").map((u) => [u.id, u]));
+    const confirms = Object.fromEntries(outbox().filter((u) => u.kind === "confirm" && u.status === "still broken").map((u) => [u.id, u]));
+    const ev = eventNow(); const inEvent = new Set(ev ? ev.communities : []);
     const fresh = (store("rn-intake") || []).filter((j) => j.week === state.week && !j.joined_to).map((j) => freshRow(j, base));
     let changed = fresh.length > 0;
     const out = base.map((r) => {
-      const ch = U[r.id], as = A[r.id], v = visits[r.id];
-      if (!ch && !as && !v) return r;
-      const x = { ...r, checks: ch || [], assign: as || null, visit: v || null };
+      const ch = U[r.id], as = A[r.id], v = visits[r.id], cf = confirms[r.id], evt = inEvent.has(r.site);
+      if (!ch && !as && !v && !cf && !evt) return r;
+      const x = { ...r, checks: ch || [], assign: as || null, visit: v || null, event: evt ? ev : null };
+      if (cf && (x.done || x.visit)) { reopen(x, cf); changed = true; }
       const last = (ch || []).slice(-1)[0];
       if (last && last.to !== x.hazard) { rehazard(x, last.to, last.day); changed = true; }
       if (as && as.trade && as.trade !== x.trade) { x.trade = as.trade; changed = true; }
       return x;
     }).concat(fresh.map((x) => { const ch = U[x.id], as = A[x.id], v = visits[x.id];
-      Object.assign(x, { checks: ch || [], assign: as || null, visit: v || null });
+      Object.assign(x, { checks: ch || [], assign: as || null, visit: v || null, event: inEvent.has(x.site) ? ev : null });
       const last = (ch || []).slice(-1)[0]; if (last && last.to !== x.hazard) rehazard(x, last.to, last.day);
       if (as && as.trade) x.trade = as.trade; return x; }));
     if (changed) {   // place in line, per trade, as the planner ranks them (value, then the order it had)
@@ -246,7 +261,7 @@
         const p = map.project(mk.getLngLat()); const x = p.x * dpr, y = p.y * dpr; const r = 17 * dpr;
         const col = getComputedStyle(el).getPropertyValue("--c").trim() || "#0a84ff";
         g.beginPath(); for (let i = 0; i < 6; i++) { const a = (Math.PI / 3) * i; g[i ? "lineTo" : "moveTo"](x + r * Math.cos(a), y + r * Math.sin(a)); } g.closePath();
-        g.fillStyle = el.classList.contains("s-near") ? "rgba(16,20,26,.7)" : col; g.fill(); g.lineWidth = 2 * dpr; g.strokeStyle = "#fff"; g.stroke();
+        g.fillStyle = col; g.fill(); g.lineWidth = 2 * dpr; g.strokeStyle = "#fff"; g.stroke();
         g.fillStyle = "#fff"; g.font = `700 ${14 * dpr}px -apple-system, Helvetica, Arial`; g.textAlign = "center"; g.textBaseline = "middle";
         g.fillText($(".hx b", el).textContent, x, y + 0.5 * dpr);
         const nm = $(".nm", el); if (nm && (el.classList.contains("s-stop") || document.body.classList.contains("zoomed"))) {
@@ -513,7 +528,7 @@
     map.setLayoutProperty("reach", "visibility", state.layer === "reach" && state.role === "coord" ? "visible" : "none");
     map.setLayoutProperty("reach-line", "visibility", state.layer === "reach" && state.role === "coord" ? "visible" : "none");
     if (state.role === "field") return drawField();
-    if (state.role === "tenant") { map.getSource("routes").setData(fc([])); return; }
+    if (state.role === "tenant" || state.role === "officer") { map.getSource("routes").setData(fc([])); return; }
     const all = rows().filter((r) => state.trade === "all" || r.trade === state.trade);
     const hubComs = RN.communities.filter((c) => c.hub === RN.hub);
     if (state.layer === "year") {
@@ -534,7 +549,7 @@
       hubComs.forEach((c) => {
         const r = all.filter((x) => x.site === c.cid); if (!r.length) return;
         const st = r.some((x) => x.trip) ? "booked" : r.some((x) => !x.reachable) ? "cut" : "waiting";
-        badge(ll(c), { n: r.length, cls: "s-" + st + (state.filter === c.cid ? " sel" : ""), name: c.name, onClick: () => focusCommunity(c.cid) });
+        badge(ll(c), { n: r.length, cls: "s-" + st + (state.filter === c.cid ? " sel" : "") + (eventNow() && eventNow().communities.includes(c.cid) ? " evt" : ""), name: c.name, onClick: () => focusCommunity(c.cid) });
       });
       if (state.layer === "week") shared.forEach(([a, b, p]) => p && savingTag(a, b, p, !!focus));
       map.getSource("foot").setData(fc([]));
@@ -607,7 +622,7 @@
     $$("#coord .tabs button[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === state.tab)));
     const body = $("#coord-body");
     if (state.tab === "queue") body.innerHTML = queueHTML();
-    if (state.tab === "trips") body.innerHTML = tripsHTML();
+    if (state.tab === "trips") { body.innerHTML = tripsHTML(); bindEvent(body); }
     if (state.tab === "checks") { body.innerHTML = checksHTML(); bindChecks(body); }
     if (state.tab === "reader") { body.innerHTML = readerHTML(); bindReader(); return; }
     bindGuides(body);
@@ -636,12 +651,13 @@
     const tb = (k, l) => `<button data-tr="${k}" aria-pressed="${state.trade === k}">${l}</button>`;
     return guide("coord", `<b>What you're looking at.</b> Each hexagon on the map is a community; the number is how many repairs are waiting. Green means a tradesperson goes this week, orange means no trip yet. A blue line is a shared trip: one person visits two nearby places on one trip. Tap a repair below to see why it sits where it does.`)
       + decisionHTML()
+      + (eventNow() ? `<div class="decision" style="border-color:var(--bad)"><span class="eyebrow" style="color:var(--bad)">${esc(EVENT_WORD[eventNow().type])} declared ${dateOf(eventNow().day)}</span><b>${esc(eventNow().communities.map((c) => comById[c].name).join(", "))}</b><p>Make safe within 48 hours, one team trip, surge crews from the panel. The plan is in Trips.</p></div>` : "")
       + `<div class="stats">${stats.map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("")}</div>`
       + `<div class="filters" style="padding:0 6px 6px">${tb("all", "All trades")}${Object.keys(TRADE).map((k) => tb(k, TRADE_SHORT[k])).join("")}</div>`
       + `<div class="filters" style="padding:0 6px 8px">${fb("remote", "Remote")}${fb("urgent", "Urgent")}${fb("town", "Town")}${fb("all", "All")}${comById[f] ? `<button data-f="all" aria-pressed="true" aria-label="Stop showing only ${esc(comById[f].name)}">${esc(comById[f].name)} ✕</button>` : ""}</div>`
       + `<p class="note" style="padding:0 8px 6px">Most urgent first. Where someone lives, how they told us and how much they said never change their place in line. A repair moves up as its time runs out.</p>`
       + list.slice(0, 120).map((r) => `<button class="row" data-id="${r.id}" aria-current="${state.job === r.id}"><span class="dot ${r.category}"></span>
-          <span class="t">${esc(H[r.hazard].label)}</span><span class="chips"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}</span>
+          <span class="t">${esc(H[r.hazard].label)}</span><span class="chips"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}${r.event ? `<span class="chip immediate">${esc(EVENT_WORD[r.event.type])}</span>` : ""}</span>
           <span class="s">${esc(r.place)} · ${TRADE_SHORT[r.trade]} · waiting ${days(r.wait)}${r.checks && r.checks.length ? " · checked by a person" : ""}</span></button>`).join("")
       + (list.length > 120 ? `<p class="note" style="padding:8px">Showing 120 of ${list.length}.</p>` : "");
   }
@@ -690,7 +706,8 @@
       + (missed.length ? missed.map((u) => line(job(u.id), `<span class="chip travel_cost">${esc(u.status)}</span>`)).join("") + `<p class="note" style="padding:0 6px 6px">These stay open and go on the next trip. The tenant has been told when we came and what we tried.</p>`
           : `<p class="note" style="padding:0 6px 6px">None. Tradespeople record them from the run sheet.</p>`)
       + `<div class="section-title"><h3>Tenant says it's still broken</h3><span class="note">${broken.length}</span></div>`
-      + (broken.length ? broken.map((u) => line(job(u.id), `<span class="chip cut">reopened</span>`)).join("") : `<p class="note" style="padding:0 6px 6px">None.</p>`)
+      + (broken.length ? `<p class="note" style="padding:0 6px 6px">Reopened with ${REWORK} extra points; each keeps the day it was first reported, so it goes on the next trip. Send a different crew if the last fix didn't hold.</p>`
+          + broken.map((u) => { const r = job(u.id); return r ? line(r, `<span class="chip rework">${u.via === "cho" ? "via housing officer" : "tenant"}: still broken</span>`) + (r.rework && !(r.assign && r.assign.at > r.rework.at) ? quick(r) : "") : ""; }).join("") : `<p class="note" style="padding:0 6px 6px">None.</p>`)
       + `<div class="section-title"><h3>Came back within 90 days of a fix</h3><span class="note">${back.length}</span></div>`
       + back.slice(0, 8).map((r) => line(r, `<span class="chip cut">${days(r.came_back)} after</span>`)).join("")
       + `<div class="section-title"><h3>Reported twice, joined into one job</h3><span class="note">${twice.length}</span></div>`
@@ -709,9 +726,92 @@
       renderAll();
     }));
   }
+  // ---------------------------------------------------------------- trades travelling together
+  // Trades booked to the same community (or the same shared trip) this week can go in one vehicle or one charter.
+  const SEATS = { road: 3, "road-run": 3, air: 5, "air-run": 5 };   // as simulate.SEATS
+  function togetherGroups(all = rows()) {
+    const g = {};
+    all.filter((r) => r.trip && r.site !== "TOWN" && !r.rework).forEach((r) => {
+      const k = r.run || r.site; const x = (g[k] = g[k] || { k, mode: r.mode, cost: {} });
+      x.cost[r.trade] = Math.max(x.cost[r.trade] || 0, r.trip_cost || 0);
+    });
+    return Object.values(g).filter((x) => Object.keys(x.cost).length >= 2).map((x) => {
+      const seats = SEATS[x.mode] || 3; const costs = Object.values(x.cost).sort((a, b) => b - a);
+      const separate = costs.reduce((a, b) => a + b, 0); let together = 0; for (let i = 0; i < costs.length; i += seats) together += costs[i];
+      return { ...x, trades: Object.keys(x.cost), separate, together, saving: separate - together, vehicles: Math.ceil(costs.length / seats) };
+    }).sort((a, b) => b.saving - a.saving);
+  }
+  function nearbyPairs(all = rows()) {   // different trades going to neighbouring communities (within 2 hexagons) could share one loop
+    const at = {}; all.filter((r) => r.trip && r.site !== "TOWN" && !r.run).forEach((r) => ((at[r.site] = at[r.site] || new Set()).add(r.trade)));
+    return RN.pairs.filter((p) => p.hub === RN.hub && at[p.a] && at[p.b]).map((p) => {
+      const a = [...at[p.a]].filter((t) => !at[p.b].has(t)), b = [...at[p.b]].filter((t) => !at[p.a].has(t));
+      return a.length && b.length ? { p, a, b } : null;
+    }).filter(Boolean).slice(0, 4);
+  }
+  const tradeList = (ts) => ts.map((t) => TRADE_WORD[t]).join(" + ");
+  function togetherHTML() {
+    const G = togetherGroups(), N2 = nearbyPairs();
+    if (!G.length && !N2.length) return "";
+    return `<div class="section-title"><h3>Trades travelling together</h3><span class="note">${G.length}</span></div>
+      <p class="note" style="padding:0 6px 6px">Different trades booked to the same place this week go in one vehicle or one charter (a ute takes 3, a light plane 5).</p>`
+      + G.map((g) => `<button class="trip-card" data-trip="${g.k}"><div style="display:flex;justify-content:space-between;gap:8px"><h3>${esc(g.k.split("+").map((c) => comById[c].name).join(" + "))}</h3><span class="chip hex">${g.mode.startsWith("air") ? "One charter" : g.vehicles > 1 ? `${g.vehicles} vehicles` : "One vehicle"}</span></div>
+          <span class="note">${esc(tradeList(g.trades))} · about ${money(g.together)} in ${g.mode.startsWith("air") ? "flights" : "fuel and vehicle"} instead of ${money(g.separate)}, saving about ${money(g.saving)}</span></button>`).join("")
+      + N2.map(({ p, a, b }) => `<button class="trip-card" data-trip="${p.a}+${p.b}"><h3>${esc(comById[p.a].name)} and ${esc(comById[p.b].name)}, ${Math.round(p.km)} km apart</h3>
+          <span class="note">The ${esc(tradeList(a))} (${esc(comById[p.a].name)}) and the ${esc(tradeList(b))} (${esc(comById[p.b].name)}) could share one loop: hub → ${esc(comById[p.a].name)} → ${esc(comById[p.b].name)} → hub.</span></button>`).join("");
+  }
+
+  // ---------------------------------------------------------------- floods, cyclones and fires
+  const EVENT_WORD = { flood: "Flood", cyclone: "Cyclone", fire: "Bushfire", storm: "Storm" };
+  const DZ = RN.disaster_params || { damaged_share: 0.4, faults_per_house: [1, 3], fault_mix: { damp_mould: 0.2, no_power: 0.15, sewage_overflow: 0.12, electrical_danger: 0.1, no_water: 0.1, stove_broken: 0.08, kitchen: 0.08, aircon_fan: 0.07, structural_danger: 0.05, security: 0.05 }, communities: [] };
+  function eventPlan(e) {
+    const cs = e.communities.map((cid) => comById[cid]).filter(Boolean);
+    const houses = cs.reduce((a, c) => a + c.houses, 0), damaged = Math.round(houses * DZ.damaged_share);
+    const faults = Math.round(damaged * (DZ.faults_per_house[0] + DZ.faults_per_house[1]) / 2);
+    const wsum = Object.values(DZ.fault_mix).reduce((a, b) => a + b, 0); const hrs = {};
+    Object.entries(DZ.fault_mix).forEach(([hz, w]) => { const h = H[hz]; if (h) hrs[h.trade] = (hrs[h.trade] || 0) + faults * (w / wsum) * h.hours; });
+    const trades = Object.entries(hrs).sort((a, b) => b[1] - a[1]).map(([t, h]) => ({ t, h, crews: ((RN.crews || {})[t] || [1]).length, extra: Math.max(1, Math.ceil(h / (2 * 40))) }));
+    return { cs, houses, damaged, faults, trades, air: cs.every((c) => c.airstrip) };
+  }
+  function eventHTML() {
+    const e = eventNow();
+    const coms = RN.communities.filter((c) => c.hub === RN.hub).sort((a, b) => a.name.localeCompare(b.name));
+    if (!e) return `<details class="card" id="evbox" style="margin:0 6px 10px"><summary style="cursor:pointer"><b>Flood, cyclone or fire?</b> Declare an event</summary>
+      <form class="form" id="evf" style="margin-top:10px"><label class="field-label">What happened<select name="type">${Object.entries(EVENT_WORD).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></label>
+        <fieldset><legend class="field-label">Communities hit</legend>${coms.map((c) => `<label class="tick"><input type="checkbox" name="c" value="${c.cid}"${(DZ.communities || []).includes(c.cid) ? " checked" : ""}> ${esc(c.name)}</label>`).join("")}</fieldset>
+        <label class="field-label">Note (optional)<input type="text" name="note" maxlength="300" placeholder="e.g. Victoria River over the Buntine Highway"></label>
+        <button class="btn primary" type="submit">Declare and plan the response</button></form></details>`;
+    const P = eventPlan(e); const Z = RN.disaster || [];
+    const zr = (l) => Z.find((x) => x.label === l) || {};
+    const no = zr("No flood"), usual = zr("Flood, usual crews"), surge = zr("Flood, surge crews");
+    return `<div class="card" style="margin:0 6px 10px;border:1px solid var(--bad);display:grid;gap:8px">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><b>${esc(EVENT_WORD[e.type])} declared ${dateOf(e.day)}: ${esc(P.cs.map((c) => c.name).join(", "))}</b><button class="btn small ghost" id="evend">End event</button></div>
+      <p class="note">About ${P.houses} houses. If ${Math.round(DZ.damaged_share * 100)}% are damaged, expect about ${P.faults} repairs from ${P.damaged} houses in the next two weeks. Need still sets the order; dangerous faults are made safe first.</p>
+      <ol class="note" style="margin:0;padding-left:18px;display:grid;gap:4px">
+        <li><b style="color:var(--ink)">Make safe within 48 hours.</b> Maintenance and housing officers check every house; anything dangerous is made safe the same day.</li>
+        <li><b style="color:var(--ink)">One team, one ${P.air ? "charter" : "trip"}.</b> ${esc(tradeList(P.trades.map((x) => x.t)))} go in together${P.air ? " while roads are cut" : ""}, sharing the ${P.air ? "plane" : "vehicles"}.</li>
+        <li><b style="color:var(--ink)">Ask the contractor panel for surge crews</b> for 2 weeks: ${P.trades.map((x) => `${x.extra} ${esc(TRADE_WORD[x.t])}${x.extra > 1 ? "s" : ""}`).join(", ")}. Local Aboriginal Business Enterprises first. A named person signs the request.</li>
+        <li><b style="color:var(--ink)">Tell every household.</b> The hotline, the housing officer, free interpreters. Reports from the area are tagged to the event and asked the same questions.</li>
+        <li><b style="color:var(--ink)">Everyone else keeps their clock.</b> Surge crews take the event work so other communities' trips go ahead.</li></ol>
+      ${usual.label ? `<p class="note">In our modelled flood (${esc((RN.disaster_params || {}).name || "Victoria River, January 2023 pattern")}), with the usual crews 9 in 10 urgent flood repairs were fixed within ${Math.round(usual.event_urgent_p90)} days and the rest of the hub's urgent repairs within ${Math.round(usual.other_urgent_p90)} (${Math.round(no.other_urgent_p90)} with no flood). With surge crews: ${Math.round(surge.event_urgent_p90)} and ${Math.round(surge.other_urgent_p90)} days.</p>` : ""}
+    </div>`;
+  }
+  function bindEvent(body) {
+    const f = $("#evf", body);
+    if (f) f.addEventListener("submit", (e) => {
+      e.preventDefault(); const cs = $$("input[name=c]:checked", f).map((x) => x.value);
+      if (!cs.length) return toast("Tick the communities that were hit.");
+      const ev = { type: f.type.value, communities: cs, day: today(), week: state.week, at: new Date().toISOString(), note: f.note.value.trim() || undefined };
+      store("rn-event", ev);
+      recordUpdate({ id: "EV-" + String(Date.now() % 1e6).padStart(6, "0"), trade: "general", place: cs.join(",") }, "declared", { event: ev.type, communities: cs, start_day: ev.day, note: ev.note }, "event");
+      toast(`${EVENT_WORD[ev.type]} declared. Jobs in those communities are tagged, and the response plan is below.`); renderAll();
+    });
+    const end = $("#evend", body);
+    if (end) end.addEventListener("click", () => { const ev = store("rn-event"); if (ev) { ev.ended = new Date().toISOString(); store("rn-event", ev); } toast("Event ended."); renderAll(); });
+  }
+
   function tripsHTML() {
     const all = rows(); const F2 = fieldData();
-    let h = guide("trips", `<b>Shared trips.</b> When two communities are close, one tradesperson can visit both on the same trip instead of two separate trips. ReachNT finds the pairs with a hexagon map grid (Uber's H3): if their hexagons are no more than two apart, about 90 km, they can share. Tap a trip to see it on the map.`) + costsHTML();
+    let h = guide("trips", `<b>Shared trips.</b> When two communities are close, one tradesperson can visit both on the same trip instead of two separate trips. ReachNT finds the pairs with a hexagon map grid (Uber's H3): if their hexagons are no more than two apart, about 90 km, they can share. Tap a trip to see it on the map.`) + eventHTML() + costsHTML() + togetherHTML();
     Object.keys(TRADE).forEach((t) => {
       if (!F2[t]) return;
       const tj = all.filter((r) => r.trade === t); const groups = {};
@@ -738,7 +838,8 @@
   }
   function scoreBars(s) {
     const parts = [["Kind of fault", s.base, "var(--ink-3)"], ["How harmful", s.harm, "var(--bad)"], ["Health need", s.hlp, "var(--accent)"],
-      ["Who lives there", s.exposure, "var(--good)"], ["Reported before", s.repeat, "var(--violet)"], ["Time waited", s.ageing, "var(--warn)"]];
+      ["Who lives there", s.exposure, "var(--good)"], ["Reported before", s.repeat, "var(--violet)"], ["Time waited", s.ageing, "var(--warn)"],
+      ...(s.rework ? [["Fix didn't hold", s.rework, "var(--cut)"]] : [])];
     const tot = parts.reduce((a, p) => a + p[1], 0) || 1;
     return `<div class="bars">${parts.filter((p) => p[1] > 0).map((p) => `<span title="${p[0]}: ${p[1]}" style="width:${(100 * p[1]) / tot}%;background:${p[2]}"></span>`).join("")}</div>
       <div class="legend">${parts.map((p) => `<span><i style="background:${p[2]}"></i>${p[0]} ${p[1]}</span>`).join("")}</div>`;
@@ -891,16 +992,16 @@
     return { mods: Object.fromEntries(Object.entries(src).filter(([, v]) => v.length).map(([k]) => [k, 1])), src, unanswered };
   }
   const SRC_WORD = { answer: "an answer to the questions", record: "the tenancy record", history: "the house's job history", words: "the tenant's words" };
-  function readerHTML() {
+  function readerHTML(opts = {}) {
     const coms = RN.communities.filter((c) => c.hub === RN.hub).sort((a, b) => a.name.localeCompare(b.name));
     const yn = (id) => `<span class="yn" role="radiogroup" aria-label="${esc(id)}">${[["yes", "Yes"], ["no", "No"], ["unknown", "Not asked"]].map(([v, l]) =>
       `<label><input type="radio" name="q_${id}" value="${v}"${v === "unknown" ? " checked" : ""}><span>${l}</span></label>`).join("")}</span>`;
-    return guide("intake", `<b>Log a report.</b> Whoever the tenant told logs it here: the repairs line, the Community Housing Officer, the maintenance officer, a tradesperson on site, or the tenant in the app. Everyone is asked the same short questions, so nobody gets fewer points for saying less, for their English, or for how they got in touch.`)
+    return (opts.officer ? "" : guide("intake", `<b>Log a report.</b> Whoever the tenant told logs it here: the repairs line, the Community Housing Officer, the maintenance officer, a tradesperson on site, or the tenant in the app. Everyone is asked the same short questions, so nobody gets fewer points for saying less, for their English, or for how they got in touch.`))
       + `<form class="form" id="intakef" style="padding:0 6px">
-        <div class="two"><label class="field-label">Who is logging it<select name="who">${Object.entries(INTAKE_WHO).map(([k, v]) => `<option value="${k}">${esc(v[0].toUpperCase() + v.slice(1))}</option>`).join("")}</select></label>
+        <div class="two"><label class="field-label">Who is logging it<select name="who">${Object.entries(INTAKE_WHO).map(([k, v]) => `<option value="${k}"${k === (opts.who || "line") ? " selected" : ""}>${esc(v[0].toUpperCase() + v.slice(1))}</option>`).join("")}</select></label>
           <label class="field-label">When did they first tell anyone?<select name="back">${["Today", "Yesterday", "2 days ago", "3 days ago", "4 days ago", "5 days ago", "6 days ago", "A week ago"].map((l, i) => `<option value="${i}">${l}</option>`).join("")}</select></label></div>
         <p class="note" style="margin-top:-4px">The clock starts when the tenant first told anyone, not when it is typed in.</p>
-        <div class="two"><label class="field-label">Community<select name="site">${coms.map((c) => `<option value="${c.cid}"${c.name === "Ngukurr" ? " selected" : ""}>${esc(c.name)}</option>`).join("")}<option value="TOWN">${esc(RN.hub)} (town)</option></select></label>
+        <div class="two"><label class="field-label">Community<select name="site">${coms.map((c) => `<option value="${c.cid}"${c.cid === (opts.site || (coms.find((x) => x.name === "Ngukurr") || coms[0]).cid) ? " selected" : ""}>${esc(c.name)}</option>`).join("")}<option value="TOWN">${esc(RN.hub)} (town)</option></select></label>
           <label class="field-label">House number<input type="number" name="house" min="1" max="999" value="12"></label></div>
         <div class="two"><label class="field-label">Language they speak<select name="lang">${LANGS.map((l) => `<option>${esc(l)}</option>`).join("")}</select></label>
           <label class="field-label">Interpreter<select name="interp">${Object.entries(INTERP).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join("")}</select></label></div>
@@ -930,15 +1031,15 @@
     const needs_human = !r.primary || (picked && picked !== r.primary) || reasons.some((x) => /calls today|stays dangerous/.test(x));
     return { answers, r, hz, site, house, record, facts, hh, reasons, needs_human, back: Number(f.back.value) };
   }
-  function bindReader() {
-    bindGuides($("#coord-body"));
-    const f = $("#intakef"); const out = $("#rout");
+  function bindReader(root = $("#coord-body"), opts = {}) {
+    bindGuides(root);
+    const f = $("#intakef", root); const out = $("#rout", root); const add = $("#iadd", root);
     const go = () => {
       const S = intakeState(f); const { r, hz, hh, record, facts } = S;
-      $("#recnote").textContent = `Tenancy record for house ${S.house}: ${record.people} people, ${record.bedrooms} bedrooms. Change the number above if it has changed.`;
+      $("#recnote", root).textContent = `Tenancy record for house ${S.house}: ${record.people} people, ${record.bedrooms} bedrooms. Change the number above if it has changed.`;
       f.q_people.placeholder = record.people;
-      if (!hz) { out.innerHTML = `<div class="card"><b>Not sure what this is</b><p class="note" style="margin-top:4px">Pick the fault below, or log it and a person calls the tenant back to ask.</p></div>`; $("#iadd").disabled = true; return; }
-      $("#iadd").disabled = false;
+      if (!hz) { out.innerHTML = `<div class="card"><b>Not sure what this is</b><p class="note" style="margin-top:4px">Pick the fault below, or log it and a person calls the tenant back to ask.</p></div>`; add.disabled = true; return; }
+      add.disabled = false;
       const h = H[hz]; const sc = needScore(hz, (hh.mods.vulnerable ? RN.triage.vulnerable_points : 0) + (hh.mods.crowded ? RN.triage.crowded_points : 0), hh.mods.repeat ? RN.triage.repeat_points : 0, S.back);
       const wordsOnly = needScore(hz, (r.mods.vulnerable ? RN.triage.vulnerable_points : 0) + (r.mods.crowded ? RN.triage.crowded_points : 0), r.mods.repeat ? RN.triage.repeat_points : 0, S.back);
       const clock = h.category === "immediate" ? "Made safe today by the maintenance officer, then fixed within 2 business days" : h.category === "urgent" ? "Within 2 business days, in town or out bush (the official remote rule allows 5)" : "Within 10 business days, in town or out bush (the official remote rule allows 25)";
@@ -952,7 +1053,7 @@
         ${hh.unanswered.length ? `<p class="note"><span class="chip person">Call back</span> Not asked yet: ${hh.unanswered.map((q) => esc((Q.find((x) => x.id === q) || {}).ask || q).replace(/\s*\(.*\)$/, "").toLowerCase()).join("; ")}. Unanswered questions never take points away.</p>` : ""}
         ${facts.open ? `<p class="note"><span class="chip hex">Already open</span> This fault is already open for house ${S.house} as job ${esc(facts.open.id)}. Adding it joins the two: one visit fixes both.</p>` : ""}
         ${S.reasons.map((x) => `<p class="note"><span class="chip person">A person</span> ${esc(x)}</p>`).join("")}</div>`;
-      $("#iadd").textContent = facts.open ? `Join it to job ${facts.open.id}` : "Add to the line";
+      add.textContent = facts.open ? `Join it to job ${facts.open.id}` : "Add to the line";
     };
     f.addEventListener("input", go); f.addEventListener("change", go);
     $$("[data-s]", f).forEach((b) => b.addEventListener("click", () => { f.text.value = SAMPLES[b.dataset.s]; go(); }));
@@ -971,8 +1072,9 @@
       list.push(j); store("rn-intake", list);
       recordUpdate({ id, trade: H[S.hz].trade, place: j.place }, "new", { channel: j.who, words: j.text, language: j.language, interpreter: j.interpreter,
         answers: j.answers, hazard: j.hazard, first_contact_day: j.day, joined_to: j.joined_to }, "intake");
-      if (j.joined_to) { toast(`Joined to job ${j.joined_to}: one visit fixes both.`); state.tab = "queue"; state.filter = "all"; renderAll(); openJob(j.joined_to); return; }
+      if (j.joined_to) { toast(`Joined to job ${j.joined_to}: one visit fixes both.`); if (opts.onDone) return opts.onDone(j); state.tab = "queue"; state.filter = "all"; renderAll(); openJob(j.joined_to); return; }
       toast(H[S.hz].category === "immediate" ? "Added. Dangerous: the maintenance officer is called to make it safe today." : "Added. It goes into next week's plan, with its clock already running.");
+      if (opts.onDone) return opts.onDone(j);
       state.tab = "queue"; state.filter = S.site === "TOWN" ? "town" : S.site; renderAll(); openJob(id);
     });
     go();
@@ -1143,7 +1245,7 @@
     stops.forEach((s, i) => badge(ll(comById[s.cid]), { n: i + 1, cls: "s-stop", name: comById[s.cid].name, sub: `${s.jobs.length} job${s.jobs.length > 1 ? "s" : ""}`, onClick: () => focusCommunity(s.cid) }));
     order.filter((k) => k.includes("+")).forEach((k) => { const [a, b] = k.split("+").map((c) => comById[c]); const p = pairOf(k); if (p) savingTag(a, b, p, true); });
     const near = {}; (F2.nearby || []).forEach((n) => { const r = all.find((x) => x.id === n.id); if (r) (near[r.site] = near[r.site] || []).push(r); });
-    Object.entries(near).forEach(([cid, js]) => badge(ll(comById[cid]), { n: js.length, cls: "s-near small", name: comById[cid].name, sub: "nearby, not booked", onClick: () => focusCommunity(cid) }));
+    Object.entries(near).forEach(([cid, js]) => badge(ll(comById[cid]), { n: js.length, cls: "s-near", name: comById[cid].name, sub: "nearby, not booked", onClick: () => focusCommunity(cid) }));
     showHouses(stops.flatMap((s) => s.jobs));
     hubBadge();
   }
@@ -1189,10 +1291,13 @@
            </form>`}
       </div>`;
     };
+    const together = togetherGroups(all);
     const runCards = order.map((k) => {
       const names = k.split("+").map((c) => comById[c].name); const g = groups[k]; const p = pairOf(k); const c0 = comById[k.split("+")[0]];
       return `<div class="trip-card"><div style="display:flex;justify-content:space-between;gap:8px"><h3>${esc(names.join(" → "))}</h3><span class="chip ${p ? "hex" : g[0].mode.startsWith("air") ? "cut" : "booked"}">${p ? "Shared trip" : g[0].mode.startsWith("air") ? "Charter flight" : "Drive"}</span></div>
-        <span class="note">${g.length} job${g.length > 1 ? "s" : ""} · ${g[0].mode.startsWith("air") ? "flight" : c0.hours + " h drive"} from ${esc(RN.hub)}${p ? `, then ${Math.round(p.km)} km to ${esc(names[1])}. One trip instead of two saves about ${money(p.saving)}.` : ""}</span></div>`
+        <span class="note">${g.length} job${g.length > 1 ? "s" : ""} · ${g[0].mode.startsWith("air") ? "flight" : c0.hours + " h drive"} from ${esc(RN.hub)}${p ? `, then ${Math.round(p.km)} km to ${esc(names[1])}. One trip instead of two saves about ${money(p.saving)}.` : ""}</span>
+        ${(() => { const tg = together.find((x) => x.k === k); if (!tg) return ""; const others = tg.trades.filter((x) => x !== t);
+          return `<p class="note" style="margin-top:6px"><span class="chip hex">Travelling together</span> with the ${esc(others.map((x) => TRADE_WORD[x]).join(" and "))} (${esc(others.map((x) => ((RN.crews || {})[x] || [""])[0]).join(", "))}). ${tg.mode.startsWith("air") ? "One charter" : "One ute"} instead of ${tg.trades.length} saves about ${money(tg.saving)}.</p>`; })()}</div>`
         + g.sort((a, b) => b.score.total - a.score.total).map((r) => card(r)).join("");
     }).join("");
     const near = (d.nearby || []).map((x) => ({ r: all.find((y) => y.id === x.id), k: x.rings })).filter((x) => x.r && !x.r.assign);
@@ -1290,7 +1395,11 @@
       p: `${esc(CHECK_SOURCES[c.source])}. ${c.from === c.to ? `It is still ${esc(CAT_WORD[c.to_cat])}.` : `Changed from ${esc(H[c.from].label.toLowerCase())} (${esc(CAT_WORD[c.from_cat])}) to ${esc(H[c.to].label.toLowerCase())} (${esc(CAT_WORD[c.to_cat])}).`} “${esc(c.note)}”` }));
     const asStep = as ? [{ cls: "ok", t: as.mode === "next" ? "Back in line for the next trip" : as.mode === "crew" ? `Given to another ${esc(tw)}` : as.accepted_by ? `${an(tw, true)} took it` : `Offered to any ${esc(tw)} who can come sooner`,
       p: `${dateOf(as.day)}. Your repair keeps its place and its waiting time.${as.mode === "open" && !as.accepted_by ? " We'll tell you who is coming." : ""}` }] : [];
-    const worseStep = worse && !(r.checks || []).some((c) => c.at > worse.at) ? [{ cls: "wait", t: "You told us it got worse", p: "A person calls you back today and checks how urgent it is. If anyone is in danger now, call 000." }] : [];
+    const viaCho = (u) => (u && u.via === "cho" ? " Your housing officer recorded this for you." : "");
+    const worseStep = worse && !(r.checks || []).some((c) => c.at > worse.at) ? [{ cls: "wait", t: worse.from === "cho" ? "Your housing officer told us it got worse" : "You told us it got worse", p: "A person calls you back today and checks how urgent it is. If anyone is in danger now, call 000." }] : [];
+    const confirmStep = confirm ? [{ cls: confirm.status === "fixed" ? "ok" : "wait", t: confirm.status === "fixed" ? "You told us it's fixed" : "You told us it's still broken",
+      p: (confirm.status === "fixed" ? "Thank you." : `It's back in line with ${REWORK} extra points, and it keeps the day you first reported it, so it goes on the next trip.`) + viaCho(confirm) }] : [];
+    const reviewStep = review ? [{ cls: "wait", t: "You asked for a review", p: `A person answers within 10 working days.${viaCho(review)}` }] : [];
     const how = r.intake ? ` Through ${esc(INTAKE_WHO[r.intake.who])}${INTERP_WITH[r.intake.interpreter] ? `, with ${INTERP_WITH[r.intake.interpreter]}` : ""}.` : "";
     const steps = [
       { cls: "ok", t: `Reported ${dateOf(r.day)}`, p: `You said: “${esc(r.text)}”${how}` },
@@ -1300,8 +1409,8 @@
       ...runs.map((x) => ({ cls: "wait", t: `${x.n} week${x.n > 1 ? "s" : ""}, ${x.n > 1 ? `${dateOf(x.from * 7)} to ${dateOf(x.to * 7 + 6)}` : `week of ${dateOf(x.from * 7)}`}`, p: say[x.code] ? say[x.code](x) : esc(x.code) })),
       ...(visit && NO_ACCESS.includes(visit.status) ? [{ cls: "wait", t: `${an(trade, true)} came at ${timeOf(visit.knocked_at)}`, p: `${esc(visit.status)}. They ${esc(visit.actions.join(", ").toLowerCase())}. Your repair stays in line.` }]
         : missed ? [{ cls: "wait", t: `${an(trade, true)} came but couldn't finish`, p: `${esc(visit.status)}. Your repair stays in line.` }] : []),
-      ...asStep, ...checkSteps, ...worseStep,
-      missed ? { cls: "now", t: as && (as.mode === "crew" || as.accepted_by) ? `Booked with another ${esc(tw)}` : "Booked for the next trip", p: `We'll tell you the day. Your waiting time keeps counting. If it gets worse before then, call 1800 104 076.` }
+      ...confirmStep, ...asStep, ...checkSteps, ...worseStep, ...reviewStep,
+      (missed || r.rework) ? { cls: "now", t: as && (as.mode === "crew" || as.accepted_by) ? `Booked with another ${esc(tw)}` : "Booked for the next trip", p: `We'll tell you the day. Your waiting time keeps counting. If it gets worse before then, call 1800 104 076.` }
         : r.done ? { cls: "now", t: "Booked this week", p: `${an(trade, true)} is coming to ${esc(r.place)}.` } : { cls: "now", t: `Waiting ${days(r.wait)}`, p: `You are number ${r.rank} of ${r.of} waiting for ${an(trade)} from ${esc(RN.hub)}.` },
     ];
     const secs = r.sections.filter(([t]) => t !== "What we heard" && t !== "Where it is up to");
@@ -1355,6 +1464,81 @@
     if (fy) fy.addEventListener("click", () => { recordUpdate(r, "fixed", {}, "confirm"); toast("Thanks. Marked as fixed."); renderTenant(); });
     if (fn) fn.addEventListener("click", () => { recordUpdate(r, "still broken", {}, "confirm"); toast("Reopened as a repeat repair. It moves up the line."); renderTenant(); });
   }
+  // ================================================================ COMMUNITY HOUSING OFFICER
+  // The person in the community tenants talk to. Logs reports (same questions as everyone), and records what a tenant
+  // says when they don't use the app: it's fixed, it's still broken, it got worse, or they want a review. Each update
+  // goes to the server marked via: "cho", and the tenant's timeline says who recorded it.
+  function renderOfficer() {
+    const el = $("#officer"); const all = rows();
+    const coms = RN.communities.filter((c) => c.hub === RN.hub).sort((a, b) => a.name.localeCompare(b.name));
+    if (!state.ocom || !comById[state.ocom]) state.ocom = (coms.find((c) => c.name === "Ngukurr") || coms[0]).cid;
+    const c = comById[state.ocom];
+    const here = all.filter((r) => r.site === state.ocom);
+    const fixedNow = here.filter((r) => r.done && !r.rework).sort((a, b) => b.value - a.value);
+    const waiting = here.filter((r) => !r.done).sort((a, b) => b.value - a.value);
+    const by = (r, kind) => updateOf(r.id, kind);
+    const card = (r, kind) => {
+      const cf = by(r, "confirm"), rv = by(r, "review"), wo = by(r, "escalate");
+      return `<div class="job" data-id="${r.id}">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h4>House ${r.house}: ${esc(H[r.hazard].label)}</h4><span class="chip ${r.category}">${CAT[r.category]}</span></div>
+        <div class="meta"><span class="chip ${codeOf(r)}">${REASON[codeOf(r)]}</span>${dueChip(r)}<span>waiting ${days(r.wait)}</span>${r.event ? `<span class="chip immediate">${esc(EVENT_WORD[r.event.type])} area</span>` : ""}</div>
+        ${kind === "fixed" ? (cf ? `<p class="note">You recorded: <b style="color:var(--ink)">${esc(cf.status === "fixed" ? "the tenant says it's fixed" : "the tenant says it's still broken")}</b>${cf.status !== "fixed" ? `. Reopened with ${REWORK} extra points; the coordinator decides who goes back.` : "."}</p>`
+            : `<p class="note">Booked this week. After the visit, ask the tenant: did it work?</p>
+               <div class="acts" style="grid-template-columns:1fr 1fr"><button class="btn good" data-o="fixed">Tenant says fixed</button><button class="btn ghost" data-o="broken">Still broken</button></div>`) : ""}
+        ${wo ? `<p class="note"><span class="chip immediate">It got worse</span> recorded ${dateOf(today())}. The coordinator calls back today.</p>` : ""}
+        ${rv ? `<p class="note"><span class="chip person">Review asked</span> “${esc(rv.note)}”. A person answers within 10 working days.</p>` : ""}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${wo ? "" : `<button class="btn small ghost" data-o="worse">It got worse</button>`}<button class="btn small ghost" data-o="saw">I saw it</button>${rv ? "" : `<button class="btn small ghost" data-o="review">Ask for a review</button>`}</div>
+        <form class="form osaw" hidden><label class="field-label">The fault is<select name="hz">${["immediate", "urgent", "routine"].map((k) => `<optgroup label="${CAT[k]}">${Object.entries(H).filter(([, h]) => h.category === k).map(([id, h]) => `<option value="${id}"${id === r.hazard ? " selected" : ""}>${esc(h.label)}</option>`).join("")}</optgroup>`).join("")}</select></label>
+          <label class="field-label">What you saw (the tenant reads this)<input type="text" name="note" maxlength="300" required placeholder="e.g. Water under the switchboard, family moved out of that room"></label><button class="btn primary" type="submit">Save what I saw</button></form>
+        <form class="form oreview" hidden><label class="field-label">What should the reviewer know? (the tenant's words)<textarea name="note" maxlength="1000" required></textarea></label><button class="btn primary" type="submit">Ask for a review for the tenant</button></form>
+        <form class="form obroken" hidden><label class="field-label">What did the tenant say? (optional)<input type="text" name="note" maxlength="300" placeholder="e.g. Blocked again two days after the plumber left"></label><button class="btn primary" type="submit">Record: still broken</button></form>
+      </div>`;
+    };
+    el.innerHTML = `<div class="grabber"></div><div class="app-head">
+        <div class="who"><div class="avatar" style="background:var(--accent-bg);color:var(--accent)"><svg width="24" height="24" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="6.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 17c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div><h2>Housing officer</h2><p>Community Housing Officer · example</p></div></div>
+        <div class="net-slot">${netHTML()}</div>
+        <label class="field-label" for="ocom" style="margin:0">Your community</label>
+        <select id="ocom" class="pill" style="width:100%">${coms.map((x) => `<option value="${x.cid}"${x.cid === state.ocom ? " selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+      </div>
+      <div class="panel-body">
+        ${guide("officer", `<b>For tenants who don't use the app.</b> Log their reports with the same questions as everyone, and record what they tell you: it's fixed, it's still broken, it got worse, or they want a review. Each update says you recorded it for them.`)}
+        <button class="btn primary" id="olog" style="width:100%">${state.olog ? "Close the report form" : "Log a report for a tenant"}</button>
+        <div id="ointake" style="margin-top:10px"${state.olog ? "" : " hidden"}></div>
+        ${eventNow() && eventNow().communities.includes(state.ocom) ? `<div class="card" style="margin-top:10px;border:1px solid var(--bad)"><b>${esc(EVENT_WORD[eventNow().type])} declared ${dateOf(eventNow().day)}</b><p class="note">Check every house with the maintenance officer in the next 48 hours, and log each fault with the same questions. Tell tenants about free interpreters and the hotline.</p></div>` : ""}
+        <div class="section-title"><h3>Booked this week: did it work?</h3><span class="note">${fixedNow.length}</span></div>
+        ${fixedNow.length ? fixedNow.map((r) => card(r, "fixed")).join("") : `<p class="note" style="padding:0 4px 8px">No repairs booked here this week.</p>`}
+        <div class="section-title"><h3>Waiting in ${esc(c.name)}</h3><span class="note">${waiting.length}</span></div>
+        ${waiting.slice(0, 30).map((r) => card(r, "waiting")).join("")}${waiting.length > 30 ? `<p class="note">and ${waiting.length - 30} more</p>` : ""}
+      </div>`;
+    bindGuides(el);
+    $("#ocom", el).addEventListener("change", (e) => { state.ocom = e.target.value; renderOfficer(); officerMap(); });
+    $("#olog", el).addEventListener("click", () => { state.olog = !state.olog; renderOfficer(); });
+    if (state.olog) {
+      const box = $("#ointake", el); box.innerHTML = readerHTML({ officer: true, who: "cho", site: state.ocom });
+      bindReader(box, { onDone: () => { state.olog = false; renderOfficer(); officerMap(); } });
+    }
+    $$(".job", el).forEach((j) => {
+      const r = all.find((x) => x.id === j.dataset.id); if (!r) return;
+      const show = (cls) => $$("form", j).forEach((f) => (f.hidden = !f.classList.contains(cls) || !f.hidden));
+      $$("[data-o]", j).forEach((b) => b.addEventListener("click", () => {
+        const o = b.dataset.o;
+        if (o === "fixed") { recordUpdate(r, "fixed", { via: "cho" }, "confirm"); toast("Recorded for the tenant: fixed."); renderOfficer(); }
+        if (o === "broken") show("obroken");
+        if (o === "worse") { recordUpdate(r, "worse", { from: "cho" }, "escalate"); toast("The coordinator is told and calls back today."); renderOfficer(); }
+        if (o === "saw") show("osaw");
+        if (o === "review") show("oreview");
+      }));
+      const fb = $(".obroken", j), fs = $(".osaw", j), fr = $(".oreview", j);
+      fb.addEventListener("submit", (e) => { e.preventDefault(); recordUpdate(r, "still broken", { via: "cho", note: fb.note.value.trim() || undefined }, "confirm");
+        toast(`Reopened with ${REWORK} extra points. It keeps the day it was first reported.`); renderAll(); });
+      fs.addEventListener("submit", (e) => { e.preventDefault(); if (saveCheck(r, fs.hz.value, "cho", fs.note.value.trim())) renderAll(); });
+      fr.addEventListener("submit", (e) => { e.preventDefault(); const note = fr.note.value.trim(); if (!note) return toast("Write down why, in the tenant's words.");
+        recordUpdate(r, "review", { note, via: "cho" }, "review"); toast("Review asked for the tenant. A person answers within 10 working days."); renderOfficer(); });
+    });
+  }
+  function officerMap() { if (!map) return; clearMarkers(); map.getSource("routes").setData(fc([])); hubBadge(); const c = comById[state.ocom]; if (c) { showHouses(rows().filter((r) => r.site === c.cid)); map.flyTo({ center: ll(c), zoom: Math.min(imagery.crisp ? 14 : 10.5, map.getMaxZoom()), pitch: 30, duration: reduce ? 0 : 1400 }); } }
+
   function tenantMap() { const r = rows().find((x) => x.id === state.tjob); if (r && r.cell) { clearMarkers(); hubBadge(); flyToJob(r); } }
 
   // ================================================================ wiring
@@ -1364,18 +1548,21 @@
     $("#coord").classList.toggle("hide", role !== "coord");
     $("#field").classList.toggle("hide", role !== "field");
     $("#tenant").classList.toggle("hide", role !== "tenant");
+    $("#officer").classList.toggle("hide", role !== "officer");
     $("#detail").classList.add("hide");
     $("#layers").style.display = role === "coord" ? "" : "none";
     $("#legend").style.display = role === "coord" ? "" : "none";
     showHouses([]); padMap();
     if (role === "field") { renderField(); fieldMap(); }
     if (role === "tenant") { renderTenant(); refreshMap(); tenantMap(); }
+    if (role === "officer") { renderOfficer(); refreshMap(); officerMap(); }
     if (role === "coord") { refreshMap(); home(); }
   }
   function renderAll() {
     renderCoord();
     if (state.role === "field") renderField();
     if (state.role === "tenant") renderTenant();
+    if (state.role === "officer") renderOfficer();
     refreshMap();
     if (state.job) { const r = rows().find((x) => x.id === state.job); if (r) openJob(r.id); else $("#detail").classList.add("hide"); }
   }
@@ -1493,7 +1680,7 @@
     renderCoord(); renderNet(); sync();
     const sp = $("#splash"); if (sp) { sp.classList.add("gone"); setTimeout(() => sp.remove(), 700); }
     initMap();
-    if (["field", "tenant"].includes(h)) setTimeout(() => setRole(h), 50);
+    if (["field", "tenant", "officer"].includes(h)) setTimeout(() => setRole(h), 50);
     if (h === "tradeoff") setTimeout(() => openSheet("tradeoff"), 50);
   }
   init();

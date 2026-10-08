@@ -1,0 +1,4 @@
+label,cost_per_job,cost_per_job_joint,event_jobs,event_urgent,event_houses,event_urgent_p90,event_all_p90,event_fixed_within_28,event_open_at_end,event_made_safe_same_day,other_urgent_p90,other_jobs
+No flood,803.9805030286136,673.9252359524048,0,0,0,,,,0,,3.0,708
+"Flood, usual crews",806.0904534257764,675.0832880901003,94,74,44,14.700000000000003,21.80000000000001,0.925531914893617,0,1.0,10.0,708
+"Flood, surge crews",810.12815722899,676.3821207432654,94,74,44,3.0,5.400000000000006,1.0,0,1.0,3.0,708

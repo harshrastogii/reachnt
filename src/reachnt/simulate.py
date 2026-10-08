@@ -25,11 +25,25 @@ def prepare_requests(force: bool = False, seed: int | None = None) -> pd.DataFra
     path = PROCESSED / f"requests{'' if seed is None else '_' + str(seed)}.parquet"
     if path.exists() and not force:
         return pd.read_parquet(path)
-    H = taxonomy()["hazards"]
     com = geo.load_communities()
-    req = synth.request_stream(com, seed)
-    tr = synth.labelled_corpus(60, "train", 1)
-    clf = intake.Classifier().fit(tr.text, tr.hazard)
+    req = read_requests(synth.request_stream(com, seed), com)
+    req.to_parquet(path)
+    return req
+
+
+_CLF = None
+
+
+def read_requests(req: pd.DataFrame, com: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Run raw synthetic requests through the reader (intake.py), as an intake officer's screen would."""
+    global _CLF
+    H = taxonomy()["hazards"]
+    com = geo.load_communities() if com is None else com
+    if _CLF is None:
+        tr = synth.labelled_corpus(60, "train", 1)
+        _CLF = intake.Classifier().fit(tr.text, tr.hazard)
+    clf = _CLF
+    req = req.copy()
     reads = [intake.read(t, clf) for t in req.text]
     req["read_hazard"] = [r.hazard for r in reads]
     req["needs_human"] = [r.needs_human for r in reads]
@@ -53,7 +67,6 @@ def prepare_requests(force: bool = False, seed: int | None = None) -> pd.DataFra
                        for s, h in zip(req.site, req.house)]
     req["band"] = np.where(req.town, "Town", req.site.map(band))
     req["remote"] = ~req.town
-    req.to_parquet(path)
     return req
 
 
@@ -106,10 +119,17 @@ class SimResult:
 
 
 def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, seed: int | None = None,
-        snapshot_weeks: tuple[int, ...] = (), miss_share: float = 0.0) -> SimResult:
+        snapshot_weeks: tuple[int, ...] = (), miss_share: float = 0.0, surge: dict | None = None,
+        closed: dict | None = None) -> SimResult:
     """miss_share: the share of booked visits that miss (no one home, can't get in, parts). A missed job is not closed:
     it keeps its clock and its waiting time, logs "no_access", and goes back into next week's plan for whichever crew
-    of that trade goes (crews are pooled per hub and trade), where its shrinking time left raises its value."""
+    of that trade goes (crews are pooled per hub and trade), where its shrinking time left raises its value.
+    surge: {"hub": name, "factor": x, "weeks": (w0, w1)}: extra crews from the contractor panel after a disaster.
+    closed: {cid: (w0, w1)}: roads cut by a flood in those weeks (fly-in only, if there is an airstrip).
+
+    Trades that go to the same community (or the same shared trip) in the same week can travel together: one
+    vehicle or one charter instead of one each. The planner still plans each trade on its own; the saving is
+    counted afterwards, so it is a floor on what planning for it would save (SimResult.reasons["joint"])."""
     P = params()
     miss_rng = np.random.default_rng(P["seed"] + 99)    # its own stream, so miss_share=0 changes nothing else
     req = prepare_requests(seed=seed) if req is None else req
@@ -135,13 +155,18 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
     logs: dict[str, list] = {}
     last_reason: dict[str, dict] = {}
     weekly = []
+    joint_rows: list[dict] = []
     weeks = P["demand"]["weeks"] + extra_weeks
     start_month = P["demand"]["start_month"]
     for wk in range(weeks):
         day0, day_end = wk * 7, wk * 7 + 7
         month = (start_month - 1 + day0 // 30) % 12 + 1
         road = {cid: geo.road_open(com.loc[cid], month, wk, rng) for cid in com.index}
+        for cid, (w0, w1) in (closed or {}).items():
+            if w0 <= wk < w1:
+                road[cid] = False
         for hub, hjobs in by_hub.items():
+            hub_trips: dict[str, dict] = {}
             open_jobs = [j for j in hjobs if np.isnan(j["done_day"]) and j["available_day"] < day_end]
             # duplicates join the earliest open job for the same house and fault, and are fixed on the same visit
             first: dict[tuple, dict] = {}
@@ -155,6 +180,8 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
             for trade in sorted({j["trade"] for j in open_jobs}):
                 tj = [j for j in open_jobs if j["trade"] == trade]
                 cap = crews.get((hub, trade), 1) * P["crews"]["hours_per_week"]
+                if surge and surge["hub"] == hub and surge["weeks"][0] <= wk < surge["weeks"][1]:
+                    cap *= surge["factor"]
                 plan_jobs, options = [], {}
                 for j in tj:
                     site = "TOWN" if j["town"] else j["site"]
@@ -177,6 +204,7 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                             if o:
                                 runs[o.site] = (o, (pr.a, pr.b))
                 res = plan_week(trimmed, options, cap, policy.lam, runs=runs)
+                hub_trips[trade] = res.trips
                 done = set(res.done)
                 missed = {jid for jid in sorted(done) if miss_rng.random() < miss_share} if miss_share else set()
                 if wk in snapshot_weeks:
@@ -224,6 +252,7 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
                                    hours_used=res.hours_used, jobs_done=len(done), trips=len(res.trips),
                                    air_trips=sum(o.mode.startswith("air") for o in res.trips.values()),
                                    run_trips=len({o.site for o in res.trips.values() if "+" in o.site}), **{f"cost_{k}": v for k, v in res.cost.items()}))
+            joint_rows.extend(joint_trips(wk, hub, hub_trips))
     out = pd.DataFrame(recs)
     end = weeks * 7
     out["open_at_end"] = out.done_day.isna()
@@ -238,7 +267,34 @@ def run(policy: Policy, req: pd.DataFrame | None = None, extra_weeks: int = 8, s
     out["last_reason"] = out.job_id.map(lambda k: last_reason.get(k, {}))
     out["policy"] = policy.name
     out["lam"] = policy.lam
-    return SimResult(policy, out, pd.DataFrame(weekly), {"snapshots": pd.DataFrame(snaps)})
+    return SimResult(policy, out, pd.DataFrame(weekly), {"snapshots": pd.DataFrame(snaps), "joint": pd.DataFrame(joint_rows)})
+
+
+SEATS = {"road": 3, "road-run": 3, "air": 5, "air-run": 5}   # ASSUMPTION: a work ute takes 3 trades and tools; a light twin 5
+
+
+def joint_trips(week: int, hub: str, trips_by_trade: dict[str, dict]) -> list[dict]:
+    """Trades going to the same community, or the same shared trip, in the same week travel together.
+    Each trade's trips dict maps a community to its TripOption (a shared trip appears under both communities,
+    each with half the cost). Returns one row per trip that two or more trades could share."""
+    legs: dict[str, dict[str, tuple[str, float]]] = {}
+    for trade, trips in trips_by_trade.items():
+        for o in trips.values():
+            k = o.site                                        # 'C12' or 'C12+C40'
+            mode, cost = legs.setdefault(k, {}).get(trade, (o.mode, 0.0))
+            legs[k][trade] = (o.mode, cost + o.fixed_cost)
+    rows = []
+    for k, by_trade in legs.items():
+        if len(by_trade) < 2:
+            continue
+        modes = {m for m, _ in by_trade.values()}
+        mode = sorted(modes)[0]
+        costs = sorted((c for _, c in by_trade.values()), reverse=True)
+        vehicles = math.ceil(len(costs) / SEATS.get(mode, 3))
+        together = sum(costs[i] for i in range(0, len(costs), SEATS.get(mode, 3)))  # one vehicle per group of seats
+        rows.append(dict(week=week, hub=hub, trip=k, trades=sorted(by_trade), mode=mode, separate=sum(costs),
+                         together=together, saving=sum(costs) - together, vehicles=vehicles))
+    return rows
 
 
 # ------------------------------------------------------------------ metrics
@@ -277,4 +333,10 @@ def summarise(res: SimResult, houses: pd.Series | None = None) -> dict:
                        overdue_equal=float(u.overdue_equal.mean()), harm_days=float(x.harm_days.sum()),
                        open_at_end=int(x.open_at_end.sum())))
     s["bands"] = by
+    J = res.reasons.get("joint")
+    if J is not None and len(J):
+        Jy = J[J.week < params()["demand"]["weeks"]]
+        s["joint_saving"] = float(Jy.saving.sum())
+        s["joint_trips"] = int(len(Jy))
+        s["cost_per_job_joint"] = (total - float(Jy.saving.sum())) / max(done, 1)
     return s

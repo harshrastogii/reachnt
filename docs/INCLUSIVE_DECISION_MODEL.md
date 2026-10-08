@@ -84,6 +84,21 @@ The channel is stored only to check fairness by channel. Everything a tenant can
   - "Needs another trade" lets the coordinator change the trade.
 - The job keeps its waiting time throughout, so it moves up the line by itself.
 
+## 3a. Tenants who don't use the app, and fixes that don't hold
+
+- **The Community Housing Officer has their own view.** They log reports with the same questions, and record what a tenant tells them: it's fixed, it's still broken, it got worse, or they want a review. The server accepts these only for tenants in the officer's own communities, and each is marked "recorded by your housing officer", so the tenant's timeline says who did it.
+- **A fix that didn't hold moves up.** "Still broken" reopens the job with 50 rework points (an assumption, in `config/params.yaml`). It keeps the day it was first reported, so its clock has usually run out and the deadline boost puts it on the next trip. The coordinator can send a different crew.
+
+## 3b. Floods, cyclones and fires
+
+When a disaster hits whole communities, need still sets the order, and the coordinator declares an event:
+- make every house safe within 48 hours;
+- send one team trip with the trades needed, sharing the vehicle or plane;
+- ask the contractor panel for surge crews, local Aboriginal Business Enterprises first, as a signed decision;
+- tell every household about the hotline, the housing officer and free interpreters.
+
+The point for fairness is the rest of the region. In the modelled flood, without surge crews the other Katherine-hub communities' urgent repairs slipped from 3 to 10 days (9 in 10). With surge crews they stayed at 3. A disaster should not quietly take other communities' trades.
+
 ## 4. Measured, not just claimed
 
 **Saying less** (`evaluate.inclusion()`, 3,000 synthetic households, each described twice: once in full, once in a few words):

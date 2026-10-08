@@ -185,6 +185,8 @@ def build(N: dict) -> None:
         taxonomy=taxonomy(), triage=P["triage"], clocks=P["clocks"], h3=Hc,
         planning={k: P["planning"][k] for k in ("due_soon_days", "deadline_bonus", "floor_bonus", "ageing_points_per_day")},
         crews=crews,
+        disaster_params={k: P["disaster"][k] for k in ("name", "communities", "damaged_share", "faults_per_house", "fault_mix")},
+        disaster=N.get("disaster", []), joint_trips=N.get("joint_trips", []),
         hubs=hubs, communities=cdict,
         pairs=pair_rows,
         policies={k: v for k, v in N["policies"].items()},

@@ -102,6 +102,38 @@ def test_a_missed_visit_keeps_its_clock_and_goes_back_in_the_plan():
     assert later.reason_log.map(lambda log: any(x[1] == "no_access" for x in log)).all()
 
 
+def test_a_fix_that_did_not_hold_comes_back_ahead_and_keeps_its_first_day():
+    fresh = urgency.score("toilet_blocked", {}, 0, 2.8)
+    rework = urgency.score("toilet_blocked", {"rework": 1}, 0, 2.8)
+    assert rework.total - fresh.total == params()["triage"]["rework_points"]
+    # reopened, it keeps the day it was first reported: its clock has run out, so the planner boosts it
+    job = dict(hazard="toilet_blocked", category="urgent", vulnerable=False, crowded=False, repeat=False, day=0, clock_equal=2.8, clock_official=7.0)
+    assert simulate.job_value(job, simulate.Policy("guarantee", 0.2), 21) > simulate.job_value(dict(job, day=20), simulate.Policy("guarantee", 0.2), 21) - 1
+
+
+def test_trades_going_to_the_same_place_share_one_vehicle():
+    o = lambda site, cost, mode="road": planner.TripOption(site, True, mode, 6, cost, True)
+    rows = simulate.joint_trips(3, "Katherine", {"plumber": {"C1": o("C1", 400)}, "electrician": {"C1": o("C1", 400), "C2": o("C2", 300)},
+                                                 "carpenter": {"C9": o("C9", 500)}})
+    assert len(rows) == 1 and rows[0]["trip"] == "C1" and rows[0]["saving"] == 400 and rows[0]["trades"] == ["electrician", "plumber"]
+    seats = simulate.SEATS["road"]
+    many = simulate.joint_trips(3, "K", {f"t{i}": {"C1": o("C1", 100)} for i in range(seats + 1)})
+    assert many[0]["vehicles"] == 2 and many[0]["saving"] == 100 * (seats - 1)   # a ute takes only so many
+
+
+def test_a_flood_adds_jobs_only_in_the_hit_communities_and_cuts_their_roads():
+    from reachnt import experiments
+    ev = experiments.event_requests()
+    D = params()["disaster"]
+    assert set(ev.site) <= set(D["communities"]) and ev.event.all() and len(ev) > 0
+    small = simulate.prepare_requests()
+    small = small[(small.hub == "Katherine") & (small.week >= D["week"] - 1) & (small.week < D["week"] + 2)]
+    res = simulate.run(simulate.Policy("guarantee", 0.2), small, extra_weeks=0,
+                       closed={cid: (0, 999) for cid in D["communities"]})
+    roads = res.jobs[res.jobs.site.isin(D["communities"]) & res.jobs.done_mode.str.startswith("road")]
+    assert roads.empty                                                  # nothing reaches them by road while it is cut
+
+
 # ---------------------------------------------------------------- reader
 @pytest.fixture(scope="module")
 def clf():

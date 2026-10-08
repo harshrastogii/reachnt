@@ -147,6 +147,77 @@ def missed_visits() -> list[dict]:
     return rows
 
 
+def event_requests(seed: int = 31) -> pd.DataFrame:
+    """The repair requests a flood or cyclone adds: a share of houses in the hit communities each report 1 to 3 faults
+    from the disaster's fault mix over the first two weeks. Read by the same reader as every other report."""
+    D, Dm = params()["disaster"], params()["demand"]
+    com = geo.load_communities().set_index("cid", drop=False)
+    rng = np.random.default_rng(seed)
+    hz = list(D["fault_mix"]); pw = np.array([D["fault_mix"][h] for h in hz], float); pw /= pw.sum()
+    lo, hi = D["faults_per_house"]
+    rows, n = [], 0
+    for cid in D["communities"]:
+        r = com.loc[cid]; houses = int(r.houses_est)
+        for h in sorted(rng.choice(np.arange(1, houses + 1), int(round(houses * D["damaged_share"])), replace=False)):
+            for _ in range(int(rng.integers(lo, hi + 1))):
+                fault = hz[rng.choice(len(hz), p=pw)]
+                day = D["week"] * 7 + int(rng.integers(0, 14)); wk = day // 7
+                rows.append(dict(job_id=f"E{n:05d}", week=wk, day=day, month=(Dm["start_month"] - 1 + (wk * 7) // 30) % 12 + 1, site=cid,
+                                 hub=r.hub, town=False, house=f"{cid}-H{int(h):03d}", true_hazard=fault,
+                                 text=synth.make_report(fault, rng, "train"), synthetic=True))
+                n += 1
+    return simulate.read_requests(pd.DataFrame(rows), com.reset_index(drop=True)).assign(event=True)
+
+
+def _disaster_one(args):
+    label, req, surge, closed = args
+    p = simulate.Policy("guarantee", 0.2, runs=True)
+    r = simulate.run(p, req, surge=surge, closed=closed)
+    s = simulate.summarise(r)
+    D = params()["disaster"]
+    j = r.jobs
+    w0, w1 = D["week"], D["week"] + 12
+    ev = j[j.get("event", False) == True] if "event" in j else j.iloc[0:0]   # noqa: E712
+    ev_u = ev[ev.category.isin(["urgent", "immediate"])]
+    hub = params()["disaster"]["communities"][0]
+    hub = geo.load_communities().set_index("cid").loc[hub, "hub"]
+    other = j[(j.hub == hub) & ~j.town & (j.week >= w0) & (j.week < w1) & ~j.site.isin(D["communities"])]
+    other_u = other[other.category.isin(["urgent", "immediate"])]
+    p90 = lambda x: float(np.percentile(x, 90)) if len(x) else None
+    return dict(label=label, cost_per_job=s["cost_per_job"], cost_per_job_joint=s.get("cost_per_job_joint"),
+                event_jobs=int(len(ev)), event_urgent=int(len(ev_u)), event_houses=int(ev.house.nunique()) if len(ev) else 0,
+                event_urgent_p90=p90(ev_u.wait_days), event_all_p90=p90(ev.wait_days),
+                event_fixed_within_28=float((ev.wait_days <= 28).mean()) if len(ev) else None,
+                event_open_at_end=int(ev.open_at_end.sum()) if len(ev) else 0,
+                event_made_safe_same_day=float(((ev.made_safe_day - ev.day) <= 1)[ev.true_category == "immediate"].mean()) if len(ev) else None,
+                other_urgent_p90=p90(other_u.wait_days), other_jobs=int(len(other)))
+
+
+def disaster() -> list[dict]:
+    """A flood hits three Katherine-hub communities. Need-first planning, with and without surge crews from the panel.
+    Does the flooded area get fixed, and does the rest of the region keep its clock?"""
+    D = params()["disaster"]
+    base = simulate.prepare_requests().assign(event=False)
+    both = pd.concat([base, event_requests()], ignore_index=True)
+    closed = {cid: (D["week"], D["week"] + D["road_cut_weeks"]) for cid in D["communities"]}
+    hub = geo.load_communities().set_index("cid").loc[D["communities"][0], "hub"]
+    surge = {"hub": hub, "factor": D["surge_factor"], "weeks": (D["week"], D["week"] + D["surge_weeks"])}
+    tasks = [("No flood", base, None, None), ("Flood, usual crews", both, None, closed), ("Flood, surge crews", both, surge, closed)]
+    from concurrent.futures import ProcessPoolExecutor
+    with ProcessPoolExecutor(3) as ex:
+        return list(ex.map(_disaster_one, tasks))
+
+
+def joint_trips() -> list[dict]:
+    """How much trades save by travelling together to the same community in the same week (counted after planning)."""
+    rows = []
+    for p in [simulate.Policy("cheapest", 1.0), simulate.Policy("guarantee", 0.2, runs=True)]:
+        s = simulate.summarise(simulate.run(p, simulate.prepare_requests()))
+        rows.append(dict(key=key(p), cost_per_job=s["cost_per_job"], cost_per_job_joint=s.get("cost_per_job_joint"),
+                         joint_trips=s.get("joint_trips"), joint_saving=s.get("joint_saving"), trips=s["trips"]))
+    return rows
+
+
 def sensitivity(base_req: pd.DataFrame) -> list[dict]:
     """Re-run the three headline policies with the assumptions that move results changed one at a time."""
     heads = [simulate.Policy("cheapest", 1.0), simulate.Policy("guarantee", 0.2), simulate.Policy("guarantee", 0.2, runs=True)]

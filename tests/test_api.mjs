@@ -102,4 +102,27 @@ await check("repairs-line staff can log a report but cannot reassign a job", asy
   const r = await call({ updates: [intake(), { id: "J07610", kind: "assign", status: "next", trade: "plumber" }] }, bearer(sign({ role: "intake", jobs: [] }, S)));
   assert.deepEqual(r.rejected, ["J07610:assign"]);
 });
+await check("a housing officer can record a fix, a still-broken or a review for tenants in their communities only", async () => {
+  const cho = bearer(sign({ role: "housing_officer", jobs: ["J07700", "J07701"] }, S));
+  const r = await call({ updates: [
+    { id: "J07700", kind: "confirm", status: "still broken", via: "cho", note: "Told me at the shop: blocked again" },
+    { id: "J07701", kind: "review", status: "review", via: "cho", note: "Nana uses a wheelchair; the ramp is broken" },
+    { id: "J07701", kind: "escalate", status: "worse", from: "cho" },
+    { id: "J07799", kind: "confirm", status: "fixed", via: "cho" },                  // not their community
+    { id: "J07700", kind: "confirm", status: "fixed" },                              // must say it was recorded for the tenant
+    { id: "J07700", kind: "visit", status: "done" }] }, cho);                        // and can't mark a job done
+  assert.deepEqual(r.rejected, ["J07799:confirm", "J07700:confirm", "J07700:visit"]);
+});
+await check("a tenant can't send an update as if the housing officer recorded it", async () => {
+  const r = await call({ updates: [{ id: "J07568", kind: "confirm", status: "fixed", via: "cho" }] }, bearer(sign({ role: "tenant", jobs: ["J07568"] }, S)));
+  assert.deepEqual(r.rejected, ["J07568:confirm"]);
+});
+await check("only a coordinator can declare a flood or cyclone, over real communities", async () => {
+  const ev = (extra = {}) => ({ id: "EV-0001", kind: "event", status: "declared", event: "flood", communities: ["C48", "C47"], start_day: 189, ...extra });
+  const c = await call({ updates: [ev(), ev({ id: "EV-0002", event: "alien invasion" }), ev({ id: "EV-0003", communities: ["Kalkarindji"] })] },
+    bearer(sign({ role: "coordinator", jobs: [] }, S)));
+  assert.deepEqual(c.rejected, ["EV-0002:event", "EV-0003:event"]);
+  const t = await call({ updates: [ev()] }, bearer(sign({ role: "tradesperson", jobs: [] }, S)));
+  assert.deepEqual(t.rejected, ["EV-0001:event"]);
+});
 console.log(`${n} API checks passed`);

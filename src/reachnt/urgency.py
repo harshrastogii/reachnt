@@ -4,7 +4,11 @@ The score never sees distance, travel cost, community, region or anything about 
 beyond what the report itself says (a baby, an elder, a crowded house, a repeat report).
 That rule is tested in tests/test_urgency.py.
 
-    points = category base + harm + Healthy Living Practice rank + exposure + repeat + ageing
+    points = category base + harm + Healthy Living Practice rank + exposure + repeat + ageing + rework
+
+Rework: a repair that was marked done but the tenant (or their housing officer) says is still broken comes back with
+extra points, and keeps the day it was first reported, so its clock has usually run out and the planner's deadline
+boost sends it on the next trip.
 
 Category sets the clock (NT FS17). Inside a category, points order the queue. Every component is
 returned so the explanation can show the arithmetic.
@@ -28,10 +32,11 @@ class Urgency:
     exposure: int
     repeat: int
     ageing: int
+    rework: int = 0
 
     @property
     def total(self) -> int:
-        return self.base + self.harm + self.hlp + self.exposure + self.repeat + self.ageing
+        return self.base + self.harm + self.hlp + self.exposure + self.repeat + self.ageing + self.rework
 
     def parts(self) -> dict:
         d = asdict(self)
@@ -58,4 +63,5 @@ def score(hazard: str, modifiers: dict, days_waited: float = 0.0, clock: float |
     repeat = T["repeat_points"] if "repeat" in modifiers else 0
     over_half = max(0.0, days_waited - clock / 2)
     ageing = int(round(params()["planning"]["ageing_points_per_day"] * over_half))
-    return Urgency(cat, CATEGORY_BASE[cat], int(H["harm"]), hlp_pts, exposure, repeat, ageing)
+    rework = T["rework_points"] if "rework" in modifiers else 0
+    return Urgency(cat, CATEGORY_BASE[cat], int(H["harm"]), hlp_pts, exposure, repeat, ageing, rework)

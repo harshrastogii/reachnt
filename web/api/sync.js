@@ -9,6 +9,10 @@
 //   assign  - the coordinator decides who goes after a missed visit: the next trip, a named crew, or open to any trade
 //   accept  - a tradesperson takes a job that was opened to any trade
 //   escalate - a tenant or tradesperson says it got worse; a person calls back the same day
+//   event   - the coordinator declares a flood, cyclone or fire over some communities: a make-safe sweep, joint
+//             trips and surge crews follow, and every report from there is tagged
+// A Community Housing Officer can send review, confirm and escalate for a tenant who doesn't use the app: the update
+// carries via: "cho", so the tenant's timeline says who recorded it.
 // Prototype: it validates and acknowledges them. In production this writes to the ops tables in docs/schema.sql
 // using a server-side DATABASE_URL, never a key in the browser, and only for the signed-in person's own jobs.
 import { verify, allowed } from "./_auth.js";
@@ -29,6 +33,9 @@ const SOURCES = new Set(["called_in", "phoned", "cho", "rhmo", "trade", "photo",
 const SAW_OR_SPOKE = new Set(["called_in", "phoned", "cho", "rhmo", "trade"]);   // the only sources that may lower a dangerous repair
 const ASSIGN = new Set(["next", "crew", "open"]);
 const TRADES = new Set(["plumber", "electrician", "carpenter", "aircon", "pest", "general"]);
+const VIA = new Set([undefined, "tenant", "cho", "line"]);   // who recorded a tenant's update: themselves, their housing officer, the repairs line
+const EVENTS = new Set(["flood", "cyclone", "fire", "storm"]);
+const CID = /^C\d{2,3}$/;
 const text = (v, max) => v === undefined || (typeof v === "string" && v.length <= max);
 const when = (v) => v === undefined || (typeof v === "string" && !Number.isNaN(Date.parse(v)));
 
@@ -42,8 +49,8 @@ function valid(u) {
     if (NO_ACCESS.has(u.status)) return when(u.knocked_at) && !!u.knocked_at && Array.isArray(u.actions) && u.actions.length > 0 && u.actions.every((a) => STEPS.has(a));
     return true;
   }
-  if (kind === "review") return u.status === "review" && typeof u.note === "string" && u.note.trim().length > 0 && u.note.length <= 1000;
-  if (kind === "confirm") return (u.status === "fixed" || u.status === "still broken") && text(u.note, 500);
+  if (kind === "review") return VIA.has(u.via) && u.status === "review" && typeof u.note === "string" && u.note.trim().length > 0 && u.note.length <= 1000;
+  if (kind === "confirm") return VIA.has(u.via) && (u.status === "fixed" || u.status === "still broken") && text(u.note, 500);
   if (kind === "intake") {
     // How a report arrived (channel, language, interpreter) is recorded to book interpreters and audit fairness; it is never scored.
     const a = u.answers;
@@ -64,7 +71,11 @@ function valid(u) {
   }
   if (kind === "assign") return ASSIGN.has(u.status) && TRADES.has(u.trade) && (u.status === "crew" ? typeof u.crew === "string" && u.crew.length > 0 && u.crew.length <= 80 : u.crew === undefined);
   if (kind === "accept") return u.status === "accepted" && typeof u.crew === "string" && u.crew.length > 0 && u.crew.length <= 80;
-  if (kind === "escalate") return u.status === "worse" && (u.from === "tenant" || u.from === "tradesperson") && text(u.note, 500);
+  if (kind === "escalate") return u.status === "worse" && ["tenant", "tradesperson", "cho"].includes(u.from) && text(u.note, 500);
+  if (kind === "event") {
+    return u.status === "declared" && EVENTS.has(u.event) && Array.isArray(u.communities) && u.communities.length > 0 && u.communities.length <= 40
+      && u.communities.every((c) => CID.test(c)) && Number.isInteger(u.start_day) && text(u.note, 500);
+  }
   return false;
 }
 

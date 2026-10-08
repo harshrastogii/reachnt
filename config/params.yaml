@@ -122,8 +122,33 @@ triage:
   vulnerable_points: 25
   crowded_points: 10
   repeat_points: 10
+  rework_points: 50              # ASSUMPTION: a fix the tenant says didn't work comes back ahead of a fresh report of the same fault
   crowded_people_per_bedroom: 2  # ASSUMPTION: more than 2 people per bedroom counts as crowded (open to co-design)
   intake_answer_rate: 0.9        # ASSUMPTION for evaluate.inclusion(): share of standard questions answered on first contact
 
 missed_visits:                   # experiments.missed_visits(): visits that miss (no one home, can't get in, parts)
   share: 0.1                     # ASSUMPTION: 1 in 10 booked visits miss; the job keeps its clock and is re-planned
+
+# ------------------------------------------------------------------ disasters (experiments.disaster)
+# Modelled on the January 2023 Victoria River flood: Kalkarindji, Daguragu and Pigeon Hole were flooded and evacuated,
+# and the Buntine Highway was cut. Damage share, faults per house and surge size are ASSUMPTIONS.
+disaster:
+  name: "Victoria River, January 2023 pattern"
+  communities: [C48, C47, C45]   # Kalkarindji, Daguragu, Pigeon Hole (Katherine hub)
+  week: 27                       # early January, counting from 1 July
+  road_cut_weeks: 4              # fly-in only while the roads are cut
+  damaged_share: 0.4             # ASSUMPTION: share of houses with flood damage
+  faults_per_house: [1, 3]       # ASSUMPTION: each damaged house reports 1 to 3 faults over the first 2 weeks
+  surge_factor: 2.0              # ASSUMPTION: the contractor panel doubles the hub's crews ...
+  surge_weeks: 8                 # ... for 8 weeks
+  fault_mix:                     # ASSUMPTION: what a flood breaks
+    damp_mould: 0.20
+    no_power: 0.15
+    sewage_overflow: 0.12
+    electrical_danger: 0.10
+    no_water: 0.10
+    stove_broken: 0.08
+    kitchen: 0.08
+    aircon_fan: 0.07
+    structural_danger: 0.05
+    security: 0.05

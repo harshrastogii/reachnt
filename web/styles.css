@@ -187,9 +187,14 @@ p { margin: 0; }
 .chip.offered { background: rgba(110, 86, 207, 0.18); color: var(--violet); }
 .chip.assigned, .chip.next_trip { background: var(--good-bg); color: var(--good); }
 .chip.due { background: var(--warn-bg); color: var(--warn); }
+.chip.rework { background: var(--cut-bg); color: var(--cut); }
+.hexb.evt .hx { filter: drop-shadow(0 0 3px #ff453a) drop-shadow(0 0 7px #ff453a); }
+details#evbox summary { list-style: revert; }
+#officer .app-head select.pill { min-width: 0; }
 .chip.due.late { background: var(--bad-bg); color: var(--bad); }
 /* forms: new report, urgency check, who goes */
 .form { display: grid; gap: 10px; }
+.form[hidden] { display: none; }
 .form .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .form select, .form input[type="number"] { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: var(--glass-strong); min-width: 0; }
 .form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; min-width: 0; }
@@ -307,9 +312,9 @@ svg text { fill: var(--ink-3); font-family: var(--font); }
 
 /* ---------------------------------------------------------------- phone layout */
 @media (max-width: 1240px) and (min-width: 861px) {
-  .brand small { display: none; }
   #planbtn { max-width: 220px; }
 }
+
 .show-sm { display: none; }
 .sm-only { display: none; }
 .tabs .sm { display: none; }
@@ -401,7 +406,8 @@ svg text { fill: var(--ink-3); font-family: var(--font); }
 .hexb.s-booked { --c: #26b14f; } .hexb.s-waiting { --c: #f08c00; } .hexb.s-cut { --c: #d9a600; } .hexb.s-none { --c: #8e8e93; }
 .hexb.s-stop { --c: #0a84ff; }
 .hexb.s-stop .hx { width: 44px; height: 39px; font-size: 17px; }
-.hexb.s-near .hx { background: rgba(16,20,26,.55); box-shadow: inset 0 0 0 2px #64d2ff; color: #64d2ff; }
+.hexb.s-near { --c: #5b7488; }   /* nearby, not booked: same hexagon as a stop, in a quieter slate blue */
+.hexb.s-near .hx { width: 44px; height: 39px; font-size: 17px; }
 .hubb { display: grid; justify-items: center; padding: 6px 12px; border-radius: 14px; background: rgba(255,255,255,.92); color: #14181d; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
 .hubb span { font-weight: 700; font-size: 13px; } .hubb small { font-size: 10.5px; color: #4a525c; }
 .savetag { font-size: 11.5px; color: #e9f8ff; padding: 4px 9px; border-radius: 10px; background: rgba(14, 90, 120, .78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
@@ -469,3 +475,16 @@ label.tick { display: flex; gap: 8px; align-items: center; font-size: 14px; colo
 ul.hist { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
 ul.hist li { display: grid; gap: 1px; font-size: 14px; color: var(--ink); }
 a.btn { display: inline-grid; place-items: center; text-align: center; text-decoration: none; }
+
+/* four roles in the top bar: on narrower desktops the hub name moves to the tooltip and the plan name shortens */
+@media (max-width: 1640px) and (min-width: 861px) { .brand small { display: none; } #planbtn { max-width: 300px; } }
+.role-short { display: none; }
+@media (max-width: 1340px) and (min-width: 861px) {
+  .brand b { display: none; }
+  .role-long { display: none !important; } .role-short { display: inline; }
+  #role button { padding-left: 10px; padding-right: 10px; }
+  #planbtn { max-width: 210px; } #planbtn .k { display: none; }
+  #week button { padding-left: 10px; padding-right: 10px; }
+}
+@media (max-width: 1100px) and (min-width: 861px) { .pill.syn .lg-only { display: none; } .pill.syn .sm-only { display: inline; } #planbtn { max-width: 160px; } .topbar { gap: 6px; } }
+@media (max-width: 860px) { .role-short { display: inline; } }

@@ -48,9 +48,15 @@ Team Top Enders (AIC015): Harsh Rastogi (386401), Aashish (385593). CDU IT Code 
 
 With 1 in 10 booked visits missing, ReachNT still fixed 9 in 10 of the *missed* urgent remote repairs within 20 days (cheapest-first: 126), because a missed job keeps its waiting time and gets the deadline boost.
 
+## Fixes that didn't hold, trades travelling together, floods and cyclones
+
+- **Rework.** If the tenant (or their housing officer) says a repair is still broken, the job reopens with 50 extra points and keeps the day it was first reported, so its clock has run out and the deadline boost puts it on the next trip. The coordinator can send a different crew.
+- **Trades travelling together.** Different trades booked to the same community (or the same shared trip) in the same week share one ute (3 seats) or one charter (5 seats). Counted after planning, so it is a floor: ReachNT $804 → $674 per repair (1,482 of 8,199 trips shared); cheapest-first $559 → $514. Different trades going to neighbouring communities are suggested to share one loop.
+- **Floods, cyclones and fires.** The coordinator declares an event over the communities hit. The portal plans the response (make safe within 48 hours, one team trip, surge crews from the contractor panel, a message to every household) and tags every job from the area. In a modelled flood of Kalkarindji, Daguragu and Pigeon Hole (94 repairs, roads cut for 4 weeks), the usual crews fixed 9 in 10 urgent flood repairs within 15 days and the rest of the Katherine hub slipped from 3 to 10 days; with surge crews (double for 8 weeks) both stayed at 3 days.
+
 ## How a repair request gets into ReachNT
 
-The tenant tells someone, and that person logs it in the **New report** tab. The coordinator doesn't upload requests; they look after the line, the trips and the checks.
+The tenant tells someone, and that person logs it: in the **New report** tab, or in the **Housing officer** view. The coordinator doesn't upload requests; they look after the line, the trips and the checks. The housing officer also records, for tenants who don't use the app, whether a repair worked, that it got worse, or that they want a review; each update is marked as recorded for the tenant.
 
 1. **Who logs it.** Whoever the tenant told:
    - repairs-line staff (1800 104 076)
@@ -76,7 +82,7 @@ In this prototype, the year of requests behind the demo is synthetic (`synth.py`
 |---|---|
 | Report (PDF, A4, 8 body pages) | `docs/report/DataChallenge_Team AIC015_Report.pdf` (source `reachnt_report.md`, build `build_pdf.py`) |
 | Slide deck | `docs/deck/DataChallenge_Team AIC015_Slides.pptx` and `.pdf` (build `build_deck.js`); script with timings and Q&A prep `PITCH_SCRIPT.md` |
-| Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson and tenant views, works offline, saves PDFs and syncs updates when signal returns. Coordinators log new reports with the standard questions, check and change urgency at any time, and send a missed job to the next trip, a named crew or any contractor of that trade; tradespeople can take open jobs and say "worse than reported"; tenants can say "it got worse" |
+| Portal (interactive prototype) | `web/` (deploy to Vercel, see `web/DEPLOY.md`). It has coordinator, tradesperson, tenant and housing officer views, works offline, saves PDFs and syncs updates when signal returns. Coordinators log new reports with the standard questions, check and change urgency at any time, and send a missed job to the next trip, a named crew or any contractor of that trade; tradespeople can take open jobs and say "worse than reported"; tenants can say "it got worse" |
 | Python solution | `src/reachnt/`, `run_all.py`, `notebooks/01_walkthrough.ipynb`, `tests/` |
 | Inclusive decision-making model | `docs/INCLUSIVE_DECISION_MODEL.md` |
 | Database design | `docs/DATABASE.md`, `docs/schema.sql` |
@@ -89,9 +95,9 @@ In this prototype, the year of requests behind the demo is synthetic (`synth.py`
 ```bash
 pip install -r requirements.txt
 python run_all.py                     # every number, figure and the portal data (~15 min on 8 cores)
-pytest -q tests                       # 75 checks; node tests/test_api.mjs adds 17 for the server (both run by GitHub Actions on every push)
+pytest -q tests                       # 78 checks; node tests/test_api.mjs adds 20 for the server (both run by GitHub Actions on every push)
 python run_all.py --quality           # only the quality measures (ROC/PR-AUC, calibration, solver gap, 5 random years)
-python run_all.py --extras            # only the inclusion measure and the missed-visits experiment
+python run_all.py --extras            # only the inclusion, missed-visit, trades-together and flood experiments
 python -m http.server 8731 --directory web   # then open http://localhost:8731
 python docs/report/build_pdf.py
 ```

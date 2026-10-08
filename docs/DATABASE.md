@@ -39,7 +39,7 @@ The decision ledger (`ops.decision`) is append-only: each row stores the hash of
 | Intake staff (repairs line, Community Housing Officers) | log new reports and the standard questions; the vault only through the logged function |
 | Tenant (one-time code by SMS or read out by a Community Housing Officer) | their own jobs and the reasons logged against them |
 | Tradesperson / contractor | jobs on their assigned trips, plus open jobs within 3 res-5 rings of where they are this week ("while you're there"), plus jobs the coordinator opened to any contractor of their trade in their hub |
-| Community Housing Officer | jobs in their communities |
+| Community Housing Officer | jobs in their communities; logs reports and records fixes, still-broken, got-worse and review requests for tenants there |
 | Regional coordinator | everything in their hub; signs decisions |
 | Department analyst | the `ops` schema without the vault; `public` views |
 | Anyone | `public` views only |
@@ -78,6 +78,10 @@ Added after checking ReachNT against UK and Australian repair and automated-deci
 | `ops.urgency_check` | Every time a person checks or changes urgency: who, how (call, on site, photo, review), from what to what, and why | Append-only; a CHECK refuses lowering a dangerous repair unless the source spoke to the tenant or saw the fault |
 | `ops.job_offer` | Who goes after a missed visit: next trip, a named crew, or open to any contractor of that trade | One open offer per job; the first to accept gets it |
 | `ops.escalation` | A tenant or tradesperson says it got worse | Answered by an urgency check the same day |
+| `ops.tenant_confirmation.via`, `ops.review_request.via` | Whether the tenant recorded it, or their housing officer or the repairs line did for them | Housing officers can act only for their own communities (`ops.officer_community`, row-level security) |
+| `ops.job.reopened_at`, `ops.job_score.rework` | A fix the tenant says didn't hold | Reopened with rework points; keeps `reported_at` |
+| `ops.event`, `ops.job.event_id` | A declared flood, cyclone or fire, its communities and the surge crews asked for | Jobs from the area are tagged; the response is a signed decision |
+| `ops.trip_share` | Trades travelling together in one vehicle or charter | The vehicle cost is paid once |
 
 The schema was loaded into PostgreSQL 16 to check it: all tables and the row-level security policies are created, a no-access visit without evidence is refused, and a duplicate pointing at a job that doesn't exist is refused. (PostGIS and h3-pg were replaced by simple stand-ins for that check; on Neon or NT Government servers the real extensions are used.)
 

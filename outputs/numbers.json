@@ -4681,5 +4681,70 @@
    "urgent_remote_missed_median": 9.0,
    "open_at_end": 11
   }
+ ],
+ "joint_trips": [
+  {
+   "key": "cheapest_1",
+   "cost_per_job": 558.7486594547371,
+   "cost_per_job_joint": 513.5838163717165,
+   "joint_trips": 1153,
+   "joint_saving": 1656285.1255405324,
+   "trips": 4355
+  },
+  {
+   "key": "guarantee_0.2_h3",
+   "cost_per_job": 803.9805030286136,
+   "cost_per_job_joint": 673.9252359524048,
+   "joint_trips": 1482,
+   "joint_saving": 4875381.796885841,
+   "trips": 8199
+  }
+ ],
+ "disaster": [
+  {
+   "label": "No flood",
+   "cost_per_job": 803.9805030286136,
+   "cost_per_job_joint": 673.9252359524048,
+   "event_jobs": 0,
+   "event_urgent": 0,
+   "event_houses": 0,
+   "event_urgent_p90": null,
+   "event_all_p90": null,
+   "event_fixed_within_28": null,
+   "event_open_at_end": 0,
+   "event_made_safe_same_day": null,
+   "other_urgent_p90": 3.0,
+   "other_jobs": 708
+  },
+  {
+   "label": "Flood, usual crews",
+   "cost_per_job": 806.0904534257764,
+   "cost_per_job_joint": 675.0832880901003,
+   "event_jobs": 94,
+   "event_urgent": 74,
+   "event_houses": 44,
+   "event_urgent_p90": 14.700000000000003,
+   "event_all_p90": 21.80000000000001,
+   "event_fixed_within_28": 0.925531914893617,
+   "event_open_at_end": 0,
+   "event_made_safe_same_day": 1.0,
+   "other_urgent_p90": 10.0,
+   "other_jobs": 708
+  },
+  {
+   "label": "Flood, surge crews",
+   "cost_per_job": 810.12815722899,
+   "cost_per_job_joint": 676.3821207432654,
+   "event_jobs": 94,
+   "event_urgent": 74,
+   "event_houses": 44,
+   "event_urgent_p90": 3.0,
+   "event_all_p90": 5.400000000000006,
+   "event_fixed_within_28": 1.0,
+   "event_open_at_end": 0,
+   "event_made_safe_same_day": 1.0,
+   "other_urgent_p90": 3.0,
+   "other_jobs": 708
+  }
  ]
 }

@@ -4,7 +4,7 @@ numbers.json, report figures and the web prototype's data.
     python run_all.py            # full run (about 10 minutes)
     python run_all.py --quick    # skip the sensitivity sweep
     python run_all.py --quality  # only the quality measures (evaluate.py, about 4 minutes), merged into numbers.json
-    python run_all.py --extras   # only the inclusion measure and the missed-visits experiment, merged into numbers.json
+    python run_all.py --extras   # only the inclusion, missed-visit, trades-together and flood experiments, merged into numbers.json
 """
 from __future__ import annotations
 
@@ -81,7 +81,15 @@ def extras() -> dict:
     for r in mv:
         print(f"  {r['key']:18s} {r['share']:.0%} of visits missed: ${r['cost_per_job']:.0f}/job, urgent P90 remote {r['urgent_p90_remote']:.0f} d, "
               f"harm-days {r['harm_days_total']:.0f}" + (f", missed urgent remote jobs P90 {r['urgent_remote_missed_p90']:.0f} d" if r["share"] else ""))
-    return dict(inclusion=inc, missed_visits=mv)
+    jt = experiments.joint_trips()
+    for r in jt:
+        print(f"  {r['key']:18s} trades travelling together: {r['joint_trips']} shared trips, ${r['cost_per_job']:.0f} -> ${r['cost_per_job_joint']:.0f} per repair")
+    dz = experiments.disaster()
+    for r in dz:
+        print(f"  {r['label']:22s} flood jobs {r['event_jobs']}, urgent P90 {r['event_urgent_p90']}, rest of hub urgent P90 {r['other_urgent_p90']:.0f} d")
+    pd.DataFrame(dz).to_csv(OUTPUTS / "disaster.csv", index=False)
+    pd.DataFrame(jt).to_csv(OUTPUTS / "joint_trips.csv", index=False)
+    return dict(inclusion=inc, missed_visits=mv, joint_trips=jt, disaster=dz)
 
 
 def extras_only() -> None:

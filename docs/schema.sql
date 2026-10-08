@@ -199,7 +199,9 @@ CREATE TABLE ops.review_request (
   answered_at  timestamptz,
   answered_by  text,                                 -- role, as in the decision ledger
   outcome      text CHECK (outcome IN ('unchanged','rescored','escalated')),
-  answer_text  text                                  -- what the tenant is told, in plain words
+  answer_text  text,                                 -- what the tenant is told, in plain words
+  via          text NOT NULL DEFAULT 'tenant' CHECK (via IN ('tenant','cho','line')),   -- who recorded it for the tenant
+  recorded_by  text NOT NULL DEFAULT current_user
 );
 
 -- The weekly audit: a person re-reads 1 in 20 reports the program read on its own.
@@ -272,12 +274,49 @@ CREATE TABLE ops.escalation (
   PRIMARY KEY (job_id, at)
 );
 
--- The tenant says whether the repair worked. "still broken" reopens it as a repeat.
+-- The tenant says whether the repair worked, themselves or through their housing officer or the repairs line.
+-- "still broken" reopens the job as rework: rework points in ops.job_score, and it keeps reported_at, so its clock has
+-- usually run out and the planner's deadline boost sends it on the next trip. The coordinator picks who goes back.
 CREATE TABLE ops.tenant_confirmation (
-  job_id      bigint PRIMARY KEY REFERENCES ops.job,
+  job_id      bigint NOT NULL REFERENCES ops.job,
   at          timestamptz NOT NULL DEFAULT now(),
   fixed       boolean NOT NULL,
-  note        text
+  note        text,
+  via         text NOT NULL DEFAULT 'tenant' CHECK (via IN ('tenant','cho','line')),
+  recorded_by text NOT NULL DEFAULT current_user,
+  PRIMARY KEY (job_id, at)
+);
+ALTER TABLE ops.job ADD COLUMN reopened_at timestamptz;   -- set when a confirmation says "still broken"
+ALTER TABLE ops.job_score ADD COLUMN rework int NOT NULL DEFAULT 0;
+
+-- A housing officer looks after named communities.
+CREATE TABLE ops.officer_community (
+  db_user      text NOT NULL,
+  community_id text NOT NULL REFERENCES ops.community,
+  PRIMARY KEY (db_user, community_id)
+);
+
+-- A flood, cyclone or fire declared by the coordinator over some communities. Jobs reported there are tagged; the
+-- response (make-safe sweep, one team trip, surge crews from the panel) is a signed decision like the cost setting.
+CREATE TABLE ops.event (
+  event_id     bigserial PRIMARY KEY,
+  kind         text NOT NULL CHECK (kind IN ('flood','cyclone','fire','storm')),
+  communities  text[] NOT NULL CHECK (cardinality(communities) > 0),
+  started_at   timestamptz NOT NULL,
+  ended_at     timestamptz,
+  declared_by  text NOT NULL DEFAULT current_user,
+  surge_crews  jsonb,                                  -- {"plumber": 2, "electrician": 2, ...} asked of the panel, and for how long
+  note         text
+);
+ALTER TABLE ops.job ADD COLUMN event_id bigint REFERENCES ops.event;
+
+-- Trades booked to the same community (or shared trip) in the same week travel together: one vehicle or charter.
+CREATE TABLE ops.trip_share (
+  share_id    bigserial PRIMARY KEY,
+  week_start  date NOT NULL,
+  mode        text NOT NULL,
+  trip_ids    bigint[] NOT NULL CHECK (cardinality(trip_ids) >= 2),   -- one ops.trip per trade
+  vehicle_cost numeric NOT NULL                                        -- paid once
 );
 
 ALTER TABLE ops.job ENABLE ROW LEVEL SECURITY;
@@ -294,6 +333,10 @@ CREATE POLICY job_tradesperson ON ops.job FOR SELECT TO tradesperson USING (
             AND h3_grid_distance(h3_cell_to_parent(h.cell_r10, 5), h3_cell_to_parent(k.cell_r7, 5)) <= 3))
 );
 CREATE POLICY job_coordinator ON ops.job FOR ALL TO coordinator USING (true);
+-- A housing officer sees, and logs, jobs in their own communities only.
+CREATE POLICY job_officer ON ops.job FOR ALL TO housing_officer USING (EXISTS (
+  SELECT 1 FROM ops.house h JOIN ops.officer_community oc ON oc.community_id = h.community_id
+  WHERE h.house_id = ops.job.house_id AND oc.db_user = current_user));
 CREATE POLICY job_intake ON ops.job FOR INSERT TO intake_staff WITH CHECK (true);
 
 -- A tradesperson also sees jobs opened to any contractor of their trade in their hub, so they can accept one.
